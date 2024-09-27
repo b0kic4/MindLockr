@@ -12,6 +12,7 @@ import {
   X,
   Network,
   Home,
+  GlobeLock,
 } from "lucide-react";
 import { NavItem } from "./NavItem";
 import { useSidebarStore } from "@/lib/globalState/sidebarStore";
@@ -32,6 +33,11 @@ export function Sidebar() {
       href: "/keys",
       label: "Keys",
       icon: KeyRound,
+    },
+    {
+      href: "/cipher",
+      label: "Cipher",
+      icon: GlobeLock,
     },
     {
       href: "/credentials",
