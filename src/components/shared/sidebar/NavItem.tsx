@@ -28,11 +28,19 @@ export function NavItem({
       onClick={onClick}
       className={`flex items-center text-nowrap ${
         isDesktop ? "justify-center lg:justify-start" : ""
-      } space-x-2 px-2 hover:text-purple-500 ${
-        isActive ? "text-purple-500 font-semibold" : ""
+      } space-x-2 px-2 transition-colors duration-300 hover:text-purple-500 dark:hover:text-purple-400 ${
+        isActive
+          ? "text-purple-500 dark:text-purple-400 font-semibold"
+          : "text-gray-700 dark:text-gray-300"
       }`}
     >
-      <Icon className="w-6 h-6" />
+      <Icon
+        className={`w-6 h-6 transition-colors duration-300 ${
+          isActive
+            ? "text-purple-500 dark:text-purple-400"
+            : "text-gray-500 dark:text-gray-400"
+        }`}
+      />
       <span className={`${isDesktop ? "hidden lg:block" : ""}`}>{label}</span>
     </Link>
   );

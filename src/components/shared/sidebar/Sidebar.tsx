@@ -1,21 +1,21 @@
 "use client";
 
+import { useSidebarStore } from "@/lib/globalState/sidebarStore";
 import {
+  DatabaseBackup,
   Files,
+  Fingerprint,
+  GlobeLock,
+  Home,
+  IdCard,
   KeyRound,
+  Network,
   NotebookPen,
   UserPen,
   WalletMinimal,
-  Fingerprint,
-  DatabaseBackup,
-  IdCard,
   X,
-  Network,
-  Home,
-  GlobeLock,
 } from "lucide-react";
 import { NavItem } from "./NavItem";
-import { useSidebarStore } from "@/lib/globalState/sidebarStore";
 
 export function Sidebar() {
   const navigationRoutes = [
@@ -86,7 +86,7 @@ export function Sidebar() {
     <>
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-52 bg-white shadow-lg p-4 flex flex-col items-start z-20 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-screen w-52 bg-white dark:bg-background dark:text-foreground shadow-lg p-4 flex flex-col items-start z-20 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:hidden`}
       >
@@ -94,7 +94,7 @@ export function Sidebar() {
         <div className="flex justify-end w-full">
           <button
             onClick={handleCloseSidebar}
-            className="text-gray-500 focus:outline-none"
+            className="text-gray-500 dark:text-gray-300 focus:outline-none"
           >
             <X className="w-6 h-6" />
           </button>
@@ -123,7 +123,7 @@ export function Sidebar() {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-20 lg:w-52 md:h-screen md:bg-white md:shadow-lg md:p-4 md:items-start md:flex-shrink-0">
+      <aside className="hidden md:flex md:flex-col md:w-20 lg:w-52 md:h-screen md:bg-white dark:md:bg-background dark:md:text-foreground md:shadow-lg md:p-4 md:items-start md:flex-shrink-0">
         {/* Navigation */}
         <nav className="flex flex-col space-y-4 mt-8 w-full">
           {navigationRoutes.map((route) => (
