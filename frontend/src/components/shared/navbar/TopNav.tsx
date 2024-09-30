@@ -16,7 +16,7 @@ export function TopNav() {
       <div className="hidden md:flex items-center space-x-2">
         {/* Logo */}
         <div className="w-12 h-12">
-          <img src="/128x128.png" alt="Icon" width={48} height={48} />
+          <img src={logo} alt="Logo" width={48} height={48} />
         </div>
         {/* Title */}
         <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">

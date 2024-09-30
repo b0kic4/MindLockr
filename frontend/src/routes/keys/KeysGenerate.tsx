@@ -74,6 +74,9 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 // encryption when clicked on each it will explain to the user
 // what it is doing and how should they use it
 
+// we should have an option for careating new public private keys
+// for specific encryption or just using the one generated at the start
+
 type GenerateKeyDataRequest = {
   data: string;
   passphrase: string;
@@ -115,21 +118,23 @@ export default function KeysGen() {
       </h2>
 
       {/* Button to Toggle Questions */}
-      <Button
-        variant="ghost"
-        onClick={toggleShowQuestions}
-        className="flex items-center text-primary dark:text-primary-dark"
-      >
-        {toggleQuestions ? (
-          <>
-            Hide Questions <ChevronUp className="ml-2 h-4 w-4" />
-          </>
-        ) : (
-          <>
-            Show Questions <ChevronDown className="ml-2 h-4 w-4" />
-          </>
-        )}
-      </Button>
+      <div className="flex items-center justify-center">
+        <Button
+          variant="ghost"
+          onClick={toggleShowQuestions}
+          className="flex items-center text-primary dark:text-primary-dark"
+        >
+          {toggleQuestions ? (
+            <>
+              Hide Questions <ChevronUp className="ml-2 h-4 w-4" />
+            </>
+          ) : (
+            <>
+              Show Questions <ChevronDown className="ml-2 h-4 w-4" />
+            </>
+          )}
+        </Button>
+      </div>
 
       {/* Conditionally render Questions */}
       {toggleQuestions && (
@@ -184,12 +189,26 @@ export default function KeysGen() {
 
         <TabsContent value="asymmetric">
           <div className="space-y-4">
-            <p className="text-sm text-muted dark:text-muted-foreground">
+            <p className="text-sm text-foreground dark:text-foreground-dark">
               Asymmetric encryption uses a public/private key pair and is
               commonly used for secure sharing of data.
             </p>
+            <Input
+              type="text"
+              placeholder="Data to be encrypted"
+              value={data}
+              onChange={(e) => setData(e.target.value)}
+              className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+            />
+            <Input
+              type="text"
+              placeholder="Public key"
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+            />
             <Select value={algorithm} onValueChange={setAlgorithm}>
-              <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
+              <SelectTrigger className="bg-card dark:bg-background-dark text-foreground dark:text-foreground-dark">
                 <SelectValue placeholder="Select encryption algorithm" />
               </SelectTrigger>
               <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
@@ -198,7 +217,7 @@ export default function KeysGen() {
               </SelectContent>
             </Select>
 
-            <p className="text-sm text-muted dark:text-muted-foreground">
+            <p className="text-sm text-foreground dark:text-foreground-dark">
               Public key will be used for encryption, while the private key is
               used for decryption. You can securely share your public key with
               others to encrypt data for you.

@@ -76,7 +76,7 @@ export default function Questions() {
               You can generate a key pair by selecting the encryption algorithm
               (like RSA or ECC) and clicking "Generate".
             </p>
-            <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
+            <ul className="list-disc list-inside space-y-1 text-sm text-foreground dark:text-foreground-dark">
               <li>Select the encryption type (RSA or ECC).</li>
               <li>Choose the key size (e.g., 2048 or 4096 bits).</li>
               <li>Click "Generate" to create the key pair.</li>
