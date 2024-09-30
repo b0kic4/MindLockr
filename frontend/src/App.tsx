@@ -12,8 +12,8 @@ import KeyringManagement from "./routes/keys/KeyringManagement";
 const KeysLayout = () => {
   return (
     <div>
-      <KeysNav /> {/* Always show KeysNav for all /keys routes */}
-      <Outlet /> {/* This will render the nested routes */}
+      <KeysNav />
+      <Outlet />
     </div>
   );
 };

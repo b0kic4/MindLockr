@@ -1,6 +1,7 @@
 package main
 
 import (
+	"MindLockr/server/cryptography"
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
@@ -12,6 +13,7 @@ import (
 var assets embed.FS
 
 func main() {
+	crypto := &cryptography.Cryptography{}
 	// Create an instance of the app structure
 	app := NewApp()
 
@@ -27,9 +29,9 @@ func main() {
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
+			crypto,
 		},
 	})
-
 	if err != nil {
 		println("Error:", err.Error())
 	}

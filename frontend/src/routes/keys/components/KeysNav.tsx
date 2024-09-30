@@ -4,9 +4,10 @@ export default function KeysNav() {
   return (
     <div className="flex flex-col items-end pt-1">
       <div className="flex space-x-1">
-        {/* NavLink automatically handles the active state */}
+        {/* Add `end` prop to prevent sub-routes from marking this as active */}
         <NavLink
           to="/keys"
+          end
           className={({ isActive }) =>
             `px-4 py-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 ${
               isActive
