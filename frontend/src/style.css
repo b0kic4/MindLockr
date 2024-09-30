@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html {
-  background-color: rgba(27, 38, 54, 1);
+  background-color: hsl(var(--background));
   text-align: center;
   color: hsl(var(--foreground));
 }
@@ -42,8 +42,8 @@ body {
 
 @layer base {
   :root {
-    --background: 240, 100%, 98%; /* Soft light background */
-    --foreground: 210, 15%, 20%; /* Dark foreground for text */
+    --background: 210, 24%, 96%; /* Light background */
+    --foreground: 210, 10%, 23%; /* Dark foreground for text */
     --card: 0, 0%, 100%; /* White card background */
     --card-foreground: 210, 10%, 25%; /* Darker text on cards */
     --popover: 0, 0%, 100%; /* Popover light background */
@@ -61,27 +61,23 @@ body {
     --border: 210, 10%, 80%; /* Light gray borders */
     --input: 210, 10%, 95%; /* Light input background */
     --ring: 220, 90%, 56%; /* Blue ring for focus */
-    --chart-1: 12, 76%, 61%; /* Chart color 1 */
-    --chart-2: 173, 58%, 39%; /* Chart color 2 */
-    --chart-3: 197, 37%, 24%; /* Chart color 3 */
-    --chart-4: 43, 74%, 66%; /* Chart color 4 */
-    --chart-5: 27, 87%, 67%; /* Chart color 5 */
-    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 0, 0%, 10%; /* Dark background */
+    --background: 210, 28%, 12%; /* Dark background */
     --foreground: 0, 0%, 98%; /* Light text on dark */
-    --card: 0, 0%, 15%; /* Darker cards in dark mode */
+    --card: 210, 16%, 20%; /* Slightly lighter card background */
     --card-foreground: 0, 0%, 90%; /* Lighter text on cards */
-    --primary: 220, 90%, 75%; /* Lighter primary blue */
-    --primary-foreground: 0, 0%, 10%; /* Dark text on primary in dark mode */
-    --secondary: 190, 45%, 25%; /* Darker secondary teal */
-    --secondary-foreground: 0, 0%, 98%; /* Light text on secondary */
-    --muted: 210, 20%, 20%; /* Muted dark background */
-    --muted-foreground: 210, 15%, 70%; /* Lighter text on muted */
-    --accent: 280, 65%, 50%; /* Accent for dark mode */
-    --accent-foreground: 0, 0%, 98%; /* White text on accent */
+    --primary: 220, 80%, 70%; /* Brighter primary blue */
+    --primary-foreground: 0, 0%, 10%; /* Darker text on bright primary */
+    --secondary: 190, 40%, 35%; /* Muted dark teal */
+    --secondary-foreground: 0, 0%, 98%; /* Lighter text on secondary */
+    --muted: 210, 20%, 20%; /* Muted background */
+    --muted-foreground: 210, 15%, 70%; /* Muted text */
+    --accent: 280, 65%, 50%; /* Accent color for dark mode */
+    --accent-foreground: 0, 0%, 98%; /* Light text on accent */
+    --destructive: 0, 50%, 40%; /* Muted red for destructive */
+    --destructive-foreground: 0, 0%, 98%; /* Light text on destructive */
   }
 
   * {

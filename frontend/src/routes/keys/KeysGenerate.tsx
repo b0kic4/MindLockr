@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -7,8 +6,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React from "react";
 import { EncryptAES } from "../../../wailsjs/go/cryptography/Cryptography";
+import Questions from "./components/Questions";
+import { Button } from "@/components/ui/button";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 // one encryption for sending the data to other people
 // one encryption for saving their own data
@@ -37,14 +40,15 @@ import { EncryptAES } from "../../../wailsjs/go/cryptography/Cryptography";
 // RSA Encryption: Widely used for both encryption and digital signatures. Recommended for general use.
 // ECC Encryption: Suitable for smaller, more efficient encryption, especially on mobile devices or systems with limited resources.
 // Signing: Use the private key to sign data, which can be verified with the public key. This proves the authenticity of the data.
-// Hybrid Encryption: For large data, you can use a hybrid encryption approach where a symmetric key (e.g., AES) is used to encrypt the data, and the symmetric key is encrypted with the public key.
+// Hybrid Encryption: For large data, you can use a hybrid encryption approach where a symmetric key (e.g., AES) is used to encrypt the data,
+// and the symmetric key is encrypted with the public key.
 
 // tabs for user to choose the type of encryption method needed
 
 // +-----------------------------------------------------+
 // | Key Generation                                      |
 // +-----------------------------------------------------+
-// | [Form Fields]                | [Live Key Preview]  |
+// | [Form Fields]                 | [Live Key Preview]  |
 // | Key Type (Dropdown)           | Algorithm: RSA      |
 // | Key Size (Dropdown)           | Key Size: 4096 bits |
 // | Expiration Date (Picker)      | Usage: Signing, Enc |
@@ -53,6 +57,23 @@ import { EncryptAES } from "../../../wailsjs/go/cryptography/Cryptography";
 // |          [Generate Key Button]                      |
 // +-----------------------------------------------------+
 
+// add a generate private and public key
+// (and make the important note which should be shared)
+
+// also make if in file registry there is public and private key
+// for user not to be able to create more of them
+
+// so the key gen needs to have:
+// 1. private/public key generation
+// 2. sensitive information encryption in key with passphrase decryption
+// like passwords, location, codes and etc
+// 3. PGP asymmetric keys encryption:
+// storing the secure information with public/private key access
+
+// so there should be a tabs bar that will show symmetric and asymmetric
+// encryption when clicked on each it will explain to the user
+// what it is doing and how should they use it
+
 type GenerateKeyDataRequest = {
   data: string;
   passphrase: string;
@@ -60,76 +81,151 @@ type GenerateKeyDataRequest = {
 };
 
 export default function KeysGen() {
-  const [data, setData] = React.useState<string>("");
+  const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
   const [encryptedData, setEncryptedData] = React.useState("");
+  const [keyType, setKeyType] = React.useState("symmetric");
+  const [toggleQuestions, setToggleQuestions] = React.useState<boolean>(false);
 
-  // Call Go backend for encryption
+  // Correct function to toggle visibility
+  const toggleShowQuestions = () => {
+    setToggleQuestions((prevState) => !prevState); // Simply toggle between true and false
+  };
+
+  // Handle key generation for symmetric and asymmetric encryption
   const handleGenerateKey = async () => {
-    const requestData: GenerateKeyDataRequest = {
-      data,
-      passphrase,
-      algorithm,
-    };
-
+    if (!data || !passphrase) {
+      alert("Please provide data and passphrase");
+      return;
+    }
+    const requestData: GenerateKeyDataRequest = { data, passphrase, algorithm };
     try {
       const encrypted = await EncryptAES(requestData);
-      console.log("Encrypted Data:", encrypted); // Log the encrypted result from Go
-      setEncryptedData(encrypted); // Display the encrypted result
+      setEncryptedData(encrypted);
     } catch (error) {
       console.error("Encryption failed:", error);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h2 className="text-xl font-semibold mb-4">Key Generation</h2>
+    <div className="max-w-xl mx-auto p-6 space-y-6 rounded-lg">
+      <h2 className="text-2xl font-semibold text-foreground dark:text-foreground-dark">
+        Key Generation & Encryption
+      </h2>
 
-      {/* Input for Data */}
-      <div className="flex mb-4 gap-2">
-        <input
-          type="text"
-          placeholder="Data to be encrypted"
-          value={data}
-          onChange={(e) => setData(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-        <input
-          type="text"
-          placeholder="Passphrase for Encryption"
-          value={passphrase}
-          onChange={(e) => setPassphrase(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-      </div>
-
-      {/* Select Algorithm */}
-      <div className="mb-4">
-        <select
-          value={algorithm}
-          onChange={(e) => setAlgorithm(e.target.value)}
-          className="border p-2 rounded w-full"
-        >
-          <option value="AES">AES</option>
-          <option value="RSA">RSA</option>
-          <option value="ChaCha20">ChaCha20</option>
-        </select>
-      </div>
-
-      {/* Generate Button */}
-      <button
-        onClick={handleGenerateKey}
-        className="bg-blue-500 text-white p-2 rounded w-full"
+      {/* Button to Toggle Questions */}
+      <Button
+        variant="ghost"
+        onClick={toggleShowQuestions}
+        className="flex items-center text-primary dark:text-primary-dark"
       >
-        Generate Key
-      </button>
+        {toggleQuestions ? (
+          <>
+            Hide Questions <ChevronUp className="ml-2 h-4 w-4" />
+          </>
+        ) : (
+          <>
+            Show Questions <ChevronDown className="ml-2 h-4 w-4" />
+          </>
+        )}
+      </Button>
+
+      {/* Conditionally render Questions */}
+      {toggleQuestions && (
+        <div className="mt-4">
+          <Questions />
+        </div>
+      )}
+
+      <Tabs
+        defaultValue="symmetric"
+        onValueChange={setKeyType}
+        className="w-full mt-6"
+      >
+        <TabsList className="mb-4 bg-muted dark:bg-muted-dark">
+          <TabsTrigger value="symmetric">Symmetric Encryption</TabsTrigger>
+          <TabsTrigger value="asymmetric">Asymmetric Encryption</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="symmetric">
+          <div className="space-y-4">
+            <p className="text-sm text-foreground dark:text-foreground-dark">
+              Symmetric encryption uses the same key for encryption and
+              decryption. This is ideal for storing sensitive information
+              securely.
+            </p>
+            <Input
+              type="text"
+              placeholder="Data to be encrypted"
+              value={data}
+              onChange={(e) => setData(e.target.value)}
+              className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+            />
+            <Input
+              type="text"
+              placeholder="Passphrase for Encryption"
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+            />
+            <Select value={algorithm} onValueChange={setAlgorithm}>
+              <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
+                <SelectValue placeholder="Select encryption algorithm" />
+              </SelectTrigger>
+              <SelectContent className="bg-card dark:bg-card-dark">
+                <SelectItem value="AES">AES</SelectItem>
+                <SelectItem value="DES">DES</SelectItem>
+                <SelectItem value="TDEA">TDEA</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="asymmetric">
+          <div className="space-y-4">
+            <p className="text-sm text-muted dark:text-muted-foreground">
+              Asymmetric encryption uses a public/private key pair and is
+              commonly used for secure sharing of data.
+            </p>
+            <Select value={algorithm} onValueChange={setAlgorithm}>
+              <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
+                <SelectValue placeholder="Select encryption algorithm" />
+              </SelectTrigger>
+              <SelectContent className="bg-card dark:bg-card-dark">
+                <SelectItem value="RSA">RSA</SelectItem>
+                <SelectItem value="ECC">ECC</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <p className="text-sm text-muted dark:text-muted-foreground">
+              Public key will be used for encryption, while the private key is
+              used for decryption. You can securely share your public key with
+              others to encrypt data for you.
+            </p>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Generate Key Button */}
+      <Button
+        onClick={handleGenerateKey}
+        className="bg-blue-500 text-white p-3 rounded w-full"
+      >
+        {keyType === "symmetric"
+          ? "Encrypt Data with Symmetric Key"
+          : "Generate Public/Private Key Pair"}
+      </Button>
 
       {/* Display Encrypted Data */}
       {encryptedData && (
-        <div className="mt-4 p-4 bg-gray-200 dark:bg-gray-700 rounded">
-          <h3 className="text-lg font-semibold">Encrypted Data:</h3>
-          <p className="text-sm break-all">{encryptedData}</p>
+        <div className="mt-4 p-4 bg-muted dark:bg-muted-dark rounded">
+          <h3 className="text-lg font-semibold text-foreground dark:text-foreground-dark">
+            Encrypted Data:
+          </h3>
+          <p className="text-sm break-all text-foreground dark:text-foreground-dark">
+            {encryptedData}
+          </p>
         </div>
       )}
     </div>
