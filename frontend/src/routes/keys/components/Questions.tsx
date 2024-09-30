@@ -14,7 +14,7 @@ export default function Questions() {
             How to use this tool?
           </AccordionTrigger>
           <AccordionContent className="pl-4">
-            <p className="mb-4 text-gray-700 dark:text-gray-300">
+            <p className="mb-4 text-foreground dark:text-foreground-dark">
               This tool helps you encrypt data using either symmetric or
               asymmetric encryption methods. Choose the right encryption type
               based on your needs.
@@ -26,11 +26,11 @@ export default function Questions() {
               className="nested-accordion space-y-2"
             >
               <AccordionItem value="item-1-1">
-                <AccordionTrigger className="text-base font-semibold text-indigo-600 hover:underline">
+                <AccordionTrigger className="text-base font-semibold text-red-500 hover:underline">
                   What encryption type should I choose?
                 </AccordionTrigger>
                 <AccordionContent className="pl-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-foreground dark:text-foreground-dark">
                     The encryption type you choose depends on your use case. You
                     can use either symmetric encryption for personal data
                     storage or asymmetric encryption for sharing data securely
@@ -46,8 +46,8 @@ export default function Questions() {
           <AccordionTrigger className="text-lg font-medium text-gray-800 dark:text-gray-200">
             When should I use symmetric encryption?
           </AccordionTrigger>
-          <AccordionContent className="pl-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <AccordionContent className="pl-4 text-foreground dark:text-foreground-dark">
+            <p className="mb-4 text-foreground dark:text-foreground-dark">
               Symmetric encryption is best when you're storing or encrypting
               your own data, and you don’t need to share it with others.
             </p>
@@ -59,7 +59,7 @@ export default function Questions() {
             When should I use asymmetric encryption?
           </AccordionTrigger>
           <AccordionContent className="pl-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="mb-4 text-foreground dark:text-foreground-dark">
               Asymmetric encryption is useful for secure data sharing with
               others because you can safely share your public key while keeping
               your private key secret.
@@ -72,7 +72,7 @@ export default function Questions() {
             How do I generate a public/private key pair?
           </AccordionTrigger>
           <AccordionContent className="pl-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="mb-4 text-foreground dark:text-foreground-dark">
               You can generate a key pair by selecting the encryption algorithm
               (like RSA or ECC) and clicking "Generate".
             </p>

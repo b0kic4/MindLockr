@@ -54,8 +54,10 @@ export function Navbar() {
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
-            <NavigationMenuContent>
+            <NavigationMenuTrigger className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
+              Getting started
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
               <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                 <li className="row-span-3">
                   <NavigationMenuLink asChild>
@@ -87,8 +89,10 @@ export function Navbar() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Components</NavigationMenuTrigger>
-            <NavigationMenuContent>
+            <NavigationMenuTrigger className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
+              Components
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
               <ul className="grid w-[300px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                 {components.map((component) => (
                   <ListItem

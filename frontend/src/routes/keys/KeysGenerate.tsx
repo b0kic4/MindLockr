@@ -173,7 +173,7 @@ export default function KeysGen() {
               <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
                 <SelectValue placeholder="Select encryption algorithm" />
               </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark">
+              <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
                 <SelectItem value="AES">AES</SelectItem>
                 <SelectItem value="DES">DES</SelectItem>
                 <SelectItem value="TDEA">TDEA</SelectItem>
@@ -192,7 +192,7 @@ export default function KeysGen() {
               <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
                 <SelectValue placeholder="Select encryption algorithm" />
               </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark">
+              <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
                 <SelectItem value="RSA">RSA</SelectItem>
                 <SelectItem value="ECC">ECC</SelectItem>
               </SelectContent>
