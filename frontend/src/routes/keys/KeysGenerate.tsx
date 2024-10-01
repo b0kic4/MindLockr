@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -7,11 +8,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
-import { EncryptAES } from "../../../wailsjs/go/cryptography/Cryptography";
+import { EncryptAES } from "../../../wailsjs/go/encryption/Cryptography.js";
+import AlgorithmTypeDescription from "./components/AlgorithmTypeDescription";
 import Questions from "./components/Questions";
-import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown } from "lucide-react";
 
 // one encryption for sending the data to other people
 // one encryption for saving their own data
@@ -81,30 +83,58 @@ type GenerateKeyDataRequest = {
   data: string;
   passphrase: string;
   algorithm: string;
+  algorithmType: string;
 };
 
 export default function KeysGen() {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
+  const [algorithmType, setAlgorithmType] = React.useState<string>("");
   const [encryptedData, setEncryptedData] = React.useState("");
   const [keyType, setKeyType] = React.useState("symmetric");
   const [toggleQuestions, setToggleQuestions] = React.useState<boolean>(false);
+  const { toast } = useToast();
 
-  // Correct function to toggle visibility
   const toggleShowQuestions = () => {
-    setToggleQuestions((prevState) => !prevState); // Simply toggle between true and false
+    setToggleQuestions((prevState) => !prevState);
   };
 
-  // Handle key generation for symmetric and asymmetric encryption
   const handleGenerateKey = async () => {
+    const isASCII = (str: string) => /^[\x00-\x7F]*$/.test(str);
+
     if (!data || !passphrase) {
       alert("Please provide data and passphrase");
+      toast({
+        variant: "default",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description: "Please provide data and passphrase",
+      });
       return;
     }
-    const requestData: GenerateKeyDataRequest = { data, passphrase, algorithm };
+
+    if (!isASCII(data) || !isASCII(passphrase)) {
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description:
+          "Please only use ASCII type characters where 1 character = 1 byte",
+      });
+      return;
+    }
+
+    const requestData: GenerateKeyDataRequest = {
+      data,
+      passphrase,
+      algorithm,
+      algorithmType,
+    };
+
     try {
       const encrypted = await EncryptAES(requestData);
+      console.log("encrypted: ", encrypted);
       setEncryptedData(encrypted);
     } catch (error) {
       console.error("Encryption failed:", error);
@@ -136,7 +166,6 @@ export default function KeysGen() {
         </Button>
       </div>
 
-      {/* Conditionally render Questions */}
       {toggleQuestions && (
         <div className="mt-4">
           <Questions />
@@ -184,6 +213,27 @@ export default function KeysGen() {
                 <SelectItem value="TDEA">TDEA</SelectItem>
               </SelectContent>
             </Select>
+            {algorithm === "AES" && (
+              <>
+                <Select value={algorithmType} onValueChange={setAlgorithmType}>
+                  <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
+                    <SelectValue placeholder="Select AES Encryption Type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
+                    <SelectItem value="AES-128">
+                      AES - 128 (16 character Passphrase)
+                    </SelectItem>
+                    <SelectItem value="AES-192">
+                      AES - 192 (24 character Passphrase)
+                    </SelectItem>
+                    <SelectItem value="AES-256">
+                      AES - 256 (32 character Passphrase)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <AlgorithmTypeDescription algorithmType={algorithmType} />
+              </>
+            )}
           </div>
         </TabsContent>
 

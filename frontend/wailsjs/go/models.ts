@@ -1,9 +1,10 @@
-export namespace cryptography {
+export namespace encryption {
 	
 	export class RequestData {
 	    data: string;
 	    passphrase: string;
 	    algorithm: string;
+	    algorithmType: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RequestData(source);
@@ -14,6 +15,7 @@ export namespace cryptography {
 	        this.data = source["data"];
 	        this.passphrase = source["passphrase"];
 	        this.algorithm = source["algorithm"];
+	        this.algorithmType = source["algorithmType"];
 	    }
 	}
 

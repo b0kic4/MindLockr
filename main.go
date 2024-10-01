@@ -1,7 +1,7 @@
 package main
 
 import (
-	"MindLockr/server/cryptography"
+	"MindLockr/server/cryptography/encryption"
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
@@ -13,7 +13,7 @@ import (
 var assets embed.FS
 
 func main() {
-	crypto := &cryptography.Cryptography{}
+	crypto := &encryption.Cryptography{}
 	// Create an instance of the app structure
 	app := NewApp()
 
