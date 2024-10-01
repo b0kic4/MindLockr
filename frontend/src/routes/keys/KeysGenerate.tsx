@@ -258,7 +258,7 @@ export default function KeysGen() {
               className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
             />
             <Select value={algorithm} onValueChange={setAlgorithm}>
-              <SelectTrigger className="bg-card dark:bg-background-dark text-foreground dark:text-foreground-dark">
+              <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
                 <SelectValue placeholder="Select encryption algorithm" />
               </SelectTrigger>
               <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
@@ -266,7 +266,6 @@ export default function KeysGen() {
                 <SelectItem value="ECC">ECC</SelectItem>
               </SelectContent>
             </Select>
-
             <p className="text-sm text-foreground dark:text-foreground-dark">
               Public key will be used for encryption, while the private key is
               used for decryption. You can securely share your public key with
