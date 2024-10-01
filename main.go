@@ -2,7 +2,7 @@ package main
 
 import (
 	"MindLockr/server/cryptography/encryption"
-	"MindLockr/server/filesystem/initializeFolder"
+	"MindLockr/server/filesystem"
 	"context"
 	"embed"
 
@@ -16,11 +16,10 @@ var assets embed.FS
 
 func main() {
 	crypto := &encryption.Cryptography{}
-	folderInit := &initializeFolder.InitializeFolder{}
-	// Create an instance of the app structure
+	folder := filesystem.NewFolder()
+
 	app := NewApp()
 
-	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "MindLockr",
 		Width:  1024,
@@ -31,12 +30,12 @@ func main() {
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup: func(ctx context.Context) {
 			app.startup(ctx)
-			folderInit.SetContext(ctx)
+			folder.SetContext(ctx)
 		},
 		Bind: []interface{}{
 			app,
 			crypto,
-			folderInit,
+			folder,
 		},
 	})
 	if err != nil {
