@@ -11,7 +11,7 @@ import (
 
 type Folder struct {
 	folderPath string
-	ctx        context.Context // Added context for Wails runtime
+	ctx        context.Context // wails app runtime context
 }
 
 // NewFolder creates a new instance of Folder with an empty folder path

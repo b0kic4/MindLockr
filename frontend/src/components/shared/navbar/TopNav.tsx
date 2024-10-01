@@ -1,6 +1,5 @@
 import { ModeToggle } from "@/components/mode-toggle";
 import logo from "@/assets/images/logo-universal.png";
-import { Navbar } from "./Navbar";
 
 export function TopNav() {
   return (
@@ -24,10 +23,14 @@ export function TopNav() {
         </h3>
       </div>
 
-      {/* Navbar Centered */}
-      <div className="flex-1 flex justify-center">
-        <Navbar />
-        <ModeToggle />
+      <div className="flex-1 flex justify-between items-center">
+        <p className="hidden md:block text-center text-foreground dark:text-foreground-dark mx-auto font-semibold">
+          MindLockr: Secure Your Files, Safeguard Your Privacy.
+        </p>
+
+        <div className="ml-auto">
+          <ModeToggle />
+        </div>
       </div>
     </div>
   );
