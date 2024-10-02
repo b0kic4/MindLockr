@@ -6,6 +6,8 @@ import {
   UpdateFolderPath,
 } from "../../wailsjs/go/filesystem/Folder.js";
 
+// create folder locking?
+
 export default function Home() {
   const [folderPath, setFolderPath] = React.useState("");
 

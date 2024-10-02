@@ -15,8 +15,10 @@ type DataToDecrypt struct {
 	Passphrase    string `json:"passphrase"`
 }
 
+type Cryptography struct{}
+
 // AES128Decryption decrypts AES-128 encrypted data
-func AES128Decryption(data DataToDecrypt) (string, error) {
+func (c *Cryptography) AES128Decryption(data DataToDecrypt) (string, error) {
 	// Decode the hex-encoded encrypted string into bytes
 	encryptedBytes, err := hex.DecodeString(data.EncryptedData)
 	if err != nil {
@@ -55,7 +57,7 @@ func AES128Decryption(data DataToDecrypt) (string, error) {
 }
 
 // AES192Decryption decrypts AES-192 encrypted data
-func AES192Decryption(data DataToDecrypt) (string, error) {
+func (c *Cryptography) AES192Decryption(data DataToDecrypt) (string, error) {
 	// Decode the hex-encoded encrypted string into bytes
 	encryptedBytes, err := hex.DecodeString(data.EncryptedData)
 	if err != nil {
@@ -94,7 +96,7 @@ func AES192Decryption(data DataToDecrypt) (string, error) {
 }
 
 // AES256Decryption decrypts AES-256 encrypted data
-func AES256Decryption(data DataToDecrypt) (string, error) {
+func (c *Cryptography) AES256Decryption(data DataToDecrypt) (string, error) {
 	// Decode the hex-encoded encrypted string into bytes
 	encryptedBytes, err := hex.DecodeString(data.EncryptedData)
 	if err != nil {

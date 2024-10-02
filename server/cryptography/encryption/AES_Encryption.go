@@ -21,6 +21,10 @@ type RequestData struct {
 
 type Cryptography struct{}
 
+// when encrypting for the local
+// we can have algorithm used for filesystem based
+// but when sharing it that wont be secure
+
 // EncryptAES performs AES encryption using AES-CFB mode
 func (c *Cryptography) EncryptAES(req RequestData) (string, error) {
 	if req.Algorithm != "AES" {
