@@ -3,6 +3,7 @@ package main
 import (
 	"MindLockr/server/cryptography/encryption"
 	"MindLockr/server/filesystem"
+	"MindLockr/server/filesystem/keys" // Import the keys package
 	"context"
 	"embed"
 
@@ -17,7 +18,8 @@ var assets embed.FS
 func main() {
 	crypto := &encryption.Cryptography{}
 	folder := filesystem.NewFolder()
-	keyStore := &filesystem.KeyStore{}
+	keyRetrieve := keys.NewKeyRetrieve(folder)
+	keyStore := &keys.KeyStore{}
 
 	app := NewApp()
 
@@ -31,12 +33,13 @@ func main() {
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup: func(ctx context.Context) {
 			app.startup(ctx)
-			folder.SetContext(ctx)
+			folder.SetContext(ctx) // Set the Wails context for the Folder instance
 		},
 		Bind: []interface{}{
 			app,
 			crypto,
 			folder,
+			keyRetrieve,
 			keyStore,
 		},
 	})

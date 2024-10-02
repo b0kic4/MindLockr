@@ -16,7 +16,7 @@ import AlgorithmTypeDescription from "./components/AlgorithmTypeDescription";
 import Questions from "./components/Questions";
 import { getFolderPathClientHook } from "@/hooks/getFolderPathClinet.js";
 import { LogDebug } from "../../../wailsjs/runtime/runtime";
-import { SaveKey as SaveKeyToFilesystem } from "../../../wailsjs/go/filesystem/KeyStore.js";
+import { SaveSymmetricKey } from "../../../wailsjs/go/keys/KeyStore";
 
 // one encryption for sending the data to other people
 // one encryption for saving their own data
@@ -175,7 +175,7 @@ export default function KeysGen() {
       });
     }
     try {
-      await SaveKeyToFilesystem(folderPath, keyFileName, encryptedData);
+      await SaveSymmetricKey(folderPath, keyFileName, encryptedData);
       toast({
         variant: "default",
         className: "border-0",
