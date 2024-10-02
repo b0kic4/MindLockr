@@ -11,12 +11,13 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:frontend/dist
+//go:embed all:frontend/*
 var assets embed.FS
 
 func main() {
 	crypto := &encryption.Cryptography{}
 	folder := filesystem.NewFolder()
+	keyStore := &filesystem.KeyStore{}
 
 	app := NewApp()
 
@@ -36,6 +37,7 @@ func main() {
 			app,
 			crypto,
 			folder,
+			keyStore,
 		},
 	})
 	if err != nil {

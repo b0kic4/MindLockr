@@ -3,11 +3,20 @@ package filesystem
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
+
+type FolderPathFromClient struct {
+	Path string `json:"path"`
+}
+
+func (f *Folder) UpdateFolderPath(folderPath string) {
+	f.folderPath = folderPath
+}
 
 type Folder struct {
 	folderPath string
@@ -45,6 +54,7 @@ func (f *Folder) SelectFolder() (string, error) {
 
 // GetFolderPath returns the currently selected folder path
 func (f *Folder) GetFolderPath() string {
+	fmt.Println("folderPath: ", f.folderPath)
 	return f.folderPath
 }
 

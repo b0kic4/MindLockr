@@ -25,3 +25,7 @@ export function SelectFolder() {
 export function SetContext(arg1) {
   return window['go']['filesystem']['Folder']['SetContext'](arg1);
 }
+
+export function UpdateFolderPath(arg1) {
+  return window['go']['filesystem']['Folder']['UpdateFolderPath'](arg1);
+}

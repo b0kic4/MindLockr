@@ -13,3 +13,5 @@ export function RemoveFile(arg1:string):Promise<void>;
 export function SelectFolder():Promise<string>;
 
 export function SetContext(arg1:context.Context):Promise<void>;
+
+export function UpdateFolderPath(arg1:string):Promise<void>;

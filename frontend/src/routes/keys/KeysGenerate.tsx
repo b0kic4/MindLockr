@@ -14,6 +14,9 @@ import React from "react";
 import { EncryptAES } from "../../../wailsjs/go/encryption/Cryptography.js";
 import AlgorithmTypeDescription from "./components/AlgorithmTypeDescription";
 import Questions from "./components/Questions";
+import { getFolderPathClientHook } from "@/hooks/getFolderPathClinet.js";
+import { LogDebug } from "../../../wailsjs/runtime/runtime";
+import { SaveKey as SaveKeyToFilesystem } from "../../../wailsjs/go/filesystem/KeyStore.js";
 
 // one encryption for sending the data to other people
 // one encryption for saving their own data
@@ -94,6 +97,7 @@ export default function KeysGen() {
   const [encryptedData, setEncryptedData] = React.useState("");
   const [keyType, setKeyType] = React.useState("symmetric");
   const [toggleQuestions, setToggleQuestions] = React.useState<boolean>(false);
+  const [keyFileName, setKeyFileName] = React.useState("");
   const { toast } = useToast();
 
   const toggleShowQuestions = () => {
@@ -141,13 +145,54 @@ export default function KeysGen() {
     }
   };
 
+  const handleSaveKey = async () => {
+    const folderPath = getFolderPathClientHook();
+    if (!folderPath) {
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description: "Path to folder not found",
+      });
+      return;
+    }
+
+    if (!keyFileName) {
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description: "Filename for key not provided",
+      });
+    }
+
+    if (!encryptedData) {
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description: "Seems like there is nothing to save",
+      });
+    }
+    try {
+      await SaveKeyToFilesystem(folderPath, keyFileName, encryptedData);
+      toast({
+        variant: "default",
+        className: "border-0",
+        title: "Key Saved successfully",
+      });
+    } catch (error) {
+      LogDebug("an error ocurred when saving the key:");
+      LogDebug(error as any);
+    }
+  };
+
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6 rounded-lg">
       <h2 className="text-2xl font-semibold text-foreground dark:text-foreground-dark">
         Key Generation & Encryption
       </h2>
 
-      {/* Button to Toggle Questions */}
       <div className="flex items-center justify-center">
         <Button
           variant="ghost"
@@ -287,13 +332,33 @@ export default function KeysGen() {
 
       {/* Display Encrypted Data */}
       {encryptedData && (
-        <div className="mt-4 p-4 bg-muted dark:bg-muted-dark rounded">
+        <div className="flex flex-col space-y-4 p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-foreground dark:text-foreground-dark">
-            Encrypted Data:
+            Encrypted Data
           </h3>
-          <p className="text-sm break-all text-foreground dark:text-foreground-dark">
-            {encryptedData}
-          </p>
+
+          <div className="p-3 bg-card dark:bg-card-dark rounded-lg overflow-x-auto">
+            <p className="text-sm break-words text-foreground dark:text-foreground-dark">
+              {encryptedData}
+            </p>
+          </div>
+
+          {/* File name input for saving key */}
+          <Input
+            type="text"
+            placeholder="Enter the name for the key file"
+            value={keyFileName}
+            onChange={(e) => setKeyFileName(e.target.value)}
+            className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+          />
+
+          {/* Save Key Button */}
+          <Button
+            onClick={handleSaveKey}
+            className="self-end bg-green-700 hover:bg-green-800 text-white p-2 rounded-lg"
+          >
+            Save Key
+          </Button>
         </div>
       )}
     </div>

@@ -3,33 +3,36 @@ import React from "react";
 import {
   SelectFolder,
   GetFolderPath,
+  UpdateFolderPath,
 } from "../../wailsjs/go/filesystem/Folder.js";
 
 export default function Home() {
   const [folderPath, setFolderPath] = React.useState("");
 
-  // Check if there is a folder path saved in localStorage
   function checkForFolderPathInLocalStorage() {
     const savedFolderPath = localStorage.getItem("folderPath");
     if (savedFolderPath) {
       setFolderPath(savedFolderPath);
+      UpdateFolderPath(savedFolderPath);
       return true;
     }
     return false;
   }
 
-  // Function to select a folder and store it in localStorage
   async function pickFolder() {
     try {
       const folder = await SelectFolder();
       setFolderPath(folder);
       localStorage.setItem("folderPath", folder);
+      const path = localStorage.getItem("folderPath");
+      if (path) {
+        UpdateFolderPath(path);
+      }
     } catch (error) {
       console.error("Error selecting folder:", error);
     }
   }
 
-  // Effect to initialize folder path on component mount
   React.useEffect(() => {
     async function initializeFolderPath() {
       const localStorageFound = checkForFolderPathInLocalStorage();
@@ -40,6 +43,10 @@ export default function Home() {
           if (systemPath) {
             setFolderPath(systemPath);
             localStorage.setItem("folderPath", systemPath);
+            const path = localStorage.getItem("folderPath");
+            if (path) {
+              UpdateFolderPath(path);
+            }
           }
         } catch (error) {
           console.error("Error fetching folder path:", error);
@@ -50,21 +57,23 @@ export default function Home() {
     initializeFolderPath();
   }, []);
 
-  // Function to change the folder path
   async function changeFolderPath() {
     try {
       const folder = await SelectFolder();
       setFolderPath(folder);
       localStorage.setItem("folderPath", folder);
+      const path = localStorage.getItem("folderPath");
+      if (path) {
+        UpdateFolderPath(path);
+      }
     } catch (error) {
       console.error("Error selecting folder:", error);
     }
   }
 
-  // Function to remove the folder path from both state and localStorage
   function removeFolderPath() {
-    setFolderPath(""); // Clear the state
-    localStorage.removeItem("folderPath"); // Remove from localStorage
+    setFolderPath("");
+    localStorage.removeItem("folderPath");
   }
 
   return (
@@ -74,7 +83,7 @@ export default function Home() {
       </div>
 
       {!folderPath && (
-        <div className="flex items-center justify-center text-center my-4 p-6 rounded-md max-w-2xl text-center shadow-md">
+        <div className="flex items-center justify-center my-4 p-6 rounded-md max-w-2xl text-center shadow-md">
           <p className="mt-4 text-red-500">
             Please choose a folder where you want to store encrypted data.
           </p>

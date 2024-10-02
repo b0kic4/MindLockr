@@ -20,6 +20,19 @@ export default function KeysNav() {
         </NavLink>
 
         <NavLink
+          to="/keys/keyring"
+          className={({ isActive }) =>
+            `px-4 py-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 ${
+              isActive
+                ? "text-purple-500 dark:text-purple-400 font-semibold"
+                : "text-gray-700 dark:text-gray-300"
+            }`
+          }
+        >
+          Keyring Management
+        </NavLink>
+
+        <NavLink
           to="/keys/generate"
           className={({ isActive }) =>
             `px-4 py-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 ${
@@ -56,19 +69,6 @@ export default function KeysNav() {
           }
         >
           Import Export
-        </NavLink>
-
-        <NavLink
-          to="/keys/keyring"
-          className={({ isActive }) =>
-            `px-4 py-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 ${
-              isActive
-                ? "text-purple-500 dark:text-purple-400 font-semibold"
-                : "text-gray-700 dark:text-gray-300"
-            }`
-          }
-        >
-          Keyring Management
         </NavLink>
       </div>
     </div>
