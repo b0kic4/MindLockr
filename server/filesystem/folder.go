@@ -3,7 +3,6 @@ package filesystem
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -54,7 +53,6 @@ func (f *Folder) SelectFolder() (string, error) {
 
 // GetFolderPath returns the currently selected folder path
 func (f *Folder) GetFolderPath() string {
-	fmt.Println("folderPath: ", f.folderPath)
 	return f.folderPath
 }
 

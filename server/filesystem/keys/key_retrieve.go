@@ -21,7 +21,6 @@ func NewKeyRetrieve(folder *filesystem.Folder) *KeyRetrieve {
 func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]string, error) {
 	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()
-	fmt.Println("Retrieved folder path:", folderPath)
 
 	// Define the keys subdirectory
 	keysFolderPath := filepath.Join(folderPath, "keys/symmetric")
@@ -53,7 +52,6 @@ func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]string, error) {
 func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]string, error) {
 	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()
-	fmt.Println("Retrieved folder path:", folderPath)
 
 	// Define the keys subdirectory
 	keysFolderPath := filepath.Join(folderPath, "keys/asymmetric")
