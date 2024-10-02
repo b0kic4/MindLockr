@@ -1,61 +1,106 @@
-import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button.js";
+import React from "react";
 import {
   SelectFolder,
   GetFolderPath,
 } from "../../wailsjs/go/filesystem/Folder.js";
 
 export default function Home() {
-  const [folderPath, setFolderPath] = useState("");
+  const [folderPath, setFolderPath] = React.useState("");
 
+  // Check if there is a folder path saved in localStorage
+  function checkForFolderPathInLocalStorage() {
+    const savedFolderPath = localStorage.getItem("folderPath");
+    if (savedFolderPath) {
+      setFolderPath(savedFolderPath);
+      return true;
+    }
+    return false;
+  }
+
+  // Function to select a folder and store it in localStorage
   async function pickFolder() {
     try {
       const folder = await SelectFolder();
       setFolderPath(folder);
+      localStorage.setItem("folderPath", folder);
     } catch (error) {
       console.error("Error selecting folder:", error);
     }
   }
 
-  useEffect(() => {
-    async function fetchFolderPath() {
-      try {
-        const path = await GetFolderPath();
-        if (path) {
-          setFolderPath(path); // Set the folder path in the state
+  // Effect to initialize folder path on component mount
+  React.useEffect(() => {
+    async function initializeFolderPath() {
+      const localStorageFound = checkForFolderPathInLocalStorage();
+
+      if (!localStorageFound) {
+        try {
+          const systemPath = await GetFolderPath();
+          if (systemPath) {
+            setFolderPath(systemPath);
+            localStorage.setItem("folderPath", systemPath);
+          }
+        } catch (error) {
+          console.error("Error fetching folder path:", error);
         }
-      } catch (error) {
-        console.error("Error fetching folder path:", error);
       }
     }
-    fetchFolderPath();
+
+    initializeFolderPath();
   }, []);
+
+  // Function to change the folder path
+  async function changeFolderPath() {
+    try {
+      const folder = await SelectFolder();
+      setFolderPath(folder);
+      localStorage.setItem("folderPath", folder);
+    } catch (error) {
+      console.error("Error selecting folder:", error);
+    }
+  }
+
+  // Function to remove the folder path from both state and localStorage
+  function removeFolderPath() {
+    setFolderPath(""); // Clear the state
+    localStorage.removeItem("folderPath"); // Remove from localStorage
+  }
 
   return (
     <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen">
-      {/* Header Section */}
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold mb-2">Welcome to your Lockr!</h1>
       </div>
 
-      {/* Explanation Section */}
-      <div className="my-4 p-6 bg-gray-100 dark:bg-gray-800 rounded-md max-w-2xl text-center shadow-md">
-        <p className="text-gray-700 dark:text-gray-300">
-          By default, MindLockr does not have access to your file system. Every
-          time you run this application, you need to locate the folder where you
-          want to encrypt and store your data. If you'd like, we can create a
-          folder for you, or you can use a default file path based on your
-          operating system to store the config file, which will remember the
-          folder where your data is stored.
-        </p>
-      </div>
-
-      {/* Folder Path or Button to Select Folder */}
-      {folderPath ? (
-        <div className="mt-6 text-center">
-          <p className="text-lg font-semibold mb-2">Selected Folder:</p>
-          <p className="text-md text-blue-600 dark:text-blue-500">
-            {folderPath}
+      {!folderPath && (
+        <div className="flex items-center justify-center text-center my-4 p-6 rounded-md max-w-2xl text-center shadow-md">
+          <p className="mt-4 text-red-500">
+            Please choose a folder where you want to store encrypted data.
           </p>
+        </div>
+      )}
+
+      {folderPath ? (
+        <div className="flex-col justify-center items-center mt-6 text-center">
+          <p className="text-lg font-semibold mb-2">Selected Folder:</p>
+          <div className="flex items-center gap-4">
+            <p className="text-md text-blue-600 dark:text-blue-500">
+              {folderPath}
+            </p>
+            <Button onClick={changeFolderPath} variant="ghost">
+              Change Folder Path
+            </Button>
+          </div>
+          <div className="mt-4">
+            <Button
+              variant="ghost"
+              onClick={removeFolderPath}
+              className="text-red-500"
+            >
+              Remove Folder Path
+            </Button>
+          </div>
         </div>
       ) : (
         <button
