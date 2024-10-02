@@ -3,8 +3,7 @@ import { NavLink } from "react-router-dom";
 export default function KeysNav() {
   return (
     <div className="flex flex-col items-end pt-1 text-nowrap">
-      <div className="flex space-x-1">
-        {/* Add `end` prop to prevent sub-routes from marking this as active */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 w-full lg:flex space-x-1">
         <NavLink
           to="/keys"
           end
