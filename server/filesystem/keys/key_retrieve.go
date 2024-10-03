@@ -22,43 +22,42 @@ type KeyInfo struct {
 	Algorithm string `json:"algorithm"`
 }
 
-// RetrieveSymmetricKeys retrieves the symmetric key files from the folderPath/keys/symmetric and returns them as a slice of KeyInfo
 func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()
 
-	fmt.Println("folderPath: ", folderPath)
-
 	// Define the keys subdirectory
 	keysBaseFolderPath := filepath.Join(folderPath, "keys/symmetric")
 
-	fmt.Println("Keys Base Folder Path:", keysBaseFolderPath)
-
 	// Check if the base keys folder exists
 	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Keys folder does not exist.")
+		return nil, fmt.Errorf("Keys folder does not exist at: %s", err)
 	}
 
 	// Create a slice to store key file info
 	var keyFiles []KeyInfo
-	// Iterate through subdirectories (e.g., AES-128, AES-256, etc.)
 
+	// Iterate through subdirectories (e.g., AES-128, AES-192, etc.)
 	subdirs, err := os.ReadDir(keysBaseFolderPath)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading keys folder: %v", err)
 	}
 
+	// Traverse through each subdirectory (which represents an algorithm)
 	for _, subdir := range subdirs {
 		if subdir.IsDir() {
-			algorithm := subdir.Name()
+			algorithm := subdir.Name() // Use the folder name as the algorithm (e.g., AES-128)
 
+			// Path to the directory that contains the actual key files
 			algoDirPath := filepath.Join(keysBaseFolderPath, algorithm)
+
+			// Read all files in the algorithm directory
 			files, err := os.ReadDir(algoDirPath)
 			if err != nil {
 				return nil, fmt.Errorf("Error reading algorithm directory %s: %v", algorithm, err)
 			}
 
-			// Iterate over files and add them to the keyFiles slice
+			// Iterate over each file in the directory
 			for _, file := range files {
 				if !file.IsDir() {
 					keyFiles = append(keyFiles, KeyInfo{
@@ -70,13 +69,9 @@ func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 		}
 	}
 
-	fmt.Println(keyFiles)
-
-	// Return the list of key file info
 	return keyFiles, nil
 }
 
-// RetrieveAsymmetricKeys retrieves the asymmetric key files from the folderPath/keys/asymmetric and returns them as a slice of KeyInfo
 func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]KeyInfo, error) {
 	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()
@@ -86,7 +81,7 @@ func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]KeyInfo, error) {
 
 	// Check if the base keys folder exists
 	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Keys folder does not exist.")
+		return nil, fmt.Errorf("Keys folder does not exist at: %s", keysBaseFolderPath)
 	}
 
 	// Create a slice to store key file info
@@ -98,18 +93,21 @@ func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]KeyInfo, error) {
 		return nil, fmt.Errorf("Error reading keys folder: %v", err)
 	}
 
+	// Traverse through each subdirectory (which represents an algorithm)
 	for _, subdir := range subdirs {
 		if subdir.IsDir() {
-			algorithm := subdir.Name() // Algorithm is the name of the subdirectory (e.g., RSA-2048)
+			algorithm := subdir.Name()
 
-			// Read files within the algorithm subdirectory
+			// Path to the directory that contains the actual key files
 			algoDirPath := filepath.Join(keysBaseFolderPath, algorithm)
+
+			// Read all files in the algorithm directory
 			files, err := os.ReadDir(algoDirPath)
 			if err != nil {
 				return nil, fmt.Errorf("Error reading algorithm directory %s: %v", algorithm, err)
 			}
 
-			// Iterate over files and add them to the keyFiles slice
+			// Iterate over each file in the directory
 			for _, file := range files {
 				if !file.IsDir() {
 					keyFiles = append(keyFiles, KeyInfo{
@@ -121,6 +119,5 @@ func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]KeyInfo, error) {
 		}
 	}
 
-	// Return the list of key file info
 	return keyFiles, nil
 }
