@@ -11,7 +11,6 @@ import {
   AES256Decryption,
 } from "../../../wailsjs/go/symmetricdecryption/Cryptography";
 import { LoadEncryptedKeyContent } from "../../../wailsjs/go/keys/KeyRetrieve";
-import { LogPrint } from "../../../wailsjs/runtime/runtime";
 import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
 
@@ -60,6 +59,7 @@ export default function KeyringManagement() {
               encryptedData: dataToDecrypt.EncryptedData,
               passphrase: dataToDecrypt.Passphrase,
             });
+
             break;
           case "AES-192":
             decryptedData = await AES192Decryption({
@@ -73,13 +73,11 @@ export default function KeyringManagement() {
               encryptedData: dataToDecrypt.EncryptedData,
               passphrase: dataToDecrypt.Passphrase,
             });
+
             break;
           default:
             throw new Error("Unsupported algorithm");
         }
-
-        LogPrint("Decyrpted Data");
-        LogPrint(decryptedData);
       } catch (error) {
         console.error("Decryption failed:", error);
       }

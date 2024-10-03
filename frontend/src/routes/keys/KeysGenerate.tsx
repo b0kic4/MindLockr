@@ -190,6 +190,11 @@ export default function KeysGen() {
         className: "border-0",
         title: "Key Saved successfully",
       });
+
+      setData("");
+      setPassphrase("");
+      setAlgorithm("AES");
+      setEncryptedData("");
     } catch (error) {
       LogDebug("an error ocurred when saving the key:");
       LogDebug(error as any);
