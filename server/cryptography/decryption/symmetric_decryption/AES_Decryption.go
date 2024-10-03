@@ -25,9 +25,13 @@ func (c *Cryptography) AES128Decryption(data DataToDecrypt) (string, error) {
 		return "", fmt.Errorf("failed to decode encrypted data: %v", err)
 	}
 
+	fmt.Println("data: ", data)
+	fmt.Println("data to decrypt: ", data.EncryptedData)
+	fmt.Println("passed passphrase", data.Passphrase)
+
 	// Extract the salt (first 16 bytes)
 	if len(encryptedBytes) < 32 {
-		return "", fmt.Errorf("encrypted data too short")
+		return "", fmt.Errorf("encrypted data too short: ", err)
 	}
 	salt := encryptedBytes[:16]
 
@@ -51,6 +55,8 @@ func (c *Cryptography) AES128Decryption(data DataToDecrypt) (string, error) {
 
 	// Decrypt the ciphertext
 	stream.XORKeyStream(cipherText, cipherText)
+
+	fmt.Println("decrypted data: ", string(cipherText))
 
 	// Return the decrypted plaintext as a string
 	return string(cipherText), nil

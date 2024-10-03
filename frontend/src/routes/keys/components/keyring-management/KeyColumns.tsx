@@ -1,5 +1,5 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { Pencil, Trash } from "lucide-react";
+import { KeyRound, Pencil, Trash } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -15,8 +15,9 @@ interface KeyInfo {
 }
 
 export const getKeyColumns = (
-  handleEdit: (key: string) => void,
-  handleDelete: (key: string) => void,
+  handleEdit: (key: KeyInfo) => void,
+  handleDelete: (key: KeyInfo) => void,
+  handleDecrypt: (key: KeyInfo) => void,
 ) => {
   const columnHelper = createColumnHelper<KeyInfo>();
 
@@ -46,7 +47,22 @@ export const getKeyColumns = (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => handleEdit(row.original.name)}
+                  onClick={() => handleDecrypt(row.original)}
+                  aria-label={`Decrypt key ${row.original.name}`}
+                >
+                  <KeyRound className="w-5 h-5 text-primary hover:text-primary-dark" />
+                </button>
+              </TooltipTrigger>
+              <Portal>
+                <TooltipContent className="z-50 p-2 bg-white ">
+                  <p className="text-sm">Decrypt</p>
+                </TooltipContent>
+              </Portal>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => handleEdit(row.original)}
                   aria-label={`Edit key ${row.original.name}`}
                 >
                   <Pencil className="w-5 h-5 text-primary hover:text-primary-dark" />
@@ -61,7 +77,7 @@ export const getKeyColumns = (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => handleDelete(row.original.name)}
+                  onClick={() => handleDelete(row.original)}
                   aria-label={`Delete key ${row.original.name}`}
                 >
                   <Trash className="w-5 h-5 text-secondary hover:text-secondary-dark" />

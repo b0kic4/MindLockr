@@ -1,8 +1,17 @@
+import { PassphraseDialog } from "@/components/shared/decryption/DecrytDialog";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { useKeys } from "@/hooks/keyring-management/useKeys";
+import { KeyInfo } from "@/lib/types/keys";
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
+import {
+  AES128Decryption,
+  AES192Decryption,
+  AES256Decryption,
+} from "../../../wailsjs/go/symmetricdecryption/Cryptography";
+import { LoadEncryptedKeyContent } from "../../../wailsjs/go/keys/KeyRetrieve";
+import { LogPrint } from "../../../wailsjs/runtime/runtime";
 import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
 
@@ -11,17 +20,74 @@ import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
 export default function KeyringManagement() {
   const { keys } = useKeys();
   const [filterKeyType, setFilterKeyType] = React.useState<string>("All");
+  const [selectedKey, setSelectedKey] = React.useState<KeyInfo | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
-  const handleEdit = (key: string) => {
+  const handleEdit = (key: KeyInfo) => {
     console.log("Edit key:", key);
   };
 
-  const handleDelete = (key: string) => {
+  const handleDelete = (key: KeyInfo) => {
     console.log("Delete key:", key);
   };
 
+  const handleDecrypt = React.useCallback((key: KeyInfo) => {
+    setSelectedKey(key);
+    setIsDialogOpen(true);
+  }, []);
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setSelectedKey(null);
+  };
+
+  const handlePassphraseSubmit = async (passphrase: string) => {
+    if (selectedKey) {
+      try {
+        const dataToDecrypt = {
+          EncryptedData: await LoadEncryptedKeyContent(
+            selectedKey.name,
+            selectedKey.algorithm,
+          ),
+          Passphrase: passphrase,
+        };
+
+        let decryptedData = "";
+
+        switch (selectedKey.algorithm) {
+          case "AES-128":
+            decryptedData = await AES128Decryption({
+              encryptedData: dataToDecrypt.EncryptedData,
+              passphrase: dataToDecrypt.Passphrase,
+            });
+            break;
+          case "AES-192":
+            decryptedData = await AES192Decryption({
+              encryptedData: dataToDecrypt.EncryptedData,
+              passphrase: dataToDecrypt.Passphrase,
+            });
+
+            break;
+          case "AES-256":
+            decryptedData = await AES256Decryption({
+              encryptedData: dataToDecrypt.EncryptedData,
+              passphrase: dataToDecrypt.Passphrase,
+            });
+            break;
+          default:
+            throw new Error("Unsupported algorithm");
+        }
+
+        LogPrint("Decyrpted Data");
+        LogPrint(decryptedData);
+      } catch (error) {
+        console.error("Decryption failed:", error);
+      }
+    }
+  };
+
   const columns = React.useMemo(
-    () => getKeyColumns(handleEdit, handleDelete),
+    () => getKeyColumns(handleEdit, handleDelete, handleDecrypt),
     [handleEdit, handleDelete],
   );
 
@@ -52,6 +118,14 @@ export default function KeyringManagement() {
             </div>
           </div>
           <DataTable data={filteredKeys} columns={columns} />
+          {selectedKey && (
+            <PassphraseDialog
+              isOpen={isDialogOpen}
+              onClose={handleDialogClose}
+              onSubmit={handlePassphraseSubmit}
+              keyName={selectedKey.name}
+            />
+          )}
         </div>
       ) : (
         <div className="text-center py-6">
