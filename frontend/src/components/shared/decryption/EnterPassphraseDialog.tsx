@@ -1,4 +1,3 @@
-// components/keyring-management/PassphraseDialog.tsx
 import React from "react";
 import {
   Dialog,
