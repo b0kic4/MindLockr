@@ -175,7 +175,12 @@ export default function KeysGen() {
       });
     }
     try {
-      await SaveSymmetricKey(folderPath, keyFileName, encryptedData);
+      await SaveSymmetricKey(
+        folderPath,
+        keyFileName,
+        encryptedData,
+        algorithmType,
+      );
       toast({
         variant: "default",
         className: "border-0",

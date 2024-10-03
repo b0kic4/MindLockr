@@ -1,6 +1,9 @@
 import React from "react";
-import { RetrieveSymmetricKeys } from "../../../wailsjs/go/keys/KeyRetrieve";
-import { AES128Decryption } from "../../../wailsjs/go/decryption/Cryptography.js";
+import {
+  RetrieveSymmetricKeys,
+  RetrieveAsymmetricKeys,
+} from "../../../wailsjs/go/keys/KeyRetrieve"; // Import key retrieval
+import { LogInfo, LogPrint, LogError } from "../../../wailsjs/runtime/runtime";
 import {
   Table,
   TableBody,
@@ -11,14 +14,39 @@ import {
 } from "@/components/ui/table";
 import { Pencil, Trash } from "lucide-react";
 
+interface KeyInfo {
+  name: string;
+  algorithm: string;
+}
+
 export default function KeyringManagement() {
-  const [keys, setKeys] = React.useState<string[]>([]);
+  const [keys, setKeys] = React.useState<KeyInfo[]>([]);
 
   const fetchKeys = async () => {
     try {
-      const retrievedKeys = await RetrieveSymmetricKeys();
-      setKeys(retrievedKeys);
+      // Fetch symmetric and asymmetric keys
+      const symmetricKeys: KeyInfo[] = await RetrieveSymmetricKeys();
+      const asymmetricKeys: KeyInfo[] = await RetrieveAsymmetricKeys();
+
+      // Combine symmetric and asymmetric keys into one array
+      const allKeys = [
+        ...symmetricKeys.map((key) => ({
+          name: key.name,
+          type: "Symmetric",
+          algorithm: key.algorithm,
+        })),
+        ...asymmetricKeys.map((key) => ({
+          name: key.name,
+          type: "Asymmetric",
+          algorithm: key.algorithm,
+        })),
+      ];
+      LogPrint("Kurcina");
+      LogPrint(JSON.stringify(allKeys, null, 2));
+
+      setKeys(allKeys);
     } catch (error) {
+      LogError(error as any);
       console.error("Error retrieving keys:", error);
     }
   };
@@ -43,19 +71,22 @@ export default function KeyringManagement() {
           <TableHeader>
             <TableRow>
               <TableHead>Key Name</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Algorithm</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {keys.map((key, index) => (
               <TableRow key={index}>
-                <TableCell className="flex items-start">{key}</TableCell>
+                <TableCell>{key.name}</TableCell>
+                <TableCell>{key.algorithm}</TableCell>
                 <TableCell>
                   <div className="flex space-x-4">
-                    <button onClick={() => handleEdit(key)}>
+                    <button onClick={() => handleEdit(key.name)}>
                       <Pencil className="w-5 h-5 text-blue-500 hover:text-blue-700" />
                     </button>
-                    <button onClick={() => handleDelete(key)}>
+                    <button onClick={() => handleDelete(key.name)}>
                       <Trash className="w-5 h-5 text-red-500 hover:text-red-700" />
                     </button>
                   </div>

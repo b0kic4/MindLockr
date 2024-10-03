@@ -7,6 +7,7 @@ import (
 )
 
 func TestEmptyData(t *testing.T) {
+	decrypt := &decryption.Cryptography{}
 	originalData := ""
 	passphrase := "mypassword"
 
@@ -33,7 +34,7 @@ func TestEmptyData(t *testing.T) {
 	}
 
 	// Perform AES-128 decryption
-	decryptedData, err := decryption.AES128Decryption(decryptData)
+	decryptedData, err := decrypt.AES128Decryption(decryptData)
 	if err != nil {
 		t.Fatalf("Decryption failed: %v", err)
 	}

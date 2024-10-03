@@ -9,11 +9,11 @@ import (
 type KeyStore struct{}
 
 // SaveSymmetricKey saves a symmetric encryption key to the specified folder
-func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent string) error {
-	// Ensure the 'keys/symmetric' subdirectory exists
-	keysDir := filepath.Join(folderPath, "keys/symmetric")
+func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent, algorithmUsed string) error {
+	// Ensure the 'keys/symmetric/algorithmUsed' subdirectory exists
+	keysDir := filepath.Join(folderPath, "keys/symmetric", algorithmUsed)
 	if err := os.MkdirAll(keysDir, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create keys/symmetric directory: %v", err)
+		return fmt.Errorf("failed to create keys/symmetric/%s directory: %v", algorithmUsed, err)
 	}
 
 	// Create the full path for the key file (with .key extension)
@@ -28,9 +28,9 @@ func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent string) er
 }
 
 // SaveAsymmetricKey saves a symmetric encryption key to the specified folder
-func (ks *KeyStore) SaveAsymmetricKey(folderPath, fileName, keyContent string) error {
+func (ks *KeyStore) SaveAsymmetricKey(folderPath, fileName, keyContent string, algorithmUsed string) error {
 	// Ensure the 'keys/symmetric' subdirectory exists
-	keysDir := filepath.Join(folderPath, "keys/asymmetric")
+	keysDir := filepath.Join(folderPath, "keys/asymmetric", algorithmUsed)
 	if err := os.MkdirAll(keysDir, os.ModePerm); err != nil {
 		return fmt.Errorf("failed to create keys/asymmetric directory: %v", err)
 	}

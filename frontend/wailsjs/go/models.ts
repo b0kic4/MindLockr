@@ -40,3 +40,22 @@ export namespace encryption {
 
 }
 
+export namespace keys {
+	
+	export class KeyInfo {
+	    name: string;
+	    algorithm: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new KeyInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.algorithm = source["algorithm"];
+	    }
+	}
+
+}
+
