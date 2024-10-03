@@ -22,6 +22,18 @@ type KeyInfo struct {
 	Algorithm string `json:"algorithm"`
 }
 
+func (kr *KeyRetrieve) LoadEncryptedKeyContent(keyName string, algorithmType string) (string, error) {
+	folderPath := kr.folderInstance.GetFolderPath()
+	keyFilePath := filepath.Join(folderPath, "keys", "symmetric", algorithmType, keyName)
+
+	content, err := os.ReadFile(keyFilePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read key file: %v", err)
+	}
+
+	return string(content), nil
+}
+
 func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()

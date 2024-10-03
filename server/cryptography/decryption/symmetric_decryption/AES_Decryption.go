@@ -27,7 +27,7 @@ func (c *Cryptography) AES128Decryption(data DataToDecrypt) (string, error) {
 
 	// Extract the salt (first 16 bytes)
 	if len(encryptedBytes) < 32 {
-		return "", fmt.Errorf("encrypted data too short")
+		return "", fmt.Errorf("encrypted data too short: ", err)
 	}
 	salt := encryptedBytes[:16]
 

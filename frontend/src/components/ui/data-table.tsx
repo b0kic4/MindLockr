@@ -1,4 +1,3 @@
-// components/ui/data-table.tsx
 import {
   flexRender,
   getCoreRowModel,

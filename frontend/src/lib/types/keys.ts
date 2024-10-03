@@ -3,3 +3,8 @@ export interface KeyInfo {
   algorithm: string;
   type: "Symmetric" | "Asymmetric";
 }
+
+export interface DataToDecrypt {
+  encryptedKey: KeyInfo;
+  passphrase: string;
+}

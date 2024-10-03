@@ -48,7 +48,6 @@ type DataToEncrypt struct {
 	Passphrase string `json:"passphrase"`
 }
 
-// AES128Encryption performs AES-128 encryption
 func AES128Encryption(data DataToEncrypt) (string, error) {
 	bytePassphrase := []byte(data.Passphrase)
 
@@ -67,27 +66,26 @@ func AES128Encryption(data DataToEncrypt) (string, error) {
 		return "", fmt.Errorf("failed to create AES cipher: %v", err)
 	}
 
-	// Prepare the plain text and cipher text buffer
+	// Prepare the plain text
 	plainText := []byte(data.Data)
-	cipherText := make([]byte, aes.BlockSize+len(plainText))
 
 	// Generate a random IV (Initialization Vector)
-	iv := cipherText[:aes.BlockSize]
+	iv := make([]byte, aes.BlockSize)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", fmt.Errorf("failed to generate IV: %v", err)
 	}
 
 	// Encrypt the plain text
+	cipherText := make([]byte, len(plainText))
 	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(cipherText[aes.BlockSize:], plainText)
+	stream.XORKeyStream(cipherText, plainText)
 
-	// Prepend the salt to the final cipher text (salt + IV + ciphertext)
-	finalCipherText := append(salt, cipherText...)
+	finalCipherText := append(salt, iv...)
+	finalCipherText = append(finalCipherText, cipherText...)
 
 	return hex.EncodeToString(finalCipherText), nil
 }
 
-// AES192Encryption performs AES-192 encryption
 func AES192Encryption(data DataToEncrypt) (string, error) {
 	bytePassphrase := []byte(data.Passphrase)
 
@@ -100,28 +98,33 @@ func AES192Encryption(data DataToEncrypt) (string, error) {
 	// Derive a 24-byte key for AES-192
 	key := pbkdf2.Key(bytePassphrase, salt, 4096, 24, sha256.New)
 
+	// Create AES cipher block
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", fmt.Errorf("failed to create AES cipher: %v", err)
 	}
 
+	// Prepare the plain text
 	plainText := []byte(data.Data)
-	cipherText := make([]byte, aes.BlockSize+len(plainText))
 
-	iv := cipherText[:aes.BlockSize]
+	// Generate a random IV (Initialization Vector)
+	iv := make([]byte, aes.BlockSize)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", fmt.Errorf("failed to generate IV: %v", err)
 	}
 
+	// Encrypt the plain text
+	cipherText := make([]byte, len(plainText))
 	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(cipherText[aes.BlockSize:], plainText)
+	stream.XORKeyStream(cipherText, plainText)
 
-	finalCipherText := append(salt, cipherText...)
+	// Prepend the salt and IV to the final cipher text (salt + IV + ciphertext)
+	finalCipherText := append(salt, iv...)
+	finalCipherText = append(finalCipherText, cipherText...)
 
 	return hex.EncodeToString(finalCipherText), nil
 }
 
-// AES256Encryption performs AES-256 encryption
 func AES256Encryption(data DataToEncrypt) (string, error) {
 	bytePassphrase := []byte(data.Passphrase)
 
@@ -134,23 +137,29 @@ func AES256Encryption(data DataToEncrypt) (string, error) {
 	// Derive a 32-byte key for AES-256
 	key := pbkdf2.Key(bytePassphrase, salt, 4096, 32, sha256.New)
 
+	// Create AES cipher block
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", fmt.Errorf("failed to create AES cipher: %v", err)
 	}
 
+	// Prepare the plain text
 	plainText := []byte(data.Data)
-	cipherText := make([]byte, aes.BlockSize+len(plainText))
 
-	iv := cipherText[:aes.BlockSize]
+	// Generate a random IV (Initialization Vector)
+	iv := make([]byte, aes.BlockSize)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", fmt.Errorf("failed to generate IV: %v", err)
 	}
 
+	// Encrypt the plain text
+	cipherText := make([]byte, len(plainText))
 	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(cipherText[aes.BlockSize:], plainText)
+	stream.XORKeyStream(cipherText, plainText)
 
-	finalCipherText := append(salt, cipherText...)
+	// Prepend the salt and IV to the final cipher text (salt + IV + ciphertext)
+	finalCipherText := append(salt, iv...)
+	finalCipherText = append(finalCipherText, cipherText...)
 
 	return hex.EncodeToString(finalCipherText), nil
 }
