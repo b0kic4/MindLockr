@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button.js";
 import React from "react";
 import {
-  SelectFolder,
   GetFolderPath,
+  SelectFolder,
   UpdateFolderPath,
 } from "../../wailsjs/go/filesystem/Folder.js";
 

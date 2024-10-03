@@ -1,16 +1,18 @@
-import React from "react";
 import { PassphraseDialog } from "@/components/shared/decryption/EnterPassphraseDialog";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { useKeys } from "@/hooks/keyring-management/useKeys";
 import { useToast } from "@/hooks/use-toast";
 import { KeyInfo } from "@/lib/types/keys";
-import { TextSearchIcon } from "lucide-react";
 import { decryptData } from "@/lib/utils/decryptionUtils";
-import { LoadEncryptedKeyContent } from "../../../wailsjs/go/keys/KeyRetrieve";
+import { TextSearchIcon } from "lucide-react";
+import React from "react";
+import {
+  DeleteKey,
+  LoadEncryptedKeyContent,
+} from "../../../wailsjs/go/keys/KeyRetrieve";
 import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
-import { DeleteKey } from "../../../wailsjs/go/keys/KeyRetrieve";
 
 export default function KeyringManagement() {
   const { keys, fetchKeys } = useKeys();
@@ -97,7 +99,7 @@ export default function KeyringManagement() {
         if (decryptedData.length > 0) {
           toast({
             variant: "default",
-            title: "Key decrypted successfully",
+            title: "Results",
             description: decryptedData,
           });
           handleDialogClose();

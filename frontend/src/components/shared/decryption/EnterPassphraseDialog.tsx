@@ -1,15 +1,14 @@
-import React from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogFooter,
-  DialogTrigger,
+  DialogHeader,
   DialogOverlay,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React from "react";
 
 interface PassphraseDialogProps {
   isOpen: boolean;
@@ -36,7 +35,7 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogOverlay />
-      <DialogContent>
+      <DialogContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark dark:border-0">
         <DialogHeader>
           <DialogTitle>Decrypt Key: {keyName}</DialogTitle>
         </DialogHeader>
@@ -52,7 +51,7 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
             />
           </div>
           <DialogFooter>
-            <Button variant="secondary" onClick={onClose}>
+            <Button variant="ghost" onClick={onClose}>
               Cancel
             </Button>
             <Button type="submit">Decrypt</Button>

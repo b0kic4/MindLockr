@@ -1,12 +1,12 @@
 import React from "react";
 import {
-  RetrieveSymmetricKeys,
   RetrieveAsymmetricKeys,
+  RetrieveSymmetricKeys,
 } from "../../../wailsjs/go/keys/KeyRetrieve";
 import {
-  LogWarning,
-  LogPrint,
   LogError,
+  LogPrint,
+  LogWarning,
 } from "../../../wailsjs/runtime/runtime";
 
 interface KeyInfo {

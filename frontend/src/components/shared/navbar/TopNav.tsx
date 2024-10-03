@@ -1,5 +1,5 @@
-import { ModeToggle } from "@/components/mode-toggle";
 import logo from "@/assets/images/logo-universal.png";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export function TopNav() {
   return (

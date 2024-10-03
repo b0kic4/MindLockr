@@ -256,7 +256,7 @@ export default function KeysGen() {
               className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
             />
             <Input
-              type="text"
+              type="password"
               placeholder="Passphrase for Encryption"
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
