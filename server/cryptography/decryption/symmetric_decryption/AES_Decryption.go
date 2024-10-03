@@ -1,4 +1,4 @@
-package decryption
+package symmetricdecryption
 
 import (
 	"crypto/aes"

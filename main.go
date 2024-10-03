@@ -1,8 +1,8 @@
 package main
 
 import (
-	"MindLockr/server/cryptography/decryption"
-	"MindLockr/server/cryptography/encryption"
+	symmetricdecryption "MindLockr/server/cryptography/decryption/symmetric_decryption"
+	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
 	"MindLockr/server/filesystem"
 	"MindLockr/server/filesystem/keys"
 	"context"
@@ -17,8 +17,8 @@ import (
 var assets embed.FS
 
 func main() {
-	crypto := &encryption.Cryptography{}
-	decrypt := &decryption.Cryptography{}
+	symmetric_encryption := &symmetricencryption.Cryptography{}
+	symmetric_decryption := &symmetricdecryption.Cryptography{}
 	folder := filesystem.NewFolder()
 	keyRetrieve := keys.NewKeyRetrieve(folder)
 	keyStore := &keys.KeyStore{}
@@ -39,11 +39,11 @@ func main() {
 		},
 		Bind: []interface{}{
 			app,
-			crypto,
+			symmetric_encryption,
+			symmetric_decryption,
 			folder,
 			keyRetrieve,
 			keyStore,
-			decrypt,
 		},
 	})
 	if err != nil {
