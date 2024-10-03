@@ -8,6 +8,16 @@ import {
 
 // create folder locking?
 
+// show to user:
+// do not share the algorithm used for encrypted data
+// the algorithm used for encrypted data is undetectable
+// they are saved in the files based on what enryption algorithm
+// is used for faster decryption because you have the passphrase
+// of the ecrypted data, if you dont remember the algorithm used
+// and remember the passphrase it would take big part of you time for
+// decryption. Make sure to not share any part of the encrypiton logic
+// with anyone nor the passphrases thank you, stay safe
+
 export default function Home() {
   const [folderPath, setFolderPath] = React.useState("");
 

@@ -17,64 +17,107 @@ func NewKeyRetrieve(folder *filesystem.Folder) *KeyRetrieve {
 	}
 }
 
-// RetrieveKeys retrieves the key files from the folderPath/keys and returns them as a slice of strings
-func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]string, error) {
+type KeyInfo struct {
+	Name      string `json:"name"`
+	Algorithm string `json:"algorithm"`
+}
+
+func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()
 
 	// Define the keys subdirectory
-	keysFolderPath := filepath.Join(folderPath, "keys/symmetric")
+	keysBaseFolderPath := filepath.Join(folderPath, "keys/symmetric")
 
-	// Check if the keys folder exists
-	if _, err := os.Stat(keysFolderPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Keys folder does not exist.")
+	// Check if the base keys folder exists
+	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("Keys folder does not exist at: %s", err)
 	}
 
-	// Read all files in the keys folder
-	files, err := os.ReadDir(keysFolderPath)
+	// Create a slice to store key file info
+	var keyFiles []KeyInfo
+
+	// Iterate through subdirectories (e.g., AES-128, AES-192, etc.)
+	subdirs, err := os.ReadDir(keysBaseFolderPath)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading keys folder: %v", err)
 	}
 
-	// Create a slice to store the names of key files
-	var keyFiles []string
-	for _, file := range files {
-		if !file.IsDir() {
-			keyFiles = append(keyFiles, file.Name())
+	// Traverse through each subdirectory (which represents an algorithm)
+	for _, subdir := range subdirs {
+		if subdir.IsDir() {
+			algorithm := subdir.Name() // Use the folder name as the algorithm (e.g., AES-128)
+
+			// Path to the directory that contains the actual key files
+			algoDirPath := filepath.Join(keysBaseFolderPath, algorithm)
+
+			// Read all files in the algorithm directory
+			files, err := os.ReadDir(algoDirPath)
+			if err != nil {
+				return nil, fmt.Errorf("Error reading algorithm directory %s: %v", algorithm, err)
+			}
+
+			// Iterate over each file in the directory
+			for _, file := range files {
+				if !file.IsDir() {
+					keyFiles = append(keyFiles, KeyInfo{
+						Name:      file.Name(),
+						Algorithm: algorithm,
+					})
+				}
+			}
 		}
 	}
 
-	// Return the list of key file names
 	return keyFiles, nil
 }
 
-// RetrieveKeys retrieves the key files from the folderPath/keys and returns them as a slice of strings
-func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]string, error) {
+func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]KeyInfo, error) {
 	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()
 
 	// Define the keys subdirectory
-	keysFolderPath := filepath.Join(folderPath, "keys/asymmetric")
+	keysBaseFolderPath := filepath.Join(folderPath, "keys/asymmetric")
 
-	// Check if the keys folder exists
-	if _, err := os.Stat(keysFolderPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Keys folder does not exist.")
+	// Check if the base keys folder exists
+	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("Keys folder does not exist at: %s", keysBaseFolderPath)
 	}
 
-	// Read all files in the keys folder
-	files, err := os.ReadDir(keysFolderPath)
+	// Create a slice to store key file info
+	var keyFiles []KeyInfo
+
+	// Iterate through subdirectories (e.g., RSA-2048, RSA-4096, etc.)
+	subdirs, err := os.ReadDir(keysBaseFolderPath)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading keys folder: %v", err)
 	}
 
-	// Create a slice to store the names of key files
-	var keyFiles []string
-	for _, file := range files {
-		if !file.IsDir() {
-			keyFiles = append(keyFiles, file.Name())
+	// Traverse through each subdirectory (which represents an algorithm)
+	for _, subdir := range subdirs {
+		if subdir.IsDir() {
+			algorithm := subdir.Name()
+
+			// Path to the directory that contains the actual key files
+			algoDirPath := filepath.Join(keysBaseFolderPath, algorithm)
+
+			// Read all files in the algorithm directory
+			files, err := os.ReadDir(algoDirPath)
+			if err != nil {
+				return nil, fmt.Errorf("Error reading algorithm directory %s: %v", algorithm, err)
+			}
+
+			// Iterate over each file in the directory
+			for _, file := range files {
+				if !file.IsDir() {
+					keyFiles = append(keyFiles, KeyInfo{
+						Name:      file.Name(),
+						Algorithm: algorithm,
+					})
+				}
+			}
 		}
 	}
 
-	// Return the list of key file names
 	return keyFiles, nil
 }

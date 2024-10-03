@@ -8,6 +8,7 @@ import (
 
 func TestEncryptDecryptAES128(t *testing.T) {
 	// Test data and passphrase
+	decrypt := &decryption.Cryptography{}
 	originalData := "This is a test message for AES-128 encryption."
 	passphrase := "mystrongpassphrase"
 
@@ -35,7 +36,7 @@ func TestEncryptDecryptAES128(t *testing.T) {
 	}
 
 	// Perform AES-128 decryption
-	decryptedData, err := decryption.AES128Decryption(decryptData)
+	decryptedData, err := decrypt.AES128Decryption(decryptData)
 	if err != nil {
 		t.Fatalf("Decryption failed: %v", err)
 	}
@@ -47,6 +48,7 @@ func TestEncryptDecryptAES128(t *testing.T) {
 }
 
 func TestEncryptDecryptAES192(t *testing.T) {
+	decrypt := &decryption.Cryptography{}
 	originalData := "This is a test message for AES-192 encryption."
 	passphrase := "mystrongpassphrase"
 
@@ -73,7 +75,7 @@ func TestEncryptDecryptAES192(t *testing.T) {
 	}
 
 	// Perform AES-192 decryption
-	decryptedData, err := decryption.AES192Decryption(decryptData)
+	decryptedData, err := decrypt.AES192Decryption(decryptData)
 	if err != nil {
 		t.Fatalf("Decryption failed: %v", err)
 	}
@@ -85,6 +87,7 @@ func TestEncryptDecryptAES192(t *testing.T) {
 }
 
 func TestEncryptDecryptAES256(t *testing.T) {
+	decrypt := &decryption.Cryptography{}
 	originalData := "This is a test message for AES-256 encryption."
 	passphrase := "mystrongpassphrase"
 
@@ -111,7 +114,7 @@ func TestEncryptDecryptAES256(t *testing.T) {
 	}
 
 	// Perform AES-256 decryption
-	decryptedData, err := decryption.AES256Decryption(decryptData)
+	decryptedData, err := decrypt.AES256Decryption(decryptData)
 	if err != nil {
 		t.Fatalf("Decryption failed: %v", err)
 	}
@@ -123,6 +126,7 @@ func TestEncryptDecryptAES256(t *testing.T) {
 }
 
 func TestIncorrectPassphrase(t *testing.T) {
+	decrypt := &decryption.Cryptography{}
 	originalData := "This is a test message for AES-128 encryption."
 	passphrase := "correctpassphrase"
 	wrongPassphrase := "wrongpassphrase"
@@ -145,7 +149,7 @@ func TestIncorrectPassphrase(t *testing.T) {
 	}
 
 	// Perform AES-128 decryption
-	decryptedData, err := decryption.AES128Decryption(decryptData)
+	decryptedData, err := decrypt.AES128Decryption(decryptData)
 	if err == nil {
 		// Even though decryption didn't produce an error, check if the output makes sense
 		if decryptedData == originalData {
