@@ -1,12 +1,23 @@
-import { createColumnHelper } from "@tanstack/react-table";
-import { KeyRound, Pencil, Trash } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@radix-ui/react-tooltip";
+} from "@/components/ui/tooltip";
 import { Portal } from "@radix-ui/react-portal";
+import { createColumnHelper } from "@tanstack/react-table";
+import { KeyRound, Pencil, Trash } from "lucide-react";
 
 interface KeyInfo {
   name: string;
@@ -74,21 +85,32 @@ export const getKeyColumns = (
                 </TooltipContent>
               </Portal>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => handleDelete(row.original)}
-                  aria-label={`Delete key ${row.original.name}`}
-                >
-                  <Trash className="w-5 h-5 text-secondary hover:text-secondary-dark" />
-                </button>
-              </TooltipTrigger>
-              <Portal>
-                <TooltipContent className="z-50 p-2 bg-white ">
-                  <p className="text-sm">Delete</p>
-                </TooltipContent>
-              </Portal>
-            </Tooltip>
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <Trash className="w-5 h-5 text-red-500" />
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your encrypted file and remove its data from your
+                    filesystem.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="border-0">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => handleDelete(row.original)}
+                    aria-label={`Delete key ${row.original.name}`}
+                  >
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </TooltipProvider>
         </div>
       ),

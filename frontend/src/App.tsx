@@ -1,12 +1,12 @@
-import { Routes, Route, Outlet } from "react-router-dom";
-import Home from "./routes/Home";
-import { Sidebar } from "./components/shared/sidebar/Sidebar";
+import { Outlet, Route, Routes } from "react-router-dom";
 import { TopNav } from "./components/shared/navbar/TopNav";
+import { Sidebar } from "./components/shared/sidebar/Sidebar";
+import Home from "./routes/Home";
 import KeysNav from "./routes/keys/components/KeysNav";
-import KeysGen from "./routes/keys/KeysGenerate";
 import KeysIndex from "./routes/keys/Index";
-import KeysIE from "./routes/keys/KeysImportExport";
 import KeyringManagement from "./routes/keys/KeyringManagement";
+import KeysGen from "./routes/keys/KeysGenerate";
+import KeysIE from "./routes/keys/KeysImportExport";
 import KeysSigningSignature from "./routes/keys/KeysSigningSignature";
 
 // Layout for the /keys route
