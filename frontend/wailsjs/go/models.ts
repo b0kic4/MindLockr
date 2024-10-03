@@ -1,4 +1,23 @@
-export namespace decryption {
+export namespace keys {
+	
+	export class KeyInfo {
+	    name: string;
+	    algorithm: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new KeyInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.algorithm = source["algorithm"];
+	    }
+	}
+
+}
+
+export namespace symmetricdecryption {
 	
 	export class DataToDecrypt {
 	    encryptedData: string;
@@ -17,7 +36,7 @@ export namespace decryption {
 
 }
 
-export namespace encryption {
+export namespace symmetricencryption {
 	
 	export class RequestData {
 	    data: string;
@@ -35,25 +54,6 @@ export namespace encryption {
 	        this.passphrase = source["passphrase"];
 	        this.algorithm = source["algorithm"];
 	        this.algorithmType = source["algorithmType"];
-	    }
-	}
-
-}
-
-export namespace keys {
-	
-	export class KeyInfo {
-	    name: string;
-	    algorithm: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new KeyInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.name = source["name"];
-	        this.algorithm = source["algorithm"];
 	    }
 	}
 

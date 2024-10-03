@@ -11,12 +11,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
-import { EncryptAES } from "../../../wailsjs/go/encryption/Cryptography.js";
+import { EncryptAES } from "../../../wailsjs/go/symmetricencryption/Cryptography";
 import AlgorithmTypeDescription from "./components/key-gen/AlgorithmTypeDescription";
 import Questions from "./components/key-gen/Questions";
 import { getFolderPathClientHook } from "@/hooks/getFolderPathClinet.js";
 import { LogDebug } from "../../../wailsjs/runtime/runtime";
 import { SaveSymmetricKey } from "../../../wailsjs/go/keys/KeyStore";
+
+// consider implementing PGP chatting inside the application
+// premium feature with the syncing data
 
 // one encryption for sending the data to other people
 // one encryption for saving their own data
@@ -36,6 +39,7 @@ import { SaveSymmetricKey } from "../../../wailsjs/go/keys/KeyStore";
 // symmetric, asymmetric, and hashing
 // symmetric (AES, DES, TDEA) -> saving the data with passphrase encryption
 // asymmetric (RSA, DSS, DSA, ECC) -> public/private key encryption
+// hybrid
 // hashing -> unique signature of fixed length (used for verifiying)
 
 // encryption is used to convert data into ciphertext
