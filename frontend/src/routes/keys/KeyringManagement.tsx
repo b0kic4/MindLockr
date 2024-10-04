@@ -1,12 +1,11 @@
+import React from "react";
 import DecryptedDataComponent from "@/components/shared/decryption/ShowDecryptedData";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { useKeys } from "@/hooks/keyring-management/useKeys";
-import { useToast } from "@/hooks/use-toast";
+import { useDeleteKey } from "@/hooks/useDeleteKey";
 import { KeyInfo } from "@/lib/types/keys";
 import { TextSearchIcon } from "lucide-react";
-import React from "react";
-import { DeleteKey } from "../../../wailsjs/go/keys/KeyRetrieve";
 import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
 
@@ -16,7 +15,8 @@ export default function KeyringManagement() {
   const [searchQuery, setSearchQuery] = React.useState<string>("");
   const [selectedKey, setSelectedKey] = React.useState<KeyInfo | null>(null);
   const [isDecrypted, setIsDecrypted] = React.useState(false);
-  const { toast } = useToast();
+
+  const { handleDelete } = useDeleteKey({ fetchKeys });
 
   const handleDecrypt = (key: KeyInfo) => {
     setSelectedKey(key);
@@ -26,25 +26,6 @@ export default function KeyringManagement() {
   const handleDialogClose = () => {
     setIsDecrypted(false);
     setSelectedKey(null);
-  };
-
-  const handleDelete = async (key: KeyInfo) => {
-    const response = await DeleteKey(key);
-    if (response) {
-      fetchKeys();
-      toast({
-        variant: "default",
-        className: "border-0",
-        title: "Key deleted successfully",
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        className: "bg-red-500 border-0",
-        title: "Uh oh! Something went wrong.",
-        description: "Deletion of the key has failed.",
-      });
-    }
   };
 
   const columns = React.useMemo(
