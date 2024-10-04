@@ -10,13 +10,13 @@ import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
 
 export default function KeyringManagement() {
-  const { keys } = useKeys();
+  const { keys, fetchKeys } = useKeys();
   const [filterKeyType, setFilterKeyType] = React.useState<string>("All");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
   const [selectedKey, setSelectedKey] = React.useState<KeyInfo | null>(null);
   const [isDecrypted, setIsDecrypted] = React.useState(false);
 
-  const { handleDelete } = useDeleteKey();
+  const { handleDelete } = useDeleteKey({ fetchKeys });
 
   const handleDecrypt = (key: KeyInfo) => {
     setSelectedKey(key);
