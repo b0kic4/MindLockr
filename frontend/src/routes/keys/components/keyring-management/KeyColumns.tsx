@@ -70,8 +70,10 @@ export const getKeyColumns = (
               </Portal>
             </Tooltip>
             <AlertDialog>
-              <AlertDialogTrigger>
-                <Trash className="w-5 h-5 text-red-500" />
+              <AlertDialogTrigger asChild>
+                <button aria-label={`Delete key ${row.original.name}`}>
+                  <Trash className="w-5 h-5 text-red-500" />
+                </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -98,7 +100,7 @@ export const getKeyColumns = (
           </TooltipProvider>
         </div>
       ),
-      meta: { align: "right" }, // Add alignment
+      meta: { align: "right" },
     }),
   ];
 };
