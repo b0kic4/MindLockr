@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { KeyInfo } from "@/lib/types/keys";
 import { decryptData } from "@/lib/utils/decryptionUtils";
 import React from "react";
-import { BarLoader } from "react-spinners";
+import { PacmanLoader } from "react-spinners";
 import { LoadEncryptedKeyContent } from "../../../../wailsjs/go/keys/KeyRetrieve";
 
 interface DecryptedDataProps {
@@ -62,7 +62,7 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
           <>
             {isLoading ? (
               <div className="flex justify-center items-center">
-                <BarLoader />
+                <PacmanLoader speedMultiplier={3} color="#ffde08" />
               </div>
             ) : (
               <PassphraseDialog
