@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Portal } from "@radix-ui/react-portal";
 import { createColumnHelper } from "@tanstack/react-table";
-import { KeyRound, Pencil, Trash } from "lucide-react";
+import { KeyRound, Trash } from "lucide-react";
 
 interface KeyInfo {
   name: string;
@@ -26,7 +26,6 @@ interface KeyInfo {
 }
 
 export const getKeyColumns = (
-  handleEdit: (key: KeyInfo) => void,
   handleDelete: (key: KeyInfo) => void,
   handleDecrypt: (key: KeyInfo) => void,
 ) => {
@@ -67,21 +66,6 @@ export const getKeyColumns = (
               <Portal>
                 <TooltipContent className="z-50 p-2 bg-white ">
                   <p className="text-sm">Decrypt</p>
-                </TooltipContent>
-              </Portal>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => handleEdit(row.original)}
-                  aria-label={`Edit key ${row.original.name}`}
-                >
-                  <Pencil className="w-5 h-5 text-primary hover:text-primary-dark" />
-                </button>
-              </TooltipTrigger>
-              <Portal>
-                <TooltipContent className="z-50 p-2 bg-white ">
-                  <p className="text-sm">Edit</p>
                 </TooltipContent>
               </Portal>
             </Tooltip>
