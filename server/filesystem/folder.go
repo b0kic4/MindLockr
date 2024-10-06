@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -22,9 +23,22 @@ type Folder struct {
 	ctx        context.Context // wails app runtime context
 }
 
+var (
+	folderInstance *Folder
+	once           sync.Once
+)
+
 // NewFolder creates a new instance of Folder with an empty folder path
 func NewFolder() *Folder {
 	return &Folder{}
+}
+
+// GetFolderInstance returns the existing Folder instance or creates one if it doesn't exist
+func GetFolderInstance() *Folder {
+	once.Do(func() {
+		folderInstance = NewFolder()
+	})
+	return folderInstance
 }
 
 // SetContext sets the context for the Folder struct

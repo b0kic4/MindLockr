@@ -18,7 +18,7 @@ import Questions from "./components/key-gen/Questions";
 // | Key Size (Dropdown)           | Key Size: 4096 bits |
 // | Expiration Date (Picker)      | Usage: Signing, Enc |
 // | Usage Flags (Checkbox)        | Expiration: 1 year  |
-// | -----------------------------|----------------------|
+// | ------------------------------|---------------------|
 // |          [Generate Key Button]                      |
 // +-----------------------------------------------------+
 
