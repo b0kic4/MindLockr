@@ -22,6 +22,7 @@ func main() {
 	folder := filesystem.NewFolder()
 	keyRetrieve := keys.NewKeyRetrieve(folder)
 	keyStore := &keys.KeyStore{}
+	pubPrivKeys := &keys.PubPrvKeyGen{}
 
 	app := NewApp()
 
@@ -44,6 +45,7 @@ func main() {
 			folder,
 			keyRetrieve,
 			keyStore,
+			pubPrivKeys,
 		},
 	})
 	if err != nil {

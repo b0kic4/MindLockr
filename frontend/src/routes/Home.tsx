@@ -88,6 +88,11 @@ export default function Home() {
     localStorage.removeItem("folderPath");
   }
 
+  // TODO:
+  // Create UI that will generate the pub priv keys
+  // for priv keys there should be a passphrase
+  // priv key should initialy be shown as type of password (dots)
+
   return (
     <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen">
       <div className="text-center mb-6">
