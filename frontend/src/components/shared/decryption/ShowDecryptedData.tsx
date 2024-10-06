@@ -1,15 +1,20 @@
 import { PassphraseDialog } from "@/components/shared/decryption/EnterPassphraseDialog";
 import { useToast } from "@/hooks/use-toast";
 import { KeyInfo } from "@/lib/types/keys";
-import { decryptData } from "@/lib/utils/decryptionUtils";
 import React from "react";
 import { PacmanLoader } from "react-spinners";
 import { LoadEncryptedKeyContent } from "../../../../wailsjs/go/keys/KeyRetrieve";
+import { DecryptAES } from "../../../../wailsjs/go/symmetricdecryption/Cryptography";
 
 interface DecryptedDataProps {
   keyInfo: KeyInfo;
   onClose: () => void;
 }
+
+type DataToDecrypt = {
+  encryptedData: string;
+  passphrase: string;
+};
 
 const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
   keyInfo,
@@ -30,11 +35,15 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
           keyInfo.algorithm,
         );
 
-        const decrypted = await decryptData({
-          algorithm: keyInfo.algorithm,
-          encryptedData,
-          passphrase,
-        });
+        const dataToDecrypt: DataToDecrypt = {
+          encryptedData: encryptedData,
+          passphrase: passphrase,
+        };
+
+        const decrypted = await DecryptAES(
+          keyInfo.algorithm as any,
+          dataToDecrypt,
+        );
 
         setDecryptedData(decrypted);
         setIsPassphraseDialogOpen(false);

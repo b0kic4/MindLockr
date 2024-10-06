@@ -1,58 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { useGenKey } from "@/hooks/useGenKey";
+import { useSaveKey } from "@/hooks/useSaveKey";
 import React from "react";
-import { EncryptAES } from "../../../wailsjs/go/symmetricencryption/Cryptography";
-import AlgorithmTypeDescription from "./components/key-gen/AlgorithmTypeDescription";
+import AlgorithmSelector from "./components/key-gen/AlgorithmSelector";
+import EncryptedDataDisplay from "./components/key-gen/EncryptedDataDisplay";
+import EncryptionForm from "./components/key-gen/EncryptionForm";
+import KeySaveForm from "./components/key-gen/KeySaveForm";
+import KeyTypeTabs from "./components/key-gen/KeyTypeTabs";
 import Questions from "./components/key-gen/Questions";
-import { getFolderPathClientHook } from "@/hooks/getFolderPathClinet.js";
-import { LogDebug } from "../../../wailsjs/runtime/runtime";
-import { SaveSymmetricKey } from "../../../wailsjs/go/keys/KeyStore";
-
-// consider implementing PGP chatting inside the application
-// premium feature with the syncing data
-
-// one encryption for sending the data to other people
-// one encryption for saving their own data
-
-// if the file is too big or smth
-// we can use like encryption with one key
-// but sending that key to the other person
-// to be with private and public key
-
-// generating private/public key
-
-// user needs to select the usage for the key
-// storing, sharing
-
-// encrypting desired data
-
-// symmetric, asymmetric, and hashing
-// symmetric (AES, DES, TDEA) -> saving the data with passphrase encryption
-// asymmetric (RSA, DSS, DSA, ECC) -> public/private key encryption
-// hybrid
-// hashing -> unique signature of fixed length (used for verifiying)
-
-// encryption is used to convert data into ciphertext
-// by using encryption key the encrypted data can be
-// decrypted with decryption key
-
-// RSA Encryption: Widely used for both encryption and digital signatures. Recommended for general use.
-// ECC Encryption: Suitable for smaller, more efficient encryption, especially on mobile devices or systems with limited resources.
-// Signing: Use the private key to sign data, which can be verified with the public key. This proves the authenticity of the data.
-// Hybrid Encryption: For large data, you can use a hybrid encryption approach where a symmetric key (e.g., AES) is used to encrypt the data,
-// and the symmetric key is encrypted with the public key.
-
-// tabs for user to choose the type of encryption method needed
 
 // +-----------------------------------------------------+
 // | Key Generation                                      |
@@ -62,319 +18,114 @@ import { SaveSymmetricKey } from "../../../wailsjs/go/keys/KeyStore";
 // | Key Size (Dropdown)           | Key Size: 4096 bits |
 // | Expiration Date (Picker)      | Usage: Signing, Enc |
 // | Usage Flags (Checkbox)        | Expiration: 1 year  |
-// | -----------------------------|---------------------|
+// | -----------------------------|----------------------|
 // |          [Generate Key Button]                      |
 // +-----------------------------------------------------+
 
-// add a generate private and public key
-// (and make the important note which should be shared)
-
-// also make if in file registry there is public and private key
-// for user not to be able to create more of them
-
-// so the key gen needs to have:
-// 1. private/public key generation
-// 2. sensitive information encryption in key with passphrase decryption
-// like passwords, location, codes and etc
-// 3. PGP asymmetric keys encryption:
-// storing the secure information with public/private key access
-
-// so there should be a tabs bar that will show symmetric and asymmetric
-// encryption when clicked on each it will explain to the user
-// what it is doing and how should they use it
-
-// we should have an option for careating new public private keys
-// for specific encryption or just using the one generated at the start
-
-type GenerateKeyDataRequest = {
-  data: string;
-  passphrase: string;
-  algorithm: string;
-  algorithmType: string;
-};
-
 export default function KeysGen() {
+  // data for encryption
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
   const [algorithmType, setAlgorithmType] = React.useState<string>("");
+
+  // encrypted string
   const [encryptedData, setEncryptedData] = React.useState("");
+
+  // keyinfo
   const [keyType, setKeyType] = React.useState("symmetric");
-  const [toggleQuestions, setToggleQuestions] = React.useState<boolean>(false);
   const [keyFileName, setKeyFileName] = React.useState("");
+
+  // hooks
+  const { generateKey, result, error } = useGenKey();
+  const { saveKey, errorWhenSaving } = useSaveKey();
   const { toast } = useToast();
 
-  const toggleShowQuestions = () => {
-    setToggleQuestions((prevState) => !prevState);
-  };
+  // effect to update encrypted data asap
+  React.useEffect(() => {
+    if (result) setEncryptedData(result);
+  }, [result]);
 
   const handleGenerateKey = async () => {
-    const isASCII = (str: string) => /^[\x00-\x7F]*$/.test(str);
-
-    if (!data || !passphrase) {
-      alert("Please provide data and passphrase");
-      toast({
-        variant: "default",
-        className: "bg-red-500 border-0",
-        title: "Uh oh! Something went wrong.",
-        description: "Please provide data and passphrase",
-      });
-      return;
-    }
-
-    if (!isASCII(data) || !isASCII(passphrase)) {
-      toast({
-        variant: "destructive",
-        className: "bg-red-500 border-0",
-        title: "Uh oh! Something went wrong.",
-        description:
-          "Please only use ASCII type characters where 1 character = 1 byte",
-      });
-      return;
-    }
-
-    const requestData: GenerateKeyDataRequest = {
+    const requestData = {
       data,
       passphrase,
       algorithm,
       algorithmType,
     };
 
-    try {
-      const encrypted = await EncryptAES(requestData);
-      console.log("encrypted: ", encrypted);
-      setEncryptedData(encrypted);
-    } catch (error) {
-      console.error("Encryption failed:", error);
+    await generateKey(requestData);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Key Generation Failed",
+        description: error,
+      });
+    } else {
+      setEncryptedData(result as any);
+      toast({
+        variant: "default",
+        className: "border-0",
+        title: "Key Generated Successfully",
+        description: "Your key has been generated.",
+      });
     }
   };
 
   const handleSaveKey = async () => {
-    const folderPath = getFolderPathClientHook();
-    if (!folderPath) {
-      toast({
-        variant: "destructive",
-        className: "bg-red-500 border-0",
-        title: "Uh oh! Something went wrong.",
-        description: "Path to folder not found",
-      });
-      return;
-    }
+    await saveKey(keyFileName, encryptedData, algorithmType);
 
-    if (!keyFileName) {
-      toast({
-        variant: "destructive",
-        className: "bg-red-500 border-0",
-        title: "Uh oh! Something went wrong.",
-        description: "Filename for key not provided",
-      });
-    }
-
-    if (!encryptedData) {
-      toast({
-        variant: "destructive",
-        className: "bg-red-500 border-0",
-        title: "Uh oh! Something went wrong.",
-        description: "Seems like there is nothing to save",
-      });
-    }
-    try {
-      await SaveSymmetricKey(
-        folderPath,
-        keyFileName,
-        encryptedData,
-        algorithmType,
-      );
-      toast({
-        variant: "default",
-        className: "border-0",
-        title: "Key Saved successfully",
-      });
-
+    if (!errorWhenSaving) {
       setData("");
       setPassphrase("");
       setAlgorithm("AES");
+      setKeyFileName("");
       setEncryptedData("");
-    } catch (error) {
-      LogDebug("an error ocurred when saving the key:");
-      LogDebug(error as any);
     }
   };
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6 rounded-lg">
-      <h2 className="text-2xl font-semibold text-foreground dark:text-foreground-dark">
-        Key Generation & Encryption
-      </h2>
+      <h2 className="text-2xl font-semibold">Key Generation & Encryption</h2>
 
-      <div className="flex items-center justify-center">
-        <Button
-          variant="ghost"
-          onClick={toggleShowQuestions}
-          className="flex items-center text-primary dark:text-primary-dark"
-        >
-          {toggleQuestions ? (
-            <>
-              Hide Questions <ChevronUp className="ml-2 h-4 w-4" />
-            </>
-          ) : (
-            <>
-              Show Questions <ChevronDown className="ml-2 h-4 w-4" />
-            </>
-          )}
-        </Button>
-      </div>
+      <Questions />
 
-      {toggleQuestions && (
-        <div className="mt-4">
-          <Questions />
-        </div>
-      )}
+      <KeyTypeTabs keyType={keyType} setKeyType={setKeyType}>
+        <EncryptionForm
+          data={data}
+          setData={setData}
+          passphrase={passphrase}
+          setPassphrase={setPassphrase}
+        />
+        <AlgorithmSelector
+          algorithm={algorithm}
+          setAlgorithm={setAlgorithm}
+          algorithmType={algorithmType}
+          setAlgorithmType={setAlgorithmType}
+        />
+      </KeyTypeTabs>
 
-      <Tabs
-        defaultValue="symmetric"
-        onValueChange={setKeyType}
-        className="w-full mt-6"
-      >
-        <TabsList className="mb-4 bg-muted dark:bg-muted-dark">
-          <TabsTrigger value="symmetric">Symmetric Encryption</TabsTrigger>
-          <TabsTrigger value="asymmetric">Asymmetric Encryption</TabsTrigger>
-          <TabsTrigger value="hybrid">Hybrid Encryption</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="symmetric">
-          <div className="space-y-4">
-            <p className="text-sm text-foreground dark:text-foreground-dark">
-              Symmetric encryption uses the same key for encryption and
-              decryption. This is ideal for storing sensitive information
-              securely.
-            </p>
-            <Input
-              type="text"
-              placeholder="Data to be encrypted"
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-              className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
-            />
-            <Input
-              type="password"
-              placeholder="Passphrase for Encryption"
-              value={passphrase}
-              onChange={(e) => setPassphrase(e.target.value)}
-              className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
-            />
-            <Select value={algorithm} onValueChange={setAlgorithm}>
-              <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
-                <SelectValue placeholder="Select encryption algorithm" />
-              </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
-                <SelectItem value="AES">AES</SelectItem>
-                <SelectItem value="DES">DES</SelectItem>
-                <SelectItem value="TDEA">TDEA</SelectItem>
-              </SelectContent>
-            </Select>
-            {algorithm === "AES" && (
-              <>
-                <Select value={algorithmType} onValueChange={setAlgorithmType}>
-                  <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
-                    <SelectValue placeholder="Select AES Encryption Type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
-                    <SelectItem value="AES-128">
-                      AES - 128 (16 character Passphrase)
-                    </SelectItem>
-                    <SelectItem value="AES-192">
-                      AES - 192 (24 character Passphrase)
-                    </SelectItem>
-                    <SelectItem value="AES-256">
-                      AES - 256 (32 character Passphrase)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <AlgorithmTypeDescription algorithmType={algorithmType} />
-              </>
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="asymmetric">
-          <div className="space-y-4">
-            <p className="text-sm text-foreground dark:text-foreground-dark">
-              Asymmetric encryption uses a public/private key pair and is
-              commonly used for secure sharing of data.
-            </p>
-            <Input
-              type="text"
-              placeholder="Data to be encrypted"
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-              className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
-            />
-            <Input
-              type="text"
-              placeholder="Public key"
-              value={passphrase}
-              onChange={(e) => setPassphrase(e.target.value)}
-              className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
-            />
-            <Select value={algorithm} onValueChange={setAlgorithm}>
-              <SelectTrigger className="bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark">
-                <SelectValue placeholder="Select encryption algorithm" />
-              </SelectTrigger>
-              <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
-                <SelectItem value="RSA">RSA</SelectItem>
-                <SelectItem value="ECC">ECC</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-sm text-foreground dark:text-foreground-dark">
-              Public key will be used for encryption, while the private key is
-              used for decryption. You can securely share your public key with
-              others to encrypt data for you.
-            </p>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Generate Key Button */}
       <Button
         onClick={handleGenerateKey}
         className="bg-blue-500 text-white p-3 rounded w-full"
       >
         {keyType === "symmetric"
           ? "Encrypt Data with Symmetric Key"
-          : "Generate Public/Private Key Pair"}
+          : keyType === "asymmetric"
+            ? "Generate Public/Private Key Pair"
+            : "Use Hybrid"}
       </Button>
 
-      {/* Display Encrypted Data */}
+      <EncryptedDataDisplay encryptedData={encryptedData} />
+
       {encryptedData && (
-        <div className="flex flex-col space-y-4 p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-foreground dark:text-foreground-dark">
-            Encrypted Data
-          </h3>
-
-          <div className="p-3 bg-card dark:bg-card-dark rounded-lg overflow-x-auto">
-            <p className="text-sm break-words text-foreground dark:text-foreground-dark">
-              {encryptedData}
-            </p>
-          </div>
-
-          {/* File name input for saving key */}
-          <Input
-            type="text"
-            placeholder="Enter the name for the key file"
-            value={keyFileName}
-            onChange={(e) => setKeyFileName(e.target.value)}
-            className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
-          />
-
-          {/* Save Key Button */}
-          <Button
-            onClick={handleSaveKey}
-            className="self-end bg-green-700 hover:bg-green-800 text-white p-2 rounded-lg"
-          >
-            Save Key
-          </Button>
-        </div>
+        <KeySaveForm
+          keyFileName={keyFileName}
+          setKeyFileName={setKeyFileName}
+          handleSaveKey={handleSaveKey}
+        />
       )}
     </div>
   );
