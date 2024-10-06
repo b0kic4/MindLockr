@@ -17,119 +17,68 @@ type DataToDecrypt struct {
 
 type Cryptography struct{}
 
-// AES128Decryption decrypts AES-128 encrypted data
-func (c *Cryptography) AES128Decryption(data DataToDecrypt) (string, error) {
-	// Decode the hex-encoded encrypted string into bytes
-	encryptedBytes, err := hex.DecodeString(data.EncryptedData)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode encrypted data: %v", err)
+func (c *Cryptography) DecryptAES(algorithmType string, data DataToDecrypt) (string, error) {
+	switch algorithmType {
+	case "AES-128":
+		return AES128Decryption(data)
+	case "AES-192":
+		return AES192Decryption(data)
+	case "AES-256":
+		return AES256Decryption(data)
+	default:
+		return "", fmt.Errorf("unsupported AES type: %s", algorithmType)
 	}
-
-	// Extract the salt (first 16 bytes)
-	if len(encryptedBytes) < 32 {
-		return "", fmt.Errorf("encrypted data too short: ", err)
-	}
-	salt := encryptedBytes[:16]
-
-	// Derive the AES-128 key using PBKDF2
-	key := pbkdf2.Key([]byte(data.Passphrase), salt, 4096, 16, sha256.New)
-
-	// Create AES cipher block
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return "", fmt.Errorf("failed to create AES cipher: %v", err)
-	}
-
-	// Extract the IV (next 16 bytes after the salt)
-	iv := encryptedBytes[16:32]
-
-	// Extract the ciphertext (everything after the salt and IV)
-	cipherText := encryptedBytes[32:]
-
-	// Create a CFB decrypter with the block and IV
-	stream := cipher.NewCFBDecrypter(block, iv)
-
-	// Decrypt the ciphertext
-	stream.XORKeyStream(cipherText, cipherText)
-
-	// Return the decrypted plaintext as a string
-	return string(cipherText), nil
 }
 
-// AES192Decryption decrypts AES-192 encrypted data
-func (c *Cryptography) AES192Decryption(data DataToDecrypt) (string, error) {
-	// Decode the hex-encoded encrypted string into bytes
+func AES128Decryption(data DataToDecrypt) (string, error) {
+	return decrypt(data, 16)
+}
+
+func AES192Decryption(data DataToDecrypt) (string, error) {
+	return decrypt(data, 24)
+}
+
+func AES256Decryption(data DataToDecrypt) (string, error) {
+	return decrypt(data, 32)
+}
+
+// 1. Decode the hex-encoded encrypted string into bytes
+// 2. Ensure the encrypted data is long enough to contain both the salt and IV
+// 3. Extract the salt (first 16 bytes)
+// 4. Derive the AES key using PBKDF2 with the passphrase and salt
+// 5.Create AES cipher block
+// 6. Extract the IV (next 16 bytes after the salt)
+// 7. Extract the ciphertext (everything after the salt and IV)
+//  Create a CFB decrypter with the block and IV
+// 8. Decrypt the ciphertext in-place
+// 9. Return the decrypted plaintext as a string
+
+func decrypt(data DataToDecrypt, keySize int) (string, error) {
 	encryptedBytes, err := hex.DecodeString(data.EncryptedData)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode encrypted data: %v", err)
 	}
 
-	// Extract the salt (first 16 bytes)
 	if len(encryptedBytes) < 32 {
 		return "", fmt.Errorf("encrypted data too short")
 	}
+
 	salt := encryptedBytes[:16]
 
-	// Derive the AES-192 key using PBKDF2
-	key := pbkdf2.Key([]byte(data.Passphrase), salt, 4096, 24, sha256.New)
+	key := pbkdf2.Key([]byte(data.Passphrase), salt, 4096, keySize, sha256.New)
 
-	// Create AES cipher block
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", fmt.Errorf("failed to create AES cipher: %v", err)
 	}
 
-	// Extract the IV (next 16 bytes after the salt)
 	iv := encryptedBytes[16:32]
 
-	// Extract the ciphertext (everything after the salt and IV)
 	cipherText := encryptedBytes[32:]
 
-	// Create a CFB decrypter with the block and IV
 	stream := cipher.NewCFBDecrypter(block, iv)
 
-	// Decrypt the ciphertext
 	stream.XORKeyStream(cipherText, cipherText)
 
-	// Return the decrypted plaintext as a string
-	return string(cipherText), nil
-}
-
-// AES256Decryption decrypts AES-256 encrypted data
-func (c *Cryptography) AES256Decryption(data DataToDecrypt) (string, error) {
-	// Decode the hex-encoded encrypted string into bytes
-	encryptedBytes, err := hex.DecodeString(data.EncryptedData)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode encrypted data: %v", err)
-	}
-
-	// Extract the salt (first 16 bytes)
-	if len(encryptedBytes) < 32 {
-		return "", fmt.Errorf("encrypted data too short")
-	}
-	salt := encryptedBytes[:16]
-
-	// Derive the AES-256 key using PBKDF2
-	key := pbkdf2.Key([]byte(data.Passphrase), salt, 4096, 32, sha256.New)
-
-	// Create AES cipher block
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return "", fmt.Errorf("failed to create AES cipher: %v", err)
-	}
-
-	// Extract the IV (next 16 bytes after the salt)
-	iv := encryptedBytes[16:32]
-
-	// Extract the ciphertext (everything after the salt and IV)
-	cipherText := encryptedBytes[32:]
-
-	// Create a CFB decrypter with the block and IV
-	stream := cipher.NewCFBDecrypter(block, iv)
-
-	// Decrypt the ciphertext
-	stream.XORKeyStream(cipherText, cipherText)
-
-	// Return the decrypted plaintext as a string
 	return string(cipherText), nil
 }

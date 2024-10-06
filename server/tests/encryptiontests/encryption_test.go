@@ -1,27 +1,26 @@
-package encryptiontests
+package symmetricecnryptiontests
 
 import (
-	"MindLockr/server/cryptography/decryption"
-	"MindLockr/server/cryptography/encryption"
+	symmetricdecryption "MindLockr/server/cryptography/decryption/symmetric_decryption"
+	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
 	"testing"
 )
 
 func TestEncryptDecryptAES128(t *testing.T) {
 	// Test data and passphrase
-	decrypt := &decryption.Cryptography{}
-	originalData := "This is a test message for AES-128 encryption."
+	originalData := "This is a test message for AES-128 symmetricecnryption."
 	passphrase := "mystrongpassphrase"
 
 	// Create request data
-	encryptData := encryption.DataToEncrypt{
+	encryptData := symmetricencryption.DataToEncrypt{
 		Data:       originalData,
 		Passphrase: passphrase,
 	}
 
-	// Perform AES-128 encryption
-	encryptedData, err := encryption.AES128Encryption(encryptData)
+	// Perform AES-128 symmetricecnryption
+	encryptedData, err := symmetricencryption.AES128Encryption(encryptData)
 	if err != nil {
-		t.Fatalf("Encryption failed: %v", err)
+		t.Fatalf("symmetricecnryption failed: %v", err)
 	}
 
 	// Check that the encrypted data is not the same as the original data
@@ -30,13 +29,13 @@ func TestEncryptDecryptAES128(t *testing.T) {
 	}
 
 	// Prepare decryption request
-	decryptData := decryption.DataToDecrypt{
+	decryptData := symmetricdecryption.DataToDecrypt{
 		EncryptedData: encryptedData,
 		Passphrase:    passphrase,
 	}
 
 	// Perform AES-128 decryption
-	decryptedData, err := decrypt.AES128Decryption(decryptData)
+	decryptedData, err := symmetricdecryption.AES128Decryption(decryptData)
 	if err != nil {
 		t.Fatalf("Decryption failed: %v", err)
 	}
@@ -48,19 +47,18 @@ func TestEncryptDecryptAES128(t *testing.T) {
 }
 
 func TestEncryptDecryptAES192(t *testing.T) {
-	decrypt := &decryption.Cryptography{}
-	originalData := "This is a test message for AES-192 encryption."
+	originalData := "This is a test message for AES-192 symmetricecnryption."
 	passphrase := "mystrongpassphrase"
 
-	encryptData := encryption.DataToEncrypt{
+	encryptData := symmetricencryption.DataToEncrypt{
 		Data:       originalData,
 		Passphrase: passphrase,
 	}
 
-	// Perform AES-192 encryption
-	encryptedData, err := encryption.AES192Encryption(encryptData)
+	// Perform AES-192 symmetricecnryption
+	encryptedData, err := symmetricencryption.AES192Encryption(encryptData)
 	if err != nil {
-		t.Fatalf("Encryption failed: %v", err)
+		t.Fatalf("symmetricecnryption failed: %v", err)
 	}
 
 	// Check that the encrypted data is not the same as the original data
@@ -69,13 +67,13 @@ func TestEncryptDecryptAES192(t *testing.T) {
 	}
 
 	// Prepare decryption request
-	decryptData := decryption.DataToDecrypt{
+	decryptData := symmetricdecryption.DataToDecrypt{
 		EncryptedData: encryptedData,
 		Passphrase:    passphrase,
 	}
 
 	// Perform AES-192 decryption
-	decryptedData, err := decrypt.AES192Decryption(decryptData)
+	decryptedData, err := symmetricdecryption.AES192Decryption(decryptData)
 	if err != nil {
 		t.Fatalf("Decryption failed: %v", err)
 	}
@@ -87,19 +85,18 @@ func TestEncryptDecryptAES192(t *testing.T) {
 }
 
 func TestEncryptDecryptAES256(t *testing.T) {
-	decrypt := &decryption.Cryptography{}
-	originalData := "This is a test message for AES-256 encryption."
+	originalData := "This is a test message for AES-256 symmetricecnryption."
 	passphrase := "mystrongpassphrase"
 
-	encryptData := encryption.DataToEncrypt{
+	encryptData := symmetricencryption.DataToEncrypt{
 		Data:       originalData,
 		Passphrase: passphrase,
 	}
 
-	// Perform AES-256 encryption
-	encryptedData, err := encryption.AES256Encryption(encryptData)
+	// Perform AES-256 symmetricecnryption
+	encryptedData, err := symmetricencryption.AES256Encryption(encryptData)
 	if err != nil {
-		t.Fatalf("Encryption failed: %v", err)
+		t.Fatalf("symmetricecnryption failed: %v", err)
 	}
 
 	// Check that the encrypted data is not the same as the original data
@@ -108,13 +105,13 @@ func TestEncryptDecryptAES256(t *testing.T) {
 	}
 
 	// Prepare decryption request
-	decryptData := decryption.DataToDecrypt{
+	decryptData := symmetricdecryption.DataToDecrypt{
 		EncryptedData: encryptedData,
 		Passphrase:    passphrase,
 	}
 
 	// Perform AES-256 decryption
-	decryptedData, err := decrypt.AES256Decryption(decryptData)
+	decryptedData, err := symmetricdecryption.AES256Decryption(decryptData)
 	if err != nil {
 		t.Fatalf("Decryption failed: %v", err)
 	}
@@ -126,30 +123,29 @@ func TestEncryptDecryptAES256(t *testing.T) {
 }
 
 func TestIncorrectPassphrase(t *testing.T) {
-	decrypt := &decryption.Cryptography{}
-	originalData := "This is a test message for AES-128 encryption."
+	originalData := "This is a test message for AES-128 symmetricecnryption."
 	passphrase := "correctpassphrase"
 	wrongPassphrase := "wrongpassphrase"
 
-	encryptData := encryption.DataToEncrypt{
+	encryptData := symmetricencryption.DataToEncrypt{
 		Data:       originalData,
 		Passphrase: passphrase,
 	}
 
-	// Perform AES-128 encryption
-	encryptedData, err := encryption.AES128Encryption(encryptData)
+	// Perform AES-128 symmetricecnryption
+	encryptedData, err := symmetricencryption.AES128Encryption(encryptData)
 	if err != nil {
-		t.Fatalf("Encryption failed: %v", err)
+		t.Fatalf("symmetricecnryption failed: %v", err)
 	}
 
 	// Try to decrypt using an incorrect passphrase
-	decryptData := decryption.DataToDecrypt{
+	decryptData := symmetricdecryption.DataToDecrypt{
 		EncryptedData: encryptedData,
 		Passphrase:    wrongPassphrase,
 	}
 
 	// Perform AES-128 decryption
-	decryptedData, err := decrypt.AES128Decryption(decryptData)
+	decryptedData, err := symmetricdecryption.AES128Decryption(decryptData)
 	if err == nil {
 		// Even though decryption didn't produce an error, check if the output makes sense
 		if decryptedData == originalData {

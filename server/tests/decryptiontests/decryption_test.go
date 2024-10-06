@@ -1,8 +1,8 @@
 package decryptiontests
 
 import (
-	"MindLockr/server/cryptography/decryption"
-	"MindLockr/server/cryptography/encryption"
+	symmetricdecryption "MindLockr/server/cryptography/decryption/symmetric_decryption"
+	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
 	"testing"
 )
 
@@ -10,13 +10,13 @@ func TestEmptyData(t *testing.T) {
 	originalData := ""
 	passphrase := "mypassword"
 
-	encryptData := encryption.DataToEncrypt{
+	encryptData := symmetricencryption.DataToEncrypt{
 		Data:       originalData,
 		Passphrase: passphrase,
 	}
 
 	// Perform AES-128 encryption
-	encryptedData, err := encryption.AES128Encryption(encryptData)
+	encryptedData, err := symmetricencryption.AES128Encryption(encryptData)
 	if err != nil {
 		t.Fatalf("Encryption failed: %v", err)
 	}
@@ -27,13 +27,13 @@ func TestEmptyData(t *testing.T) {
 	}
 
 	// Prepare decryption request
-	decryptData := decryption.DataToDecrypt{
+	decryptData := symmetricdecryption.DataToDecrypt{
 		EncryptedData: encryptedData,
 		Passphrase:    passphrase,
 	}
 
 	// Perform AES-128 decryption
-	decryptedData, err := decryption.AES128Decryption(decryptData)
+	decryptedData, err := symmetricdecryption.AES128Decryption(decryptData)
 	if err != nil {
 		t.Fatalf("Decryption failed: %v", err)
 	}
