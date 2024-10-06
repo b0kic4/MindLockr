@@ -5,6 +5,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"fmt"
 )
 
 // ECDSA -> for ditigal signature
@@ -17,23 +18,32 @@ type RequestData struct {
 }
 
 type ReturnType struct {
-	privKey crypto.PrivateKey
-	pubKey  crypto.PublicKey
+	PrivKey crypto.PrivateKey
+	PubKey  crypto.PublicKey
 }
 
 func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnType, error) {
-	// first we are creating the private key
+	// Generate the private key
 	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return ReturnType{}, err
 	}
 
-	// than from the private key
-	// we are getting the public key
+	// Get the public key from the private key
 	pubKey := privKey.Public()
 
+	err = SavePrivateKey(privKey, req.Passphrase)
+	if err != nil {
+		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
+	}
+
+	err = SavePublicKey(pubKey)
+	if err != nil {
+		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
+	}
+
 	return ReturnType{
-		privKey: privKey,
-		pubKey:  pubKey,
+		PrivKey: privKey,
+		PubKey:  pubKey,
 	}, nil
 }
