@@ -109,7 +109,7 @@ export default function Home() {
       setTimeout(() => {
         setDecryptedPrivKey("");
         setIsPrivKeyVisible(false);
-      }, 10000); // 10000 ms = 10s
+      }, 50000); // 10000 ms = 10s
     } catch (error) {
       LogError(error as any);
       toast({
