@@ -1,4 +1,4 @@
-import { PassphraseDialog } from "@/components/shared/decryption/EnterPassphraseDialog";
+import { PassphraseDialog } from "@/components/shared/decryption/PassphraseDialog";
 import { useToast } from "@/hooks/use-toast";
 import { KeyInfo } from "@/lib/types/keys";
 import React from "react";
@@ -21,47 +21,38 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
   onClose,
 }) => {
   const [decryptedData, setDecryptedData] = React.useState<string | null>(null);
-  const [isPassphraseDialogOpen, setIsPassphraseDialogOpen] =
-    React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
   const { toast } = useToast();
 
   const handleDecryptPassphraseSubmit = async (passphrase: string) => {
-    if (keyInfo) {
-      setIsLoading(true);
-      try {
-        const encryptedData = await LoadEncryptedKeyContent(
-          keyInfo.name,
-          keyInfo.algorithm,
-        );
+    setIsLoading(true);
+    try {
+      const encryptedData = await LoadEncryptedKeyContent(
+        keyInfo.name,
+        keyInfo.algorithm,
+      );
 
-        const dataToDecrypt: DataToDecrypt = {
-          encryptedData: encryptedData,
-          passphrase: passphrase,
-        };
+      const dataToDecrypt: DataToDecrypt = {
+        encryptedData: encryptedData,
+        passphrase: passphrase,
+      };
 
-        const decrypted = await DecryptAES(
-          keyInfo.algorithm as any,
-          dataToDecrypt,
-        );
+      const decrypted = await DecryptAES(
+        keyInfo.algorithm as any,
+        dataToDecrypt,
+      );
 
-        setDecryptedData(decrypted);
-        setIsPassphraseDialogOpen(false);
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          className: "bg-red-500 border-0",
-          title: "Decryption failed",
-          description: "An error occurred during decryption.",
-        });
-      } finally {
-        setIsLoading(false);
-      }
+      setDecryptedData(decrypted);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Decryption failed",
+        description: "An error occurred during decryption.",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const handlePassphraseDialogClose = () => {
-    setIsPassphraseDialogOpen(false);
   };
 
   return (
@@ -75,15 +66,12 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
               </div>
             ) : (
               <PassphraseDialog
-                isOpen={isPassphraseDialogOpen}
-                onClose={handlePassphraseDialogClose}
                 onSubmit={handleDecryptPassphraseSubmit}
                 keyName={keyInfo.name}
               />
             )}
           </>
         )}
-
         {decryptedData && (
           <div className="mt-6 p-4 bg-background dark:bg-background-dark rounded-lg">
             <h3 className="text-lg font-semibold text-foreground dark:text-foreground-dark mb-2">

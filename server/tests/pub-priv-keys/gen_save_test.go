@@ -171,7 +171,7 @@ func TestKeyRetrieval(t *testing.T) {
 	}
 
 	// Retrieve the private key
-	privKeyPEM, err := keyGen.RetrievePrivKey(req.Passphrase)
+	privKeyPEM, err := keyGen.RetrievePrivKey()
 	if err != nil {
 		t.Fatalf("failed to retrieve private key: %v", err)
 	}
@@ -216,7 +216,7 @@ func TestCryptographicOperations(t *testing.T) {
 	}
 
 	// Retrieve the keys
-	privKeyPEM, err := keyGen.RetrievePrivKey(req.Passphrase)
+	privKeyPEM, err := keyGen.RetrievePrivKey()
 	if err != nil {
 		t.Fatalf("failed to retrieve private key: %v", err)
 	}

@@ -1,4 +1,13 @@
+import { DecryptButton } from "@/components/shared/decryption/DecryptButton.js";
 import { Button } from "@/components/ui/button.js";
+import { toast } from "@/hooks/use-toast.js";
+import { EyeOff } from "lucide-react";
+import {
+  DecryptPrivKey,
+  RetrievePrivKey,
+  RetrievePubKey,
+} from "@wailsjs/go/keys/PubPrvKeyGen.js";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
 import React from "react";
 import {
   GetFolderPath,
@@ -11,7 +20,9 @@ export default function Home() {
   const [folderPath, setFolderPath] = React.useState("");
   const [privKey, setPrivKey] = React.useState<string>("");
   const [pubKey, setPubKey] = React.useState<string>("");
-  const [showPrivateKey, setShowPrivateKey] = React.useState(false);
+  const [decryptedPrivKey, setDecryptedPrivKey] = React.useState<string>("");
+  const [isPrivKeyVisible, setIsPrivKeyVisible] =
+    React.useState<boolean>(false);
 
   function checkForFolderPathInLocalStorage() {
     const savedFolderPath = localStorage.getItem("folderPath");
@@ -54,7 +65,32 @@ export default function Home() {
         }
       }
     }
+    async function getPubPrivKeys() {
+      RetrievePubKey()
+        .then((publicKey) => setPubKey(publicKey))
+        .catch((error) => {
+          LogError(error as any);
+          toast({
+            variant: "destructive",
+            className: "bg-red-500 border-0",
+            title: "Uh oh! Something went wrong.",
+            description: "Error when retrieving public key",
+          });
+        });
+      RetrievePrivKey()
+        .then((privKey) => setPrivKey(privKey))
+        .catch((error) => {
+          LogError(error as any);
+          toast({
+            variant: "destructive",
+            className: "bg-red-500 border-0",
+            title: "Uh oh! Something went wrong.",
+            description: "Error when retrieving private key",
+          });
+        });
+    }
     initializeFolderPath();
+    getPubPrivKeys();
   }, []);
 
   function removeFolderPath() {
@@ -63,9 +99,32 @@ export default function Home() {
     localStorage.removeItem("folderPath");
   }
 
-  // TODO:
-  // i need to implmenet retrieving the pub priv keys
-  // then i need to implement decrypting the private key
+  const handleDecryptPrivKey = async (passphrase: string) => {
+    LogInfo("Decrypting private key with passphrase...");
+    try {
+      const decrypted = await DecryptPrivKey(passphrase);
+      setDecryptedPrivKey(decrypted);
+      setIsPrivKeyVisible(true);
+
+      setTimeout(() => {
+        setDecryptedPrivKey("");
+        setIsPrivKeyVisible(false);
+      }, 10000); // 10000 ms = 10s
+    } catch (error) {
+      LogError(error as any);
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description: "Error decrypting the private key.",
+      });
+    }
+  };
+
+  const handleHidePrivKey = () => {
+    setDecryptedPrivKey("");
+    setIsPrivKeyVisible(false);
+  };
 
   return (
     <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen max-w-4xl mx-auto space-y-8">
@@ -138,19 +197,35 @@ export default function Home() {
               className="w-full h-32 p-3 border border-gray-600 dark:border-gray-400 bg-gray-200 dark:bg-gray-900 rounded-md"
             />
           </div>
-          <div className="relative mb-4">
-            <h3 className="text-lg font-semibold">Private Key:</h3>
+          <div className="relative mb-4 p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold mb-2 sm:mb-0">
+                Private Key:
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                <em className="text-red-500">
+                  Private key is initially encrypted. Use the decryption
+                  passphrase to retrieve the private key.
+                </em>
+              </p>
+            </div>
             <textarea
               readOnly
-              value={showPrivateKey ? privKey : "********"}
-              className="w-full h-32 p-3 border border-gray-600 dark:border-gray-400 bg-gray-200 dark:bg-gray-900 rounded-md"
+              value={decryptedPrivKey ? decryptedPrivKey : privKey}
+              className="w-full h-32 p-3 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 rounded-md resize-none mb-4"
+              placeholder="Encrypted private key will be displayed here."
             />
-            <Button
-              onClick={() => setShowPrivateKey(!showPrivateKey)}
-              className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white rounded px-4 py-2"
-            >
-              {showPrivateKey ? "Hide" : "Show"}
-            </Button>
+            <div className="flex justify-end items-center space-x-4">
+              {isPrivKeyVisible && (
+                <Button onClick={handleHidePrivKey} variant="ghost">
+                  <EyeOff className="w-6 h-6" />
+                </Button>
+              )}
+              <DecryptButton
+                onSubmit={handleDecryptPrivKey}
+                keyName={decryptedPrivKey ? decryptedPrivKey : privKey}
+              />
+            </div>
           </div>
         </div>
       )}

@@ -10,8 +10,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GeneratePrivatePublicKeys } from "@wailsjs/go/keys/PubPrvKeyGen";
+import {
+  GeneratePrivatePublicKeys,
+  RetrievePrivKey,
+  RetrievePubKey,
+} from "@wailsjs/go/keys/PubPrvKeyGen";
 import React from "react";
+import { useToast } from "@/hooks/use-toast";
+import { LogError } from "@wailsjs/runtime/runtime";
 
 type Props = {
   setPrivKey: (value: string) => void;
@@ -20,23 +26,50 @@ type Props = {
 
 export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
   const [passphrase, setPassphrase] = React.useState<string>("");
-  const [error, setError] = React.useState<string | null>(null);
+  const { toast } = useToast();
 
   const genKeys = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     try {
       const response = await GeneratePrivatePublicKeys({
         Passphrase: passphrase,
       });
 
-      setPrivKey(JSON.stringify(response.PrivKey));
-      setPubKey(JSON.stringify(response.PubKey));
+      if (response.PubKey && response.PrivKey) {
+        RetrievePubKey()
+          .then((publicKey) => setPubKey(publicKey))
+          .catch((error) => {
+            LogError(error as any);
+            toast({
+              variant: "destructive",
+              className: "bg-red-500 border-0",
+              title: "Uh oh! Something went wrong.",
+              description: "Error when retrieving public key",
+            });
+          });
+        RetrievePrivKey()
+          .then((privKey) => setPrivKey(privKey))
+          .catch((error) => {
+            LogError(error as any);
+            toast({
+              variant: "destructive",
+              className: "bg-red-500 border-0",
+              title: "Uh oh! Something went wrong.",
+              description: "Error when retrieving private key",
+            });
+          });
+      }
 
       setPassphrase("");
     } catch (err) {
-      setError("Failed to generate keys. Please try again.");
-      console.error("Error generating keys:", err);
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description: "Failed to generate keys. Please try again.",
+      });
+      LogError("Error generating keys");
+      LogError(err as any);
     }
   };
 

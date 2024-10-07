@@ -98,7 +98,21 @@ func (pubpriv *PubPrvKeyGen) RetrievePubKey() (string, error) {
 	return string(pubKeyPEM), nil
 }
 
-func (pubpriv *PubPrvKeyGen) RetrievePrivKey(passphrase string) (string, error) {
+func (pubpriv *PubPrvKeyGen) RetrievePrivKey() (string, error) {
+	folderInstance := filesystem.GetFolderInstance()
+	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
+	privKeyPath := filepath.Join(keysDir, "private.pem")
+
+	// Read the encrypted private key file
+	encryptedPrivKeyHex, err := os.ReadFile(privKeyPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read private key file: %v", err)
+	}
+
+	return string(encryptedPrivKeyHex), nil
+}
+
+func (pubpriv *PubPrvKeyGen) DecryptPrivKey(passphrase string) (string, error) {
 	folderInstance := filesystem.GetFolderInstance()
 	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
 	privKeyPath := filepath.Join(keysDir, "private.pem")

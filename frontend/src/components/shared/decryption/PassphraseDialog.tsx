@@ -7,20 +7,18 @@ import {
   DialogHeader,
   DialogOverlay,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { KeyRound } from "lucide-react";
 import React from "react";
 
 interface PassphraseDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
   onSubmit: (passphrase: string) => void;
   keyName: string;
 }
 
 export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
-  isOpen,
-  onClose,
   onSubmit,
   keyName,
 }) => {
@@ -30,12 +28,13 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
     e.preventDefault();
     onSubmit(passphrase);
     setPassphrase("");
-    onClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogOverlay />
+    <Dialog defaultOpen>
+      <DialogTrigger>
+        <KeyRound />
+      </DialogTrigger>
       <DialogContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark dark:border-0">
         <DialogHeader>
           <DialogTitle>Decrypt Key: {keyName}</DialogTitle>
@@ -53,11 +52,11 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
           </div>
           <DialogFooter>
             <DialogClose>
-              <Button variant="ghost" onClick={onClose}>
-                Cancel
-              </Button>
+              <Button variant="ghost">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Decrypt</Button>
+            <DialogClose>
+              <Button type="submit">Decrypt</Button>
+            </DialogClose>
           </DialogFooter>
         </form>
       </DialogContent>
