@@ -14,6 +14,32 @@ export namespace keys {
 	        this.algorithm = source["algorithm"];
 	    }
 	}
+	export class RequestData {
+	    Passphrase: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RequestData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Passphrase = source["Passphrase"];
+	    }
+	}
+	export class ReturnType {
+	    PrivKey: string;
+	    PubKey: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ReturnType(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.PrivKey = source["PrivKey"];
+	        this.PubKey = source["PubKey"];
+	    }
+	}
 
 }
 

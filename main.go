@@ -19,7 +19,7 @@ var assets embed.FS
 func main() {
 	symmetric_encryption := &symmetricencryption.Cryptography{}
 	symmetric_decryption := &symmetricdecryption.Cryptography{}
-	folder := filesystem.NewFolder()
+	folder := filesystem.GetFolderInstance()
 	keyRetrieve := keys.NewKeyRetrieve(folder)
 	keyStore := &keys.KeyStore{}
 	pubPrivKeys := &keys.PubPrvKeyGen{}

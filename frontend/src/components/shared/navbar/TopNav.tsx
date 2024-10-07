@@ -3,7 +3,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 
 export function TopNav() {
   return (
-    <div className="w-full h-16 bg-background dark:bg-background-dark shadow-md flex items-center relative px-4">
+    <div className="w-full h-16 bg-background dark:bg-background-dark shadow-sm dark:shadow-md flex items-center relative px-4">
       {/* Logo for small screens */}
       <div className="flex md:hidden">
         <div className="w-12 h-12">

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -51,9 +52,11 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
             />
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={onClose}>
-              Cancel
-            </Button>
+            <DialogClose>
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
+            </DialogClose>
             <Button type="submit">Decrypt</Button>
           </DialogFooter>
         </form>
