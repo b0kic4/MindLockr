@@ -28,15 +28,10 @@ var (
 	once           sync.Once
 )
 
-// NewFolder creates a new instance of Folder with an empty folder path
-func NewFolder() *Folder {
-	return &Folder{}
-}
-
 // GetFolderInstance returns the existing Folder instance or creates one if it doesn't exist
 func GetFolderInstance() *Folder {
 	once.Do(func() {
-		folderInstance = NewFolder()
+		folderInstance = &Folder{}
 	})
 	return folderInstance
 }

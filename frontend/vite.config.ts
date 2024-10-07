@@ -7,6 +7,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@wailsjs": path.resolve(__dirname, "wailsjs"),
+      "@components": path.resolve(__dirname, "src/components"),
+      "@hooks": path.resolve(__dirname, "src/hooks"),
+      "@routes": path.resolve(__dirname, "src/routes"),
     },
   },
 });

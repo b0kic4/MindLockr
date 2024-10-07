@@ -29,12 +29,11 @@ export function Sidebar() {
     { href: "/network", label: "Network", icon: Network },
     { href: "/personal", label: "Personal", icon: IdCard },
     { href: "/notes", label: "Notes", icon: NotebookPen },
-    { href: "/biometrics", label: "Biometrics", icon: Fingerprint },
     { href: "/backups", label: "Backups", icon: DatabaseBackup },
   ];
 
   return (
-    <aside className="sticky top-0 sm:w-20 md:w-24 lg:w-52 h-screen bg-white dark:bg-background-dark text-foreground dark:text-foreground-dark shadow-lg p-4 flex-shrink-0">
+    <aside className="sticky top-0 sm:w-20 md:w-24 lg:w-44 h-screen bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark p-4 flex-shrink-0">
       <nav className="flex flex-col space-y-4 mt-8 w-full">
         {navigationRoutes.map((route) => (
           <NavItem

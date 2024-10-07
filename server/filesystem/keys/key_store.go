@@ -1,12 +1,7 @@
 package keys
 
 import (
-	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
 	"MindLockr/server/filesystem"
-	"crypto"
-	"crypto/ecdsa"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -52,11 +47,11 @@ func (ks *KeyStore) SaveAsymmetricKey(folderPath, fileName, keyContent string, a
 	return nil
 }
 
-// when saving the keys on the filesystem
-// the public key should be saved as a plain text
-// but the private key should be encrypted with the AES encryption
+// 1. creating the keys dir
+// 2. opening file for writing
+// 3. writing the encrypted key to file
 
-func SavePrivateKey(privKey crypto.PrivateKey, passphrase string) error {
+func SavePrivateKey(privKey string) error {
 	folderInstance := filesystem.GetFolderInstance()
 	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
 
@@ -67,32 +62,13 @@ func SavePrivateKey(privKey crypto.PrivateKey, passphrase string) error {
 
 	keyFilePath := filepath.Join(keysDir, "private.pem")
 
-	ecdsaPrivKey, ok := privKey.(*ecdsa.PrivateKey)
-	if !ok {
-		return fmt.Errorf("unsupported private key type")
-	}
-
-	keyBytes, err := x509.MarshalECPrivateKey(ecdsaPrivKey)
+	file, err := os.OpenFile(keyFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
-		return fmt.Errorf("failed to marshal private key: %v", err)
+		return fmt.Errorf("failed to open private key file: %v", err)
 	}
+	defer file.Close()
 
-	privPemBlock := &pem.Block{
-		Type:  "EC PRIVATE KEY",
-		Bytes: keyBytes,
-	}
-
-	pemEncodedPrivKey := pem.EncodeToMemory(privPemBlock)
-
-	encryptedPrivKey, err := symmetricencryption.AES256Encryption(symmetricencryption.DataToEncrypt{
-		Data:       string(pemEncodedPrivKey),
-		Passphrase: passphrase,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to encrypt private key: %v", err)
-	}
-
-	err = os.WriteFile(keyFilePath, []byte(encryptedPrivKey), 0644)
+	_, err = file.WriteString(privKey)
 	if err != nil {
 		return fmt.Errorf("failed to write private key to file: %v", err)
 	}
@@ -100,7 +76,11 @@ func SavePrivateKey(privKey crypto.PrivateKey, passphrase string) error {
 	return nil
 }
 
-func SavePublicKey(pubKey crypto.PublicKey) error {
+// 1. create the keys dir
+// 2. open the file for writing
+// 3. write the public key to the file
+
+func SavePublicKey(pubKey []byte) error {
 	folderInstance := filesystem.GetFolderInstance()
 	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
 
@@ -111,25 +91,15 @@ func SavePublicKey(pubKey crypto.PublicKey) error {
 
 	keyFilePath := filepath.Join(keysDir, "public.pem")
 
-	pubKeyBytes, err := x509.MarshalPKIXPublicKey(pubKey)
+	file, err := os.OpenFile(keyFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
-		return fmt.Errorf("failed to marshal public key: %v", err)
+		return fmt.Errorf("failed to open public key file: %v", err)
 	}
+	defer file.Close()
 
-	pubPemBlock := &pem.Block{
-		Type:  "PUBLIC KEY",
-		Bytes: pubKeyBytes,
-	}
-
-	keyFile, err := os.Create(keyFilePath)
+	_, err = file.Write(pubKey)
 	if err != nil {
-		return fmt.Errorf("failed to create public key file: %v", err)
-	}
-	defer keyFile.Close()
-
-	err = pem.Encode(keyFile, pubPemBlock)
-	if err != nil {
-		return fmt.Errorf("failed to encode public key to PEM: %v", err)
+		return fmt.Errorf("failed to write public key to file: %v", err)
 	}
 
 	return nil
