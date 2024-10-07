@@ -7,7 +7,7 @@ import {
   RetrievePrivKey,
   RetrievePubKey,
 } from "@wailsjs/go/keys/PubPrvKeyGen.js";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
+import { LogError } from "@wailsjs/runtime/runtime.js";
 import React from "react";
 import {
   GetFolderPath,
@@ -24,6 +24,7 @@ export default function Home() {
   const [isPrivKeyVisible, setIsPrivKeyVisible] =
     React.useState<boolean>(false);
 
+  // check for saved path in localStorage
   function checkForFolderPathInLocalStorage() {
     const savedFolderPath = localStorage.getItem("folderPath");
     if (savedFolderPath) {
@@ -34,6 +35,7 @@ export default function Home() {
     return false;
   }
 
+  // destination where data is stored
   async function pickFolder() {
     try {
       const folder = await SelectFolder();
@@ -65,6 +67,8 @@ export default function Home() {
         }
       }
     }
+
+    // get pub/priv keys from fs
     async function getPubPrivKeys() {
       RetrievePubKey()
         .then((publicKey) => setPubKey(publicKey))
@@ -93,6 +97,7 @@ export default function Home() {
     getPubPrivKeys();
   }, []);
 
+  // removing path
   function removeFolderPath() {
     setFolderPath("");
     UpdateFolderPath("");
@@ -100,7 +105,6 @@ export default function Home() {
   }
 
   const handleDecryptPrivKey = async (passphrase: string) => {
-    LogInfo("Decrypting private key with passphrase...");
     try {
       const decrypted = await DecryptPrivKey(passphrase);
       setDecryptedPrivKey(decrypted);
@@ -121,6 +125,7 @@ export default function Home() {
     }
   };
 
+  // hide private key
   const handleHidePrivKey = () => {
     setDecryptedPrivKey("");
     setIsPrivKeyVisible(false);
