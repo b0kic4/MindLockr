@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
 import { useGenKey } from "@/hooks/keys/useGenKey";
 import { useSaveKey } from "@/hooks/keys/useSaveKey";
+import { useToast } from "@/hooks/use-toast";
+import usePubPrivStore from "@/lib/store/usePubPrivStore";
+import { LogInfo } from "@wailsjs/runtime/runtime";
 import React from "react";
 import AlgorithmSelector from "./components/key-gen/AlgorithmSelector";
+import AsymmetricKeyEncryptionForm from "./components/key-gen/AsymmetricEncryptionForm";
 import EncryptedDataDisplay from "./components/key-gen/EncryptedDataDisplay";
 import EncryptionForm from "./components/key-gen/EncryptionForm";
 import KeySaveForm from "./components/key-gen/KeySaveForm";
 import KeyTypeTabs from "./components/key-gen/KeyTypeTabs";
 import Questions from "./components/key-gen/Questions";
-import { LogInfo } from "@wailsjs/runtime/runtime";
-import AsymmetricKeyEncryptionForm from "./components/key-gen/AsymmetricEncryptionForm";
 
 // +-----------------------------------------------------+
 // | Key Generation                                      |
@@ -43,13 +45,13 @@ export default function KeysGen() {
   const { generateKey, result, error } = useGenKey();
   const { saveKey, errorWhenSaving } = useSaveKey();
   const { toast } = useToast();
+  const { setPrivKey, setPubKey, clearKeys, privKey, pubKey } =
+    usePubPrivStore();
 
   // effect to update encrypted data asap
   React.useEffect(() => {
     if (result) setEncryptedData(result);
   }, [result]);
-
-  React.useEffect(() => LogInfo(keyType));
 
   const handleGenerateKey = async () => {
     const requestData = {
@@ -91,18 +93,20 @@ export default function KeysGen() {
     }
   };
 
-  // asymmetric key encryption
-  // provide data (text key or any other text)
-  // provide passphrase
-  // encyrpt passphrase with pub/priv
-
-  // zustand state management
-
-  // for asymmetric section I need to have:
+  // user provids data, passphrase, selects the alg
+  // there should be a state that holds the pub and priv
+  // key provided for the encryption
   //
-  // 0. passphrase from KeysGen component
-  // 1. providing the public key
-  // 2. providing the private key
+  // than we are sending that data to Go
+  // go stores the data HOW????
+
+  // maybe to have an input that reads for the folder name
+  // and then we have the structure in the fs:
+  // /keys/asymmetric -> (name of the folder)
+  // -> 1. encrypted data 2. encrypted sharable key
+
+  // for MVP we should have only ECC
+  // later add RSA and DSA
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6 rounded-lg">
@@ -123,7 +127,14 @@ export default function KeysGen() {
         )}
 
         <div className="flex flex-col">
-          <div>
+          <div className="space-y-2">
+            {keyType === "asymmetric" && (
+              <Input
+                id="folderName"
+                placeholder="Specify the folder name to store data"
+                className="bg-muted dark:bg-muted-dark"
+              />
+            )}
             <EncryptionForm
               data={data}
               setData={setData}

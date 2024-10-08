@@ -68,7 +68,8 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
         variant: "destructive",
         className: "bg-red-500 border-0",
         title: "Uh oh! Something went wrong.",
-        description: "Failed to generate keys. Please try again.",
+        description:
+          "Failed to generate keys. Please check if you initialized folder path.",
       });
     }
   };

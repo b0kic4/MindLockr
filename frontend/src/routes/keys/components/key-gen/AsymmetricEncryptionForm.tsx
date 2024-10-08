@@ -1,23 +1,26 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { LogInfo } from "@wailsjs/runtime/runtime";
+import usePubPrivStore from "@/lib/store/usePubPrivStore";
 
 interface Props {
   passphrase: string;
 }
 
 export default function AsymmetricKeyEncryptionForm({ passphrase }: Props) {
-  React.useEffect(() => {
-    LogInfo("passphrase: \n");
-    LogInfo(passphrase);
-  }, [passphrase]);
+  const { setPrivKey, setPubKey, clearKeys, privKey, pubKey } =
+    usePubPrivStore();
+
+  const useMyPrivateKey = () => {};
+
+  const useMyPublicKey = () => {};
 
   return (
     <div className="space-y-4 p-4 bg-muted dark:bg-muted-dark mt-4 rounded-lg">
       <h3 className="text-lg font-semibold">Asymmetric Key Encryption</h3>
       <p className="text-sm text-foreground dark:text-foreground-dark">
-        Please provide the public and private keys to use with the asymmetric
-        encryption.
+        Please provide the recipient public and your private keys to use with
+        the asymmetric encryption.
       </p>
 
       <div className="space-y-2">
