@@ -53,7 +53,13 @@ func (ks *KeyStore) SaveAsymmetricKey(folderPath, fileName, keyContent string, a
 
 func SavePrivateKey(privKey string) error {
 	folderInstance := filesystem.GetFolderInstance()
-	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
+	folderPath := folderInstance.GetFolderPath()
+
+	if folderPath == "" {
+		return fmt.Errorf("Please initialize the folder where you want to store private key")
+	}
+
+	keysDir := filepath.Join(folderPath, "priv-pub")
 
 	err := os.MkdirAll(keysDir, os.ModePerm)
 	if err != nil {
@@ -82,7 +88,13 @@ func SavePrivateKey(privKey string) error {
 
 func SavePublicKey(pubKey []byte) error {
 	folderInstance := filesystem.GetFolderInstance()
-	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
+	folderPath := folderInstance.GetFolderPath()
+
+	if folderPath == "" {
+		return fmt.Errorf("Please initialize the folder where you want to store public key")
+	}
+
+	keysDir := filepath.Join(folderPath, "priv-pub")
 
 	err := os.MkdirAll(keysDir, os.ModePerm)
 	if err != nil {

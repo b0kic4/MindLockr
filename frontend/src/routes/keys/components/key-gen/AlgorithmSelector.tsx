@@ -28,8 +28,6 @@ export default function AlgorithmSelector({
         </SelectTrigger>
         <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
           <SelectItem value="AES">AES</SelectItem>
-          <SelectItem value="DES">DES</SelectItem>
-          <SelectItem value="TDEA">TDEA</SelectItem>
         </SelectContent>
       </Select>
 

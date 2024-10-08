@@ -86,7 +86,8 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 
 func (pubpriv *PubPrvKeyGen) RetrievePubKey() (string, error) {
 	folderInstance := filesystem.GetFolderInstance()
-	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
+	folderPath := folderInstance.GetFolderPath()
+	keysDir := filepath.Join(folderPath, "priv-pub")
 	pubKeyPath := filepath.Join(keysDir, "public.pem")
 
 	// Read the public key file
@@ -114,7 +115,8 @@ func (pubpriv *PubPrvKeyGen) RetrievePrivKey() (string, error) {
 
 func (pubpriv *PubPrvKeyGen) DecryptPrivKey(passphrase string) (string, error) {
 	folderInstance := filesystem.GetFolderInstance()
-	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
+	folderPath := folderInstance.GetFolderPath()
+	keysDir := filepath.Join(folderPath, "priv-pub")
 	privKeyPath := filepath.Join(keysDir, "private.pem")
 
 	// Read the encrypted private key file
