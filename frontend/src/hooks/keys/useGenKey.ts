@@ -1,7 +1,7 @@
 import React from "react";
-import { EncryptAES } from "../../wailsjs/go/symmetricencryption/Cryptography";
-import { LogError } from "../../wailsjs/runtime/runtime";
-import { useToast } from "./use-toast";
+import { EncryptAES } from "../../../wailsjs/go/symmetricencryption/Cryptography";
+import { LogError } from "../../../wailsjs/runtime/runtime";
+import { useToast } from "../use-toast";
 
 type GenerateKeyDataRequest = {
   data: string;

@@ -1,130 +1,21 @@
 import { DecryptButton } from "@/components/shared/decryption/DecryptButton.js";
 import { Button } from "@/components/ui/button.js";
-import { toast } from "@/hooks/use-toast.js";
+import { useFolderPath } from "@/hooks/folder/useFolderPath.js";
+import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption.js";
+import { usePubPriv } from "@/hooks/keys/usePubPrivKeys.js";
 import { EyeOff } from "lucide-react";
-import {
-  DecryptPrivKey,
-  RetrievePrivKey,
-  RetrievePubKey,
-} from "@wailsjs/go/keys/PubPrvKeyGen.js";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
-import React from "react";
-import {
-  GetFolderPath,
-  SelectFolder,
-  UpdateFolderPath,
-} from "../../wailsjs/go/filesystem/Folder.js";
 import { PubPrivKeyGen } from "./keys/components/key-gen/PublicPrivateKeysGen.js";
 
 export default function Home() {
-  const [folderPath, setFolderPath] = React.useState("");
-  const [privKey, setPrivKey] = React.useState<string>("");
-  const [pubKey, setPubKey] = React.useState<string>("");
-  const [decryptedPrivKey, setDecryptedPrivKey] = React.useState<string>("");
-  const [isPrivKeyVisible, setIsPrivKeyVisible] =
-    React.useState<boolean>(false);
-
-  function checkForFolderPathInLocalStorage() {
-    const savedFolderPath = localStorage.getItem("folderPath");
-    if (savedFolderPath) {
-      setFolderPath(savedFolderPath);
-      UpdateFolderPath(savedFolderPath);
-      return true;
-    }
-    return false;
-  }
-
-  async function pickFolder() {
-    try {
-      const folder = await SelectFolder();
-      setFolderPath(folder);
-      localStorage.setItem("folderPath", folder);
-      const path = localStorage.getItem("folderPath");
-      if (path) {
-        UpdateFolderPath(path);
-      }
-    } catch (error) {
-      console.error("Error selecting folder:", error);
-    }
-  }
-
-  React.useEffect(() => {
-    async function initializeFolderPath() {
-      const localStorageFound = checkForFolderPathInLocalStorage();
-      if (!localStorageFound) {
-        try {
-          const systemPath = await GetFolderPath();
-          if (systemPath) {
-            setFolderPath(systemPath);
-            localStorage.setItem("folderPath", systemPath);
-            const path = localStorage.getItem("folderPath");
-            UpdateFolderPath(path as string);
-          }
-        } catch (error) {
-          console.error("Error fetching folder path:", error);
-        }
-      }
-    }
-    async function getPubPrivKeys() {
-      RetrievePubKey()
-        .then((publicKey) => setPubKey(publicKey))
-        .catch((error) => {
-          LogError(error as any);
-          toast({
-            variant: "destructive",
-            className: "bg-red-500 border-0",
-            title: "Uh oh! Something went wrong.",
-            description: "Error when retrieving public key",
-          });
-        });
-      RetrievePrivKey()
-        .then((privKey) => setPrivKey(privKey))
-        .catch((error) => {
-          LogError(error as any);
-          toast({
-            variant: "destructive",
-            className: "bg-red-500 border-0",
-            title: "Uh oh! Something went wrong.",
-            description: "Error when retrieving private key",
-          });
-        });
-    }
-    initializeFolderPath();
-    getPubPrivKeys();
-  }, []);
-
-  function removeFolderPath() {
-    setFolderPath("");
-    UpdateFolderPath("");
-    localStorage.removeItem("folderPath");
-  }
-
-  const handleDecryptPrivKey = async (passphrase: string) => {
-    LogInfo("Decrypting private key with passphrase...");
-    try {
-      const decrypted = await DecryptPrivKey(passphrase);
-      setDecryptedPrivKey(decrypted);
-      setIsPrivKeyVisible(true);
-
-      setTimeout(() => {
-        setDecryptedPrivKey("");
-        setIsPrivKeyVisible(false);
-      }, 50000); // 10000 ms = 10s
-    } catch (error) {
-      LogError(error as any);
-      toast({
-        variant: "destructive",
-        className: "bg-red-500 border-0",
-        title: "Uh oh! Something went wrong.",
-        description: "Error decrypting the private key.",
-      });
-    }
-  };
-
-  const handleHidePrivKey = () => {
-    setDecryptedPrivKey("");
-    setIsPrivKeyVisible(false);
-  };
+  // hooks
+  const { folderPath, pickFolder, removeFolderPath } = useFolderPath();
+  const { privKey, setPrivKey, pubKey, setPubKey } = usePubPriv();
+  const {
+    decryptedPrivKey,
+    isPrivKeyVisible,
+    handleDecryptPrivKey,
+    handleHidePrivKey,
+  } = usePrivateKeyDecryption();
 
   return (
     <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen max-w-4xl mx-auto space-y-8">
