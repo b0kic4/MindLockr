@@ -16,10 +16,12 @@ export function usePubPriv({ folderPath }: Props) {
   const { toast } = useToast();
 
   React.useEffect(() => {
-    LogInfo(`Folder path: ${folderPath}`);
-  }, [folderPath]);
+    if (!folderPath) {
+      setPrivKey("");
+      setPubKey("");
+      return;
+    }
 
-  React.useEffect(() => {
     async function getPubPrivKeys() {
       try {
         const publicKey = await RetrievePubKey();
