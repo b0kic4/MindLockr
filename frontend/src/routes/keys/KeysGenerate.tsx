@@ -9,6 +9,8 @@ import EncryptionForm from "./components/key-gen/EncryptionForm";
 import KeySaveForm from "./components/key-gen/KeySaveForm";
 import KeyTypeTabs from "./components/key-gen/KeyTypeTabs";
 import Questions from "./components/key-gen/Questions";
+import { LogInfo } from "@wailsjs/runtime/runtime";
+import AsymmetricKeyEncryptionForm from "./components/key-gen/AsymmetricEncryptionForm";
 
 // +-----------------------------------------------------+
 // | Key Generation                                      |
@@ -28,6 +30,7 @@ export default function KeysGen() {
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
   const [algorithmType, setAlgorithmType] = React.useState<string>("");
+  const [asymmetricAlg, setAsymmetricAlg] = React.useState<string>("");
 
   // encrypted string
   const [encryptedData, setEncryptedData] = React.useState("");
@@ -45,6 +48,8 @@ export default function KeysGen() {
   React.useEffect(() => {
     if (result) setEncryptedData(result);
   }, [result]);
+
+  React.useEffect(() => LogInfo(keyType));
 
   const handleGenerateKey = async () => {
     const requestData = {
@@ -86,6 +91,19 @@ export default function KeysGen() {
     }
   };
 
+  // asymmetric key encryption
+  // provide data (text key or any other text)
+  // provide passphrase
+  // encyrpt passphrase with pub/priv
+
+  // zustand state management
+
+  // for asymmetric section I need to have:
+  //
+  // 0. passphrase from KeysGen component
+  // 1. providing the public key
+  // 2. providing the private key
+
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6 rounded-lg">
       <h2 className="text-2xl font-semibold">Key Generation & Encryption</h2>
@@ -93,18 +111,38 @@ export default function KeysGen() {
       <Questions />
 
       <KeyTypeTabs keyType={keyType} setKeyType={setKeyType}>
-        <EncryptionForm
-          data={data}
-          setData={setData}
-          passphrase={passphrase}
-          setPassphrase={setPassphrase}
-        />
-        <AlgorithmSelector
-          algorithm={algorithm}
-          setAlgorithm={setAlgorithm}
-          algorithmType={algorithmType}
-          setAlgorithmType={setAlgorithmType}
-        />
+        {keyType === "asymmetric" && (
+          <div className="p-4 bg-muted dark:bg-muted-dark rounded-lg mb-4">
+            <p className="text-md text-purple-700 dark:text-purple-500 text-center">
+              <strong>Note:</strong> You’ll use symmetric encryption for the
+              actual data and the passphrase. Then, you’ll encrypt that
+              passphrase using the asymmetric algorithm specified below to
+              securely share both the encrypted data and the passphrase.
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-col">
+          <div>
+            <EncryptionForm
+              data={data}
+              setData={setData}
+              passphrase={passphrase}
+              setPassphrase={setPassphrase}
+            />
+
+            <AlgorithmSelector
+              algorithm={algorithm}
+              setAlgorithm={setAlgorithm}
+              algorithmType={algorithmType}
+              setAlgorithmType={setAlgorithmType}
+            />
+          </div>
+
+          {keyType === "asymmetric" && (
+            <AsymmetricKeyEncryptionForm passphrase={passphrase} />
+          )}
+        </div>
       </KeyTypeTabs>
 
       <Button
@@ -113,9 +151,7 @@ export default function KeysGen() {
       >
         {keyType === "symmetric"
           ? "Encrypt Data with Symmetric Key"
-          : keyType === "asymmetric"
-            ? "Generate Public/Private Key Pair"
-            : "Use Hybrid"}
+          : keyType === "asymmetric" && "Generate Encryption"}
       </Button>
 
       <EncryptedDataDisplay encryptedData={encryptedData} />

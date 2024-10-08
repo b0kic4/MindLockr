@@ -30,34 +30,36 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
 
   const genKeys = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
       const response = await GeneratePrivatePublicKeys({
         Passphrase: passphrase,
       });
 
       if (response.PubKey && response.PrivKey) {
-        RetrievePubKey()
-          .then((publicKey) => setPubKey(publicKey))
-          .catch((error) => {
-            LogError(error as any);
-            toast({
-              variant: "destructive",
-              className: "bg-red-500 border-0",
-              title: "Uh oh! Something went wrong.",
-              description: "Error when retrieving public key",
-            });
+        try {
+          const publicKey = await RetrievePubKey();
+          setPubKey(publicKey);
+
+          const privateKey = await RetrievePrivKey();
+          setPrivKey(privateKey);
+
+          toast({
+            variant: "default",
+            className: "bg-green-500 border-0",
+            title: "Keys Generated Successfully",
+            description:
+              "Public and private keys have been generated and retrieved.",
           });
-        RetrievePrivKey()
-          .then((privKey) => setPrivKey(privKey))
-          .catch((error) => {
-            LogError(error as any);
-            toast({
-              variant: "destructive",
-              className: "bg-red-500 border-0",
-              title: "Uh oh! Something went wrong.",
-              description: "Error when retrieving private key",
-            });
+        } catch (error) {
+          LogError("Error retrieving keys");
+          toast({
+            variant: "destructive",
+            className: "bg-red-500 border-0",
+            title: "Uh oh! Something went wrong.",
+            description: "Error retrieving one or both keys.",
           });
+        }
       }
 
       setPassphrase("");
@@ -68,8 +70,6 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
         title: "Uh oh! Something went wrong.",
         description: "Failed to generate keys. Please try again.",
       });
-      LogError("Error generating keys");
-      LogError(err as any);
     }
   };
 
@@ -85,28 +85,34 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Generate keys</DialogTitle>
+          <DialogTitle>Generate Keys</DialogTitle>
           <DialogDescription>
-            You'r private key will be encrypted provide the passphrase for it
+            Your private key will be encrypted. Please provide a passphrase for
+            encryption.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="passphrase" className="text-right">
-              Passphrase
-            </Label>
-            <Input
-              value={passphrase}
-              onChange={(e) => setPassphrase(e.target.value)}
-              id="passphrase"
-              type="password"
-              className="col-span-3"
-            />
+        <form onSubmit={genKeys}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="passphrase" className="text-right">
+                Passphrase
+              </Label>
+              <Input
+                value={passphrase}
+                onChange={(e) => setPassphrase(e.target.value)}
+                id="passphrase"
+                type="password"
+                className="col-span-3"
+                placeholder="Enter passphrase"
+              />
+            </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button onClick={genKeys}>Generate</Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="submit" disabled={!passphrase}>
+              Generate
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

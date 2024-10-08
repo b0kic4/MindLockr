@@ -9,7 +9,9 @@ import { PubPrivKeyGen } from "./keys/components/key-gen/PublicPrivateKeysGen.js
 export default function Home() {
   // hooks
   const { folderPath, pickFolder, removeFolderPath } = useFolderPath();
-  const { privKey, setPrivKey, pubKey, setPubKey } = usePubPriv();
+  const { privKey, setPrivKey, pubKey, setPubKey } = usePubPriv({
+    folderPath: folderPath,
+  });
   const {
     decryptedPrivKey,
     isPrivKeyVisible,
@@ -18,7 +20,7 @@ export default function Home() {
   } = usePrivateKeyDecryption();
 
   return (
-    <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen max-w-4xl mx-auto space-y-8">
+    <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen max-w-4xl mx-auto mt-6 space-y-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-4">Welcome to your Lockr!</h1>
         <p className="text-md text-gray-600 dark:text-gray-400">

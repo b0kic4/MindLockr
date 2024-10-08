@@ -3,25 +3,39 @@ import {
   RetrievePrivKey,
   RetrievePubKey,
 } from "@wailsjs/go/keys/PubPrvKeyGen.js";
-import { LogError } from "@wailsjs/runtime/runtime.js";
-import { toast } from "@/hooks/use-toast.js";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
+import { useToast } from "../use-toast";
 
-export function usePubPriv() {
+interface Props {
+  folderPath: string;
+}
+
+export function usePubPriv({ folderPath }: Props) {
   const [privKey, setPrivKey] = React.useState<string>("");
   const [pubKey, setPubKey] = React.useState<string>("");
+  const { toast } = useToast();
 
   React.useEffect(() => {
+    if (!folderPath) {
+      setPrivKey("");
+      setPubKey("");
+      return;
+    }
+
     async function getPubPrivKeys() {
       try {
         const publicKey = await RetrievePubKey();
         setPubKey(publicKey);
       } catch (error) {
-        LogError(error as any);
+        LogError("Error retrieving public key");
         toast({
           variant: "destructive",
           className: "bg-red-500 border-0",
-          title: "Uh oh! Something went wrong.",
-          description: "Error when retrieving public key",
+          title: "Public Key Retrieval Failed",
+          description:
+            error instanceof Error
+              ? error.message
+              : "An unexpected error occurred.",
         });
       }
 
@@ -29,17 +43,19 @@ export function usePubPriv() {
         const privateKey = await RetrievePrivKey();
         setPrivKey(privateKey);
       } catch (error) {
-        LogError(error as any);
+        LogError("Error retrieving private key");
         toast({
           variant: "destructive",
           className: "bg-red-500 border-0",
-          title: "Uh oh! Something went wrong.",
-          description: "Error when retrieving private key",
+          title: "Private Key Retrieval Failed",
+          description:
+            "Unable to retrieve private key. Please check the folder path and try again.",
         });
       }
     }
+
     getPubPrivKeys();
-  }, []);
+  }, [folderPath]);
 
   return { privKey, setPrivKey, pubKey, setPubKey };
 }
