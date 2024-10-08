@@ -1,8 +1,8 @@
 import React from "react";
 import { getFolderPathClientHook } from "@/hooks/getFolderPathClinet";
 import { useToast } from "@/hooks/use-toast";
-import { SaveSymmetricKey } from "../../wailsjs/go/keys/KeyStore";
-import { LogDebug } from "../../wailsjs/runtime/runtime";
+import { SaveSymmetricKey } from "../../../wailsjs/go/keys/KeyStore";
+import { LogDebug } from "../../../wailsjs/runtime/runtime";
 
 export function useSaveKey() {
   const [loading, setLoading] = React.useState<boolean>(false);

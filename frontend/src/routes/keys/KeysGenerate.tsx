@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useGenKey } from "@/hooks/useGenKey";
-import { useSaveKey } from "@/hooks/useSaveKey";
+import { useGenKey } from "@/hooks/keys/useGenKey";
+import { useSaveKey } from "@/hooks/keys/useSaveKey";
 import React from "react";
 import AlgorithmSelector from "./components/key-gen/AlgorithmSelector";
 import EncryptedDataDisplay from "./components/key-gen/EncryptedDataDisplay";

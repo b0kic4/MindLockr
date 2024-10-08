@@ -1,6 +1,6 @@
-import { useCallback } from "react";
+import React from "react";
 import { KeyInfo } from "@/lib/types/keys";
-import { DeleteKey } from "../../wailsjs/go/keys/KeyRetrieve";
+import { DeleteKey } from "../../../wailsjs/go/keys/KeyRetrieve";
 import { useToast } from "@/hooks/use-toast";
 
 interface UseDeleteKeyParams {
@@ -10,7 +10,7 @@ interface UseDeleteKeyParams {
 export function useDeleteKey({ fetchKeys }: UseDeleteKeyParams) {
   const { toast } = useToast();
 
-  const handleDelete = useCallback(
+  const handleDelete = React.useCallback(
     async (key: KeyInfo) => {
       const response = await DeleteKey(key);
       if (response) {
