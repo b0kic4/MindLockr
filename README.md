@@ -54,8 +54,8 @@ No prerequisites are required. MindLockr will be available as a standalone appli
 1. **Launch the Application**
    - Start MindLockr from your applications menu or desktop shortcut.
 
-2. **Create an Account**
-   - Sign up with a master password to secure your vault.
+2. **Create Keys**
+   - Generate Keys with master password to secure your vault.
 
 3. **Data Storage**
    - The application automatically creates the necessary folders in the specified directory where your data will be securely stored. You can manage your sensitive files, keys, credentials, and personal items within the application.
