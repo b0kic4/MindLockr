@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePubPrivAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import usePubPrivStore from "@/lib/store/usePubPrivStore";
+import { EyeOff, Eye } from "lucide-react";
 import React from "react";
 
 export default function AsymmetricKeyEncryptionForm() {
@@ -14,8 +15,14 @@ export default function AsymmetricKeyEncryptionForm() {
   // and then trying to provide some other private key
   // need to test that
 
+  const [isPrivateKeyVisible, setIsPrivateKeyVisible] =
+    React.useState<boolean>(false);
+
   // local input
   const [publicKeyInput, setPublicKeyInput] = React.useState("");
+
+  // decryption of the users key
+  const { decryptedPrivKey, handleDecryptPrivKey } = usePrivateKeyDecryption();
 
   // zustand store
   const { setProvidedPrivKey, setProvidedPubKey } =
@@ -28,9 +35,6 @@ export default function AsymmetricKeyEncryptionForm() {
   // actual private key that will be used for encryption
   const [providedPrivateKey, setProvidedPrivateKey] =
     React.useState<string>("");
-
-  // decryption of the users key
-  const { decryptedPrivKey, handleDecryptPrivKey } = usePrivateKeyDecryption();
 
   // assigning decrypted key to the provided private key input
   React.useEffect(() => {
@@ -136,9 +140,21 @@ export default function AsymmetricKeyEncryptionForm() {
             <Input
               readOnly
               placeholder="Decrypted Key"
-              type="password"
+              type={isPrivateKeyVisible ? "text" : "password"}
               value={providedPrivateKey}
+              className="w-full"
             />
+            <Button
+              variant="ghost"
+              onClick={() => setIsPrivateKeyVisible(!isPrivateKeyVisible)}
+              className="ml-2"
+            >
+              {isPrivateKeyVisible ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </Button>
           </>
         )}
         {!encryptedPrivateKeyInput && (

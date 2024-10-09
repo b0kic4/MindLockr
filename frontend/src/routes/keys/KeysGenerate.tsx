@@ -25,11 +25,14 @@ import Questions from "./components/key-gen/Questions";
 // +-----------------------------------------------------+
 
 export default function KeysGen() {
-  // data for encryption
+  // data for encryption (symmetric)
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
   const [algorithmType, setAlgorithmType] = React.useState<string>("");
+
+  // utils for encryption (asymmetric)
+  const [folderName, setFolderName] = React.useState<string>("");
 
   // encrypted string
   const [encryptedData, setEncryptedData] = React.useState("");
@@ -81,7 +84,8 @@ export default function KeysGen() {
   // get the values from the asymmetric encryption
   // call the go function
 
-  const handleGenerateSharableKey = async () => {};
+  // TODO: Get all of the data, form it and send it to go func
+  const handleGenerateSharableData = async () => {};
 
   const handleSaveKey = async () => {
     await saveKey(keyFileName, encryptedData, algorithmType);
@@ -126,6 +130,8 @@ export default function KeysGen() {
             {keyType === "asymmetric" && (
               <Input
                 id="folderName"
+                value={folderName}
+                onChange={(e) => setFolderName(e.target.value)}
                 placeholder="Specify the folder name to store data"
                 className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
               />
