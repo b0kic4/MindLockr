@@ -2,15 +2,13 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
+  DialogTrigger,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { KeyRound } from "lucide-react";
 import React from "react";
 
 interface PassphraseDialogProps {
@@ -18,17 +16,11 @@ interface PassphraseDialogProps {
   keyName: string;
 }
 
-export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
+export const CustomDecryptButton: React.FC<PassphraseDialogProps> = ({
   onSubmit,
   keyName,
 }) => {
   const [passphrase, setPassphrase] = React.useState("");
-
-  // FIXME:
-  // this component is used in the Keyring Mangement
-  // getKeyColumns modifys the state
-  // displaying the DecryptedDataComponent
-  // and the Passphrase Dialog is rendered there
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +29,11 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
   };
 
   return (
-    <Dialog defaultOpen>
-      <DialogTrigger>
-        <KeyRound />
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="ghost" className="text-sm p-1 text-red-500 underline">
+          Decrypt private key
+        </Button>
       </DialogTrigger>
       <DialogContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark dark:border-0">
         <DialogHeader>

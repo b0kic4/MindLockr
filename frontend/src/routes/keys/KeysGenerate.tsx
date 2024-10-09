@@ -3,8 +3,6 @@ import { Input } from "@/components/ui/input";
 import { useGenKey } from "@/hooks/keys/useGenKey";
 import { useSaveKey } from "@/hooks/keys/useSaveKey";
 import { useToast } from "@/hooks/use-toast";
-import usePubPrivStore from "@/lib/store/usePubPrivStore";
-import { LogInfo } from "@wailsjs/runtime/runtime";
 import React from "react";
 import AlgorithmSelector from "./components/key-gen/AlgorithmSelector";
 import AsymmetricKeyEncryptionForm from "./components/key-gen/AsymmetricEncryptionForm";
@@ -32,7 +30,6 @@ export default function KeysGen() {
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
   const [algorithmType, setAlgorithmType] = React.useState<string>("");
-  const [asymmetricAlg, setAsymmetricAlg] = React.useState<string>("");
 
   // encrypted string
   const [encryptedData, setEncryptedData] = React.useState("");
@@ -45,8 +42,6 @@ export default function KeysGen() {
   const { generateKey, result, error } = useGenKey();
   const { saveKey, errorWhenSaving } = useSaveKey();
   const { toast } = useToast();
-  const { setPrivKey, setPubKey, clearKeys, privKey, pubKey } =
-    usePubPrivStore();
 
   // effect to update encrypted data asap
   React.useEffect(() => {
@@ -81,6 +76,13 @@ export default function KeysGen() {
     }
   };
 
+  // name of the folder
+  // encrypted symmetric data
+  // get the values from the asymmetric encryption
+  // call the go function
+
+  const handleGenerateSharableKey = async () => {};
+
   const handleSaveKey = async () => {
     await saveKey(keyFileName, encryptedData, algorithmType);
 
@@ -93,14 +95,7 @@ export default function KeysGen() {
     }
   };
 
-  // user provids data, passphrase, selects the alg
-  // there should be a state that holds the pub and priv
-  // key provided for the encryption
-  //
-  // than we are sending that data to Go
-  // go stores the data HOW????
-
-  // maybe to have an input that reads for the folder name
+  // have an input that reads for the folder name
   // and then we have the structure in the fs:
   // /keys/asymmetric -> (name of the folder)
   // -> 1. encrypted data 2. encrypted sharable key
@@ -132,7 +127,7 @@ export default function KeysGen() {
               <Input
                 id="folderName"
                 placeholder="Specify the folder name to store data"
-                className="bg-muted dark:bg-muted-dark"
+                className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
               />
             )}
             <EncryptionForm
@@ -150,20 +145,27 @@ export default function KeysGen() {
             />
           </div>
 
-          {keyType === "asymmetric" && (
-            <AsymmetricKeyEncryptionForm passphrase={passphrase} />
-          )}
+          {keyType === "asymmetric" && <AsymmetricKeyEncryptionForm />}
         </div>
       </KeyTypeTabs>
 
-      <Button
-        onClick={handleGenerateKey}
-        className="bg-blue-500 text-white p-3 rounded w-full"
-      >
-        {keyType === "symmetric"
-          ? "Encrypt Data with Symmetric Key"
-          : keyType === "asymmetric" && "Generate Encryption"}
-      </Button>
+      {keyType == "symmetric" && (
+        <Button
+          onClick={handleGenerateKey}
+          className="bg-blue-500 text-white p-3 rounded w-full"
+        >
+          Encrypt Data with Symmetric Key
+        </Button>
+      )}
+
+      {keyType == "asymmetric" && (
+        <Button
+          onClick={handleGenerateKey}
+          className="bg-blue-500 text-white p-3 rounded w-full"
+        >
+          Generate Sharable Encryption
+        </Button>
+      )}
 
       <EncryptedDataDisplay encryptedData={encryptedData} />
 

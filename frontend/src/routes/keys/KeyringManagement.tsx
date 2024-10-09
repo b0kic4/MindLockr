@@ -19,6 +19,9 @@ export default function KeyringManagement() {
   const { handleDelete } = useDeleteKey({ fetchKeys });
 
   const handleDecrypt = (key: KeyInfo) => {
+    // this is passed to KeyColumns
+    // key button is just used to change the state
+    // of displaying decrypted data component
     setSelectedKey(key);
     setIsDecrypted(true);
   };
@@ -70,6 +73,8 @@ export default function KeyringManagement() {
           </div>
           <DataTable data={filteredKeys} columns={columns} />
           {selectedKey && isDecrypted && (
+            // ovo se prikazuje kada se klikne key icon
+            // za decryption
             <DecryptedDataComponent
               keyInfo={selectedKey}
               onClose={handleDialogClose}

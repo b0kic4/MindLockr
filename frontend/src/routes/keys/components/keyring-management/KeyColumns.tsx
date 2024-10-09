@@ -52,7 +52,6 @@ export const getKeyColumns = (
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex space-x-4">
-          {/* Action buttons */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

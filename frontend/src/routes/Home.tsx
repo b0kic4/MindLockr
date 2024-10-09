@@ -12,6 +12,7 @@ export default function Home() {
   const { privKey, setPrivKey, pubKey, setPubKey } = usePubPriv({
     folderPath: folderPath,
   });
+
   const {
     decryptedPrivKey,
     isPrivKeyVisible,
