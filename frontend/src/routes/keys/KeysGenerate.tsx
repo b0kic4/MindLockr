@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { useGenKey } from "@/hooks/keys/useGenKey";
 import { useSaveKey } from "@/hooks/keys/useSaveKey";
 import { useToast } from "@/hooks/use-toast";
+import usePubPrivAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
+import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption";
 import React from "react";
 import AlgorithmSelector from "./components/key-gen/AlgorithmSelector";
 import AsymmetricKeyEncryptionForm from "./components/key-gen/AsymmetricEncryptionForm";
@@ -46,6 +48,10 @@ export default function KeysGen() {
   const { saveKey, errorWhenSaving } = useSaveKey();
   const { toast } = useToast();
 
+  // zustand
+  const { providedPubKey, providedPrivKey } =
+    usePubPrivAsymmetricEncryptionInputsStore();
+
   // effect to update encrypted data asap
   React.useEffect(() => {
     if (result) setEncryptedData(result);
@@ -79,13 +85,53 @@ export default function KeysGen() {
     }
   };
 
-  // name of the folder
-  // encrypted symmetric data
-  // get the values from the asymmetric encryption
-  // call the go function
+  type RequestData = {
+    Data: string;
+    Passphrase: string;
+    Algorithm: string;
+    AlgorithmType: string;
+    FolderName: string;
+    PubKey: string;
+    PrivKey: string;
+  };
 
-  // TODO: Get all of the data, form it and send it to go func
-  const handleGenerateSharableData = async () => {};
+  const handleGenerateSharableData = async () => {
+    const missingFields = [];
+
+    if (!data) missingFields.push("Data");
+    if (!passphrase) missingFields.push("Passphrase");
+    if (!algorithm) missingFields.push("Algorithm");
+    if (!algorithmType) missingFields.push("Algorithm Type");
+    if (!folderName) missingFields.push("Folder Name");
+    if (!providedPubKey) missingFields.push("Public Key");
+    if (!providedPrivKey) missingFields.push("Private Key");
+
+    if (missingFields.length > 0) {
+      missingFields.forEach((field) => {
+        toast({
+          variant: "destructive",
+          className: "bg-red-500 border-0",
+          title: `Missing Field: ${field}`,
+          description: `Please provide a value for ${field}.`,
+        });
+      });
+      return;
+    }
+
+    const reqData: RequestData = {
+      Data: data,
+      Passphrase: passphrase,
+      Algorithm: algorithm,
+      AlgorithmType: algorithmType,
+      FolderName: folderName,
+      PubKey: providedPubKey,
+      PrivKey: providedPrivKey,
+    };
+
+    EncryptSharedData(reqData as any);
+
+    // LogInfo(JSON.stringify(reqData));
+  };
 
   const handleSaveKey = async () => {
     await saveKey(keyFileName, encryptedData, algorithmType);
@@ -166,7 +212,7 @@ export default function KeysGen() {
 
       {keyType == "asymmetric" && (
         <Button
-          onClick={handleGenerateKey}
+          onClick={handleGenerateSharableData}
           className="bg-blue-500 text-white p-3 rounded w-full"
         >
           Generate Sharable Encryption
