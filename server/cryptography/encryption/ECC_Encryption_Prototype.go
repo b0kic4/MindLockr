@@ -1,4 +1,4 @@
-package asymmetricencryption
+package encryption
 
 import (
 	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
