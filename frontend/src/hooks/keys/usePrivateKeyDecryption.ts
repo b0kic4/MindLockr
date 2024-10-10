@@ -1,6 +1,6 @@
+import React from "react";
 import { DecryptPrivKey } from "@wailsjs/go/keys/PubPrvKeyGen.js";
 import { LogError } from "@wailsjs/runtime/runtime.js";
-import React from "react";
 import { useToast } from "../use-toast";
 
 export function usePrivateKeyDecryption() {
@@ -19,7 +19,7 @@ export function usePrivateKeyDecryption() {
       setTimeout(() => {
         setDecryptedPrivKey("");
         setIsPrivKeyVisible(false);
-      }, 10000);
+      }, 30000);
     } catch (error) {
       LogError(error as any);
       toast({
