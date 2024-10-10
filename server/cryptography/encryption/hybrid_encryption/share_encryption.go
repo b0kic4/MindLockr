@@ -72,6 +72,10 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 	}
 	signatureB64 := base64.StdEncoding.EncodeToString(signature)
 
+	// now we should store the
+	// symmetric data encryption
+	// passphrase encryption
+
 	return ResponseData{
 		SymmetricData:       aesRes,
 		EncryptedPassphrase: encPassphraseB64,
@@ -107,13 +111,16 @@ func ParsePrivateKey(privKey string) (*ecdsa.PrivateKey, error) {
 	return ecdsaPrivKey, nil
 }
 
+// link for explanation:
+// https://crypto.stackexchange.com/questions/30282/public-key-encryption-using-ecdhe-and-aes-gcm
+//
 // Encrypts data using the recipient's public key (ECDH + AES-GCM hybrid encryption)
 func encryptWithPublicKey(data []byte, pubKey *ecdsa.PublicKey) ([]byte, error) {
 	ephemeralPrivKey, err := ecdsa.GenerateKey(pubKey.Curve, rand.Reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate ephemeral key pair: %v", err)
 	}
-	sharedSecretX, _ := pubKey.Curve.ScalarMult(pubKey.X, pubKey.Y, ephemeralPrivKey.D.Bytes())
+	sharedSecretX, _ := pubKey.ScalarMult(pubKey.X, pubKey.Y, ephemeralPrivKey.D.Bytes())
 	sharedSecret := sha256.Sum256(sharedSecretX.Bytes())
 
 	block, err := aes.NewCipher(sharedSecret[:])
@@ -129,7 +136,7 @@ func encryptWithPublicKey(data []byte, pubKey *ecdsa.PublicKey) ([]byte, error) 
 		return nil, fmt.Errorf("failed to generate nonce: %v", err)
 	}
 	encryptedData := aesGCM.Seal(nonce, nonce, data, nil)
-	ephemeralPubKey := elliptic.Marshal(pubKey.Curve, ephemeralPrivKey.PublicKey.X, ephemeralPrivKey.PublicKey.Y)
+	ephemeralPubKey := elliptic.Marshal(pubKey.Curve, ephemeralPrivKey.X, ephemeralPrivKey.Y)
 
 	var buf bytes.Buffer
 	buf.Write([]byte{byte(len(ephemeralPubKey) >> 8), byte(len(ephemeralPubKey) & 0xff)})

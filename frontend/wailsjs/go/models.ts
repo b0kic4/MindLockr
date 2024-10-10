@@ -24,6 +24,22 @@ export namespace hybridencryption {
 	        this.privKey = source["privKey"];
 	    }
 	}
+	export class ResponseData {
+	    SymmetricData: string;
+	    EncryptedPassphrase: string;
+	    Signature: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ResponseData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.SymmetricData = source["SymmetricData"];
+	        this.EncryptedPassphrase = source["EncryptedPassphrase"];
+	        this.Signature = source["Signature"];
+	    }
+	}
 
 }
 

@@ -4,8 +4,7 @@ import (
 	hybridencryption "MindLockr/server/cryptography/encryption/hybrid_encryption"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/ecdsa"
-	"crypto/elliptic"
+	"crypto/ecdh"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -26,24 +25,33 @@ func (hpd *HybridPassphraseDecryption) DecryptPassphrase(encryptedPassphraseB64 
 		return "", fmt.Errorf("failed to parse private key: %v", err)
 	}
 
-	// Extract ephemeral public key length
+	// Convert ECDSA private key to ECDH private key
+	curve := ecdh.P256()
+	ecdhPrivKey, err := curve.NewPrivateKey(privKey.D.Bytes())
+	if err != nil {
+		return "", fmt.Errorf("failed to convert ECDSA private key to ECDH: %v", err)
+	}
+
+	// Extract ephemeral public key and encrypted passphrase
 	ephemeralPubKeyLength := int(encPassphrase[0])<<8 + int(encPassphrase[1])
 	ephemeralPubKeyBytes := encPassphrase[2 : 2+ephemeralPubKeyLength]
 	encryptedPassphrase := encPassphrase[2+ephemeralPubKeyLength:]
 
-	// Unmarshal the ephemeral public key
-	x, y := elliptic.Unmarshal(privKey.Curve, ephemeralPubKeyBytes)
-	if x == nil || y == nil {
-		return "", fmt.Errorf("failed to unmarshal ephemeral public key")
+	// Deserialize the ephemeral public key
+	ecdhPubKey, err := curve.NewPublicKey(ephemeralPubKeyBytes)
+	if err != nil {
+		return "", fmt.Errorf("failed to deserialize ephemeral public key: %v", err)
 	}
-	ephemeralPubKey := &ecdsa.PublicKey{Curve: privKey.Curve, X: x, Y: y}
 
-	// Derive the shared secret using ECDH
-	sharedSecretX, _ := privKey.Curve.ScalarMult(ephemeralPubKey.X, ephemeralPubKey.Y, privKey.D.Bytes())
-	sharedSecret := sha256.Sum256(sharedSecretX.Bytes())
+	// Derive the shared secret
+	sharedSecret, err := ecdhPrivKey.ECDH(ecdhPubKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to derive shared secret: %v", err)
+	}
 
-	// Decrypt the AES-GCM encrypted passphrase
-	block, err := aes.NewCipher(sharedSecret[:])
+	// Create AES-GCM cipher with the derived shared secret
+	key := sha256.Sum256(sharedSecret)
+	block, err := aes.NewCipher(key[:])
 	if err != nil {
 		return "", fmt.Errorf("failed to create AES cipher: %v", err)
 	}
@@ -52,11 +60,9 @@ func (hpd *HybridPassphraseDecryption) DecryptPassphrase(encryptedPassphraseB64 
 		return "", fmt.Errorf("failed to create AES-GCM: %v", err)
 	}
 
-	// Extract nonce and ciphertext for the encrypted passphrase
+	// Decrypt the passphrase
 	nonceSize := aesGCM.NonceSize()
 	nonce, ciphertext := encryptedPassphrase[:nonceSize], encryptedPassphrase[nonceSize:]
-
-	// Decrypt the passphrase
 	passphrase, err := aesGCM.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to decrypt passphrase: %v", err)
