@@ -2,6 +2,7 @@ package hybridencryption
 
 import (
 	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
+	"MindLockr/server/filesystem/keys"
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
@@ -31,6 +32,13 @@ type ResponseData struct {
 	SymmetricData       string
 	EncryptedPassphrase string
 	Signature           string
+}
+
+type SaveAsymmetricDataRequest struct {
+	SymmetricData       string
+	EncryptedPassphrase string
+	Signature           string
+	FolderName          string
 }
 
 func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, error) {
@@ -72,9 +80,24 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 	}
 	signatureB64 := base64.StdEncoding.EncodeToString(signature)
 
-	// now we should store the
-	// symmetric data encryption
-	// passphrase encryption
+	keyStore := &keys.KeyStore{}
+
+	saveData := SaveAsymmetricDataRequest{
+		SymmetricData:       aesRes,
+		EncryptedPassphrase: encPassphraseB64,
+		Signature:           signatureB64,
+		FolderName:          req.FolderName,
+	}
+
+	err = keyStore.SaveAsymmetricData(keys.HybridRequestData{
+		SymmetricData:       saveData.SymmetricData,
+		EncyrptedPassphrase: saveData.EncryptedPassphrase,
+		Signature:           saveData.Signature,
+		FolderName:          saveData.FolderName,
+	})
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to save asymmetric data: %v", err)
+	}
 
 	return ResponseData{
 		SymmetricData:       aesRes,

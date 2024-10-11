@@ -45,6 +45,24 @@ export namespace hybridencryption {
 
 export namespace keys {
 	
+	export class HybridRequestData {
+	    SymmetricData: string;
+	    EncyrptedPassphrase: string;
+	    Signature: string;
+	    FolderName: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new HybridRequestData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.SymmetricData = source["SymmetricData"];
+	        this.EncyrptedPassphrase = source["EncyrptedPassphrase"];
+	        this.Signature = source["Signature"];
+	        this.FolderName = source["FolderName"];
+	    }
+	}
 	export class KeyInfo {
 	    name: string;
 	    algorithm: string;
