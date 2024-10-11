@@ -15,14 +15,10 @@ type HybridPassphraseDecryption struct{}
 func (hpd *HybridPassphraseDecryption) DecryptPassphrase(encryptedPassphraseB64 string, privKeyB64 string) (string, error) {
 	// Decode the base64-encoded encrypted passphrase
 
-	fmt.Println("encryptedPassphraseB64: ", encryptedPassphraseB64)
-
 	encPassphrase, err := base64.StdEncoding.DecodeString(encryptedPassphraseB64)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode encrypted passphrase: %v", err)
 	}
-
-	fmt.Println("decoded passphrase: ", string(encPassphrase))
 
 	// Parse the private key
 	privKey, err := hybridencryption.ParsePrivateKey(privKeyB64)
@@ -30,16 +26,12 @@ func (hpd *HybridPassphraseDecryption) DecryptPassphrase(encryptedPassphraseB64 
 		return "", fmt.Errorf("failed to parse private key: %v", err)
 	}
 
-	fmt.Println("privKey: ", privKey)
-
 	// Convert ECDSA private key to ECDH private key
 	curve := ecdh.P256()
 	ecdhPrivKey, err := curve.NewPrivateKey(privKey.D.Bytes())
 	if err != nil {
 		return "", fmt.Errorf("failed to convert ECDSA private key to ECDH: %v", err)
 	}
-
-	fmt.Println("ecdhPrivKey: ", ecdhPrivKey)
 
 	// Extract ephemeral public key and encrypted passphrase
 	ephemeralPubKeyLength := int(encPassphrase[0])<<8 + int(encPassphrase[1])
