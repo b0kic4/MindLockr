@@ -17,8 +17,6 @@ export function usePubPriv({ folderPath }: Props) {
   const { toast } = useToast();
 
   React.useEffect(() => {
-    LogInfo(`Folder path: ${folderPath}`);
-
     if (!folderPath) {
       clearKeys();
       return;

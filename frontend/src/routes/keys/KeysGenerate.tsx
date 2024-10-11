@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import usePubPrivAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption";
 import { hybridencryption } from "@wailsjs/go/models";
+import { LogError } from "@wailsjs/runtime/runtime";
 import React from "react";
 import AlgorithmSelector from "./components/key-gen/AlgorithmSelector";
 import AsymmetricKeyEncryptionForm from "./components/key-gen/AsymmetricEncryptionForm";
@@ -86,6 +87,8 @@ export default function KeysGen() {
     }
   };
 
+  // for MVP we should have only ECC
+  // later add RSA and DSA
   const handleGenerateSharableData = async () => {
     const missingFields = [];
 
@@ -131,7 +134,7 @@ export default function KeysGen() {
         description: "Your data and passphrase have been encrypted.",
       });
     } catch (error) {
-      console.error("Encryption failed:", error);
+      LogError("Hybrid Encryption failed:");
       if (error instanceof Error) {
         toast({
           variant: "destructive",
@@ -159,14 +162,6 @@ export default function KeysGen() {
       setEncryptedData("");
     }
   };
-
-  // have an input that reads for the folder name
-  // and then we have the structure in the fs:
-  // /keys/asymmetric -> (name of the folder)
-  // -> 1. encrypted data 2. encrypted sharable key
-
-  // for MVP we should have only ECC
-  // later add RSA and DSA
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6 rounded-lg">
@@ -234,7 +229,9 @@ export default function KeysGen() {
         </Button>
       )}
 
-      <EncryptedDataDisplay encryptedData={encryptedData} />
+      {keyType == "symmetric" && (
+        <EncryptedDataDisplay encryptedData={encryptedData} />
+      )}
 
       {encryptedData && keyType == "symmetric" && (
         <KeySaveForm
