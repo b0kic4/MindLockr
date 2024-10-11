@@ -125,7 +125,6 @@ export default function KeysGen() {
     try {
       const response: hybridencryption.ResponseData =
         await EncryptSharedData(reqData);
-
       setEncryptedData(response.SymmetricData);
 
       toast({
@@ -134,20 +133,25 @@ export default function KeysGen() {
         description: "Your data and passphrase have been encrypted.",
       });
     } catch (error) {
-      LogError("Hybrid Encryption failed:");
-      if (error instanceof Error) {
-        toast({
-          variant: "destructive",
-          title: "Encryption Failed",
-          description: error.message || "An error occurred during encryption.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Encryption Failed",
-          description: "An unknown error occurred during encryption.",
-        });
-      }
+      // Log the entire error object for debugging
+      console.error("Raw error object:", error);
+      LogError("Hybrid Encryption failed: " + JSON.stringify(error));
+
+      // Handle known error structures
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : JSON.stringify(error);
+
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Encryption Failed",
+        description:
+          errorMessage || "An unknown error occurred during encryption.",
+      });
     }
   };
 

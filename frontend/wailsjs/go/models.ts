@@ -47,6 +47,7 @@ export namespace keys {
 	
 	export class HybridRequestData {
 	    SymmetricData: string;
+	    AlgSymEnc: string;
 	    EncyrptedPassphrase: string;
 	    Signature: string;
 	    FolderName: string;
@@ -58,6 +59,7 @@ export namespace keys {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.SymmetricData = source["SymmetricData"];
+	        this.AlgSymEnc = source["AlgSymEnc"];
 	        this.EncyrptedPassphrase = source["EncyrptedPassphrase"];
 	        this.Signature = source["Signature"];
 	        this.FolderName = source["FolderName"];

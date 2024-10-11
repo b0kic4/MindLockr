@@ -93,7 +93,8 @@ func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]KeyInfo, error) {
 
 	// Check if the base keys folder exists
 	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Keys folder does not exist at: %s", keysBaseFolderPath)
+		// Return an empty slice instead of nil when no folder exists
+		return []KeyInfo{}, nil
 	}
 
 	// Create a slice to store key file info

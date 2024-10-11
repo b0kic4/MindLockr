@@ -8,10 +8,11 @@ import { KeyInfo } from "@/lib/types/keys";
 import { TextSearchIcon } from "lucide-react";
 import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
+import { FileTreeAccordion } from "./components/keyring-management/AsymmetricFileTreeAccordion";
 
 export default function KeyringManagement() {
   const { keys, fetchKeys } = useKeys();
-  const [filterKeyType, setFilterKeyType] = React.useState<string>("All");
+  const [filterKeyType, setFilterKeyType] = React.useState<string>("Symmetric");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
   const [selectedKey, setSelectedKey] = React.useState<KeyInfo | null>(null);
   const [isDecrypted, setIsDecrypted] = React.useState(false);
@@ -36,13 +37,8 @@ export default function KeyringManagement() {
     [handleDelete, handleDecrypt],
   );
 
-  const filteredKeys = keys
-    .filter((key) => {
-      if (filterKeyType === "Symmetric" || filterKeyType === "Asymmetric") {
-        return key.type === filterKeyType;
-      }
-      return true;
-    })
+  const symmetricFilteredKeys = keys
+    .filter((key) => key.type === "Symmetric")
     .filter((key) => {
       if (searchQuery === "") return true;
       return key.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -71,7 +67,10 @@ export default function KeyringManagement() {
               </div>
             </div>
           </div>
-          <DataTable data={filteredKeys} columns={columns} />
+          {filterKeyType === "Symmetric" && (
+            <DataTable data={symmetricFilteredKeys} columns={columns} />
+          )}
+          {/* {filterKeyType === "Asymmetric" && <FileTreeAccordion />} */}
           {selectedKey && isDecrypted && (
             // ovo se prikazuje kada se klikne key icon
             // za decryption

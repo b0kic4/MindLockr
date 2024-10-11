@@ -34,12 +34,12 @@ export function useKeys() {
       LogPrint("Keys retrieved successfully.");
 
       const allKeys = [
-        ...symmetricKeys.map((key) => ({
+        ...(symmetricKeys || []).map((key) => ({
           name: key.name,
           algorithm: key.algorithm,
           type: "Symmetric" as const,
         })),
-        ...asymmetricKeys.map((key) => ({
+        ...(asymmetricKeys || []).map((key) => ({
           name: key.name,
           algorithm: key.algorithm,
           type: "Asymmetric" as const,
