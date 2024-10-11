@@ -16,18 +16,6 @@ import KeySaveForm from "./components/key-gen/KeySaveForm";
 import KeyTypeTabs from "./components/key-gen/KeyTypeTabs";
 import Questions from "./components/key-gen/Questions";
 
-// +-----------------------------------------------------+
-// | Key Generation                                      |
-// +-----------------------------------------------------+
-// | [Form Fields]                 | [Live Key Preview]  |
-// | Key Type (Dropdown)           | Algorithm: RSA      |
-// | Key Size (Dropdown)           | Key Size: 4096 bits |
-// | Expiration Date (Picker)      | Usage: Signing, Enc |
-// | Usage Flags (Checkbox)        | Expiration: 1 year  |
-// | ------------------------------|---------------------|
-// |          [Generate Key Button]                      |
-// +-----------------------------------------------------+
-
 export default function KeysGen() {
   // data for encryption (symmetric)
   const [data, setData] = React.useState("");
@@ -125,7 +113,6 @@ export default function KeysGen() {
     try {
       const response: hybridencryption.ResponseData =
         await EncryptSharedData(reqData);
-
       setEncryptedData(response.SymmetricData);
 
       toast({
@@ -134,20 +121,25 @@ export default function KeysGen() {
         description: "Your data and passphrase have been encrypted.",
       });
     } catch (error) {
-      LogError("Hybrid Encryption failed:");
-      if (error instanceof Error) {
-        toast({
-          variant: "destructive",
-          title: "Encryption Failed",
-          description: error.message || "An error occurred during encryption.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Encryption Failed",
-          description: "An unknown error occurred during encryption.",
-        });
-      }
+      // Log the entire error object for debugging
+      console.error("Raw error object:", error);
+      LogError("Hybrid Encryption failed: " + JSON.stringify(error));
+
+      // Handle known error structures
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : JSON.stringify(error);
+
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Encryption Failed",
+        description:
+          errorMessage || "An unknown error occurred during encryption.",
+      });
     }
   };
 

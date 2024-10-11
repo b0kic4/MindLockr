@@ -5,18 +5,22 @@ import { Input } from "@/components/ui/input";
 import { useKeys } from "@/hooks/keys/useKeys";
 import { useDeleteKey } from "@/hooks/keys/useDeleteKey";
 import { KeyInfo } from "@/lib/types/keys";
+import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import { TextSearchIcon } from "lucide-react";
 import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
+import { FileTreeAccordion } from "./components/keyring-management/AsymmetricFileTreeAccordion";
+import AsymmetricDecryption from "./components/keyring-management/AsymmetricDecryption";
 
 export default function KeyringManagement() {
   const { keys, fetchKeys } = useKeys();
-  const [filterKeyType, setFilterKeyType] = React.useState<string>("All");
+  const [filterKeyType, setFilterKeyType] = React.useState<string>("Symmetric");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
   const [selectedKey, setSelectedKey] = React.useState<KeyInfo | null>(null);
   const [isDecrypted, setIsDecrypted] = React.useState(false);
 
   const { handleDelete } = useDeleteKey({ fetchKeys });
+  const { selectedFile } = useSelectedAsymmetricFileStore();
 
   const handleDecrypt = (key: KeyInfo) => {
     // this is passed to KeyColumns
@@ -36,57 +40,55 @@ export default function KeyringManagement() {
     [handleDelete, handleDecrypt],
   );
 
-  const filteredKeys = keys
-    .filter((key) => {
-      if (filterKeyType === "Symmetric" || filterKeyType === "Asymmetric") {
-        return key.type === filterKeyType;
-      }
-      return true;
-    })
-    .filter((key) => {
-      if (searchQuery === "") return true;
-      return key.name.toLowerCase().includes(searchQuery.toLowerCase());
-    });
+  const symmetricFilteredKeys = keys.symmetric.filter((key) =>
+    key.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const renderContent = () => {
+    if (filterKeyType === "Symmetric") {
+      return <DataTable data={symmetricFilteredKeys} columns={columns} />;
+    } else if (filterKeyType === "Asymmetric") {
+      return (
+        <div className="flex">
+          <FileTreeAccordion />
+          {selectedFile && <AsymmetricDecryption />}
+        </div>
+      );
+    } else {
+      return (
+        <p className="text-muted">
+          No keys found. Please add or retrieve keys.
+        </p>
+      );
+    }
+  };
 
   return (
     <div className="p-6 bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
-      <h2 className="text-2xl font-bold mb-4">Keyring Management</h2>
-      {keys.length > 0 ? (
-        <div className="mb-4">
-          <div className="mb-4 flex items-center gap-3 max-w-lg">
-            <KeyTypeFilter
-              filterKeyType={filterKeyType}
-              setFilterKeyType={setFilterKeyType}
-            />
-            <div className="relative flex items-center text-foreground dark:text-foreground-dark">
-              <Input
-                type="text"
-                placeholder="Search..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <div className="absolute left-3 text-gray-400">
-                <TextSearchIcon />
-              </div>
-            </div>
+      <div className="mb-4 flex items-center gap-3 max-w-lg">
+        <KeyTypeFilter
+          filterKeyType={filterKeyType}
+          setFilterKeyType={setFilterKeyType}
+        />
+        <div className="relative flex items-center text-foreground dark:text-foreground-dark">
+          <Input
+            type="text"
+            placeholder="Search..."
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="absolute left-3 text-gray-400">
+            <TextSearchIcon />
           </div>
-          <DataTable data={filteredKeys} columns={columns} />
-          {selectedKey && isDecrypted && (
-            // ovo se prikazuje kada se klikne key icon
-            // za decryption
-            <DecryptedDataComponent
-              keyInfo={selectedKey}
-              onClose={handleDialogClose}
-            />
-          )}
         </div>
-      ) : (
-        <div className="text-center py-6">
-          <p className="text-muted">
-            No keys found. Please add or retrieve keys.
-          </p>
-        </div>
+      </div>
+      {renderContent()}
+      {selectedKey && isDecrypted && (
+        <DecryptedDataComponent
+          keyInfo={selectedKey}
+          onClose={handleDialogClose}
+        />
       )}
     </div>
   );

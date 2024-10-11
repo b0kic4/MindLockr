@@ -36,6 +36,7 @@ type ResponseData struct {
 
 type SaveAsymmetricDataRequest struct {
 	SymmetricData       string
+	AlgSymEnc           string
 	EncryptedPassphrase string
 	Signature           string
 	FolderName          string
@@ -81,6 +82,7 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 
 	saveData := SaveAsymmetricDataRequest{
 		SymmetricData:       aesRes,
+		AlgSymEnc:           req.AlgorithmType,
 		EncryptedPassphrase: encPassphraseB64,
 		Signature:           signatureB64,
 		FolderName:          req.FolderName,
@@ -88,6 +90,7 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 
 	err = keyStore.SaveAsymmetricData(keys.HybridRequestData{
 		SymmetricData:       saveData.SymmetricData,
+		AlgSymEnc:           saveData.AlgSymEnc,
 		EncyrptedPassphrase: saveData.EncryptedPassphrase,
 		Signature:           saveData.Signature,
 		FolderName:          saveData.FolderName,

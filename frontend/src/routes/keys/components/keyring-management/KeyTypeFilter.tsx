@@ -21,7 +21,6 @@ export const KeyTypeFilter: React.FC<KeyTypeFilterProps> = ({
       <SelectValue placeholder="Filter By Type" />
     </SelectTrigger>
     <SelectContent>
-      <SelectItem value="All">All</SelectItem>
       <SelectItem value="Symmetric">Symmetric</SelectItem>
       <SelectItem value="Asymmetric">Asymmetric</SelectItem>
     </SelectContent>
