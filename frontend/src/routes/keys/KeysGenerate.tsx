@@ -16,18 +16,6 @@ import KeySaveForm from "./components/key-gen/KeySaveForm";
 import KeyTypeTabs from "./components/key-gen/KeyTypeTabs";
 import Questions from "./components/key-gen/Questions";
 
-// +-----------------------------------------------------+
-// | Key Generation                                      |
-// +-----------------------------------------------------+
-// | [Form Fields]                 | [Live Key Preview]  |
-// | Key Type (Dropdown)           | Algorithm: RSA      |
-// | Key Size (Dropdown)           | Key Size: 4096 bits |
-// | Expiration Date (Picker)      | Usage: Signing, Enc |
-// | Usage Flags (Checkbox)        | Expiration: 1 year  |
-// | ------------------------------|---------------------|
-// |          [Generate Key Button]                      |
-// +-----------------------------------------------------+
-
 export default function KeysGen() {
   // data for encryption (symmetric)
   const [data, setData] = React.useState("");

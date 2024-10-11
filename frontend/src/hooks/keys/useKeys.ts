@@ -9,18 +9,36 @@ import {
   LogWarning,
 } from "../../../wailsjs/runtime/runtime";
 
-interface KeyInfo {
+interface FileInfo {
+  name: string;
+  type: string;
+}
+
+interface FolderInfo {
+  name: string;
+  files: FileInfo[];
+}
+
+interface SymmetricKey {
   name: string;
   algorithm: string;
-  type: "Symmetric" | "Asymmetric";
+  type: "Symmetric";
+}
+
+export interface KeyData {
+  symmetric: SymmetricKey[];
+  asymmetric: FolderInfo[];
 }
 
 export function useKeys() {
-  const [keys, setKeys] = React.useState<KeyInfo[]>([]);
+  const [keys, setKeys] = React.useState<KeyData>({
+    symmetric: [],
+    asymmetric: [],
+  });
 
   const fetchKeys = async () => {
     try {
-      const [symmetricKeys, asymmetricKeys] = await Promise.all([
+      const [symmetricKeys, asymmetricFolders] = await Promise.all([
         RetrieveSymmetricKeys().catch((error) => {
           LogWarning("No symmetric keys found or error occurred: " + error);
           return [];
@@ -33,20 +51,15 @@ export function useKeys() {
 
       LogPrint("Keys retrieved successfully.");
 
-      const allKeys = [
-        ...(symmetricKeys || []).map((key) => ({
-          name: key.name,
-          algorithm: key.algorithm,
-          type: "Symmetric" as const,
-        })),
-        ...(asymmetricKeys || []).map((key) => ({
-          name: key.name,
-          algorithm: key.algorithm,
-          type: "Asymmetric" as const,
-        })),
-      ];
+      const symmetric = (symmetricKeys || []).map((key) => ({
+        name: key.name,
+        algorithm: key.algorithm,
+        type: "Symmetric" as const,
+      }));
 
-      setKeys(allKeys);
+      const asymmetric = asymmetricFolders || [];
+
+      setKeys({ symmetric, asymmetric });
     } catch (error) {
       LogError("Error retrieving keys: " + error);
       console.error("Error retrieving keys:", error);

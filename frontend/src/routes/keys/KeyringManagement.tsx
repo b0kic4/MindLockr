@@ -37,55 +37,50 @@ export default function KeyringManagement() {
     [handleDelete, handleDecrypt],
   );
 
-  const symmetricFilteredKeys = keys
-    .filter((key) => key.type === "Symmetric")
-    .filter((key) => {
-      if (searchQuery === "") return true;
-      return key.name.toLowerCase().includes(searchQuery.toLowerCase());
-    });
+  const symmetricFilteredKeys = keys.symmetric.filter((key) =>
+    key.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const renderContent = () => {
+    if (filterKeyType === "Symmetric") {
+      return <DataTable data={symmetricFilteredKeys} columns={columns} />;
+    } else if (filterKeyType === "Asymmetric") {
+      return <FileTreeAccordion />;
+    } else {
+      return (
+        <p className="text-muted">
+          No keys found. Please add or retrieve keys.
+        </p>
+      );
+    }
+  };
 
   return (
     <div className="p-6 bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
-      <h2 className="text-2xl font-bold mb-4">Keyring Management</h2>
-      {keys.length > 0 ? (
-        <div className="mb-4">
-          <div className="mb-4 flex items-center gap-3 max-w-lg">
-            <KeyTypeFilter
-              filterKeyType={filterKeyType}
-              setFilterKeyType={setFilterKeyType}
-            />
-            <div className="relative flex items-center text-foreground dark:text-foreground-dark">
-              <Input
-                type="text"
-                placeholder="Search..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <div className="absolute left-3 text-gray-400">
-                <TextSearchIcon />
-              </div>
-            </div>
+      <div className="mb-4 flex items-center gap-3 max-w-lg">
+        <KeyTypeFilter
+          filterKeyType={filterKeyType}
+          setFilterKeyType={setFilterKeyType}
+        />
+        <div className="relative flex items-center text-foreground dark:text-foreground-dark">
+          <Input
+            type="text"
+            placeholder="Search..."
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="absolute left-3 text-gray-400">
+            <TextSearchIcon />
           </div>
-          {filterKeyType === "Symmetric" && (
-            <DataTable data={symmetricFilteredKeys} columns={columns} />
-          )}
-          {/* {filterKeyType === "Asymmetric" && <FileTreeAccordion />} */}
-          {selectedKey && isDecrypted && (
-            // ovo se prikazuje kada se klikne key icon
-            // za decryption
-            <DecryptedDataComponent
-              keyInfo={selectedKey}
-              onClose={handleDialogClose}
-            />
-          )}
         </div>
-      ) : (
-        <div className="text-center py-6">
-          <p className="text-muted">
-            No keys found. Please add or retrieve keys.
-          </p>
-        </div>
+      </div>
+      {renderContent()}
+      {selectedKey && isDecrypted && (
+        <DecryptedDataComponent
+          keyInfo={selectedKey}
+          onClose={handleDialogClose}
+        />
       )}
     </div>
   );

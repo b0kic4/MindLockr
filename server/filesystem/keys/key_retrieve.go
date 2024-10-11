@@ -84,53 +84,84 @@ func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 	return keyFiles, nil
 }
 
-func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]KeyInfo, error) {
-	// Get the folder path from the instance
-	folderPath := kr.folderInstance.GetFolderPath()
+type FileInfo struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
 
-	// Define the keys subdirectory
+type FolderInfo struct {
+	Name  string     `json:"name"`
+	Files []FileInfo `json:"files"`
+}
+
+func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]FolderInfo, error) {
+	folderPath := kr.folderInstance.GetFolderPath()
 	keysBaseFolderPath := filepath.Join(folderPath, "keys/asymmetric")
 
-	// Check if the base keys folder exists
 	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
-		// Return an empty slice instead of nil when no folder exists
-		return []KeyInfo{}, nil
+		return []FolderInfo{}, nil
 	}
 
-	// Create a slice to store key file info
-	var keyFiles []KeyInfo
-
-	// Iterate through subdirectories (e.g., RSA-2048, RSA-4096, etc.)
-	subdirs, err := os.ReadDir(keysBaseFolderPath)
+	var folders []FolderInfo
+	folderDirs, err := os.ReadDir(keysBaseFolderPath)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading keys folder: %v", err)
 	}
 
-	// Traverse through each subdirectory (which represents an algorithm)
-	for _, subdir := range subdirs {
-		if subdir.IsDir() {
-			algorithm := subdir.Name()
+	for _, folderDir := range folderDirs {
+		if !folderDir.IsDir() {
+			continue
+		}
 
-			// Path to the directory that contains the actual key files
-			algoDirPath := filepath.Join(keysBaseFolderPath, algorithm)
+		folderName := folderDir.Name()
+		mainFolderPath := filepath.Join(keysBaseFolderPath, folderName)
+		files := []FileInfo{}
 
-			// Read all files in the algorithm directory
-			files, err := os.ReadDir(algoDirPath)
-			if err != nil {
-				return nil, fmt.Errorf("Error reading algorithm directory %s: %v", algorithm, err)
+		algoDirs, err := os.ReadDir(mainFolderPath)
+		if err != nil {
+			return nil, fmt.Errorf("Error reading algorithm folders in %s: %v", folderName, err)
+		}
+
+		for _, algoDir := range algoDirs {
+			if !algoDir.IsDir() {
+				continue
 			}
 
-			// Iterate over each file in the directory
-			for _, file := range files {
-				if !file.IsDir() {
-					keyFiles = append(keyFiles, KeyInfo{
-						Name:      file.Name(),
-						Algorithm: algorithm,
-					})
-				}
+			algoName := algoDir.Name()
+			algoFolderPath := filepath.Join(mainFolderPath, algoName)
+			algoFiles, err := os.ReadDir(algoFolderPath)
+			if err != nil {
+				return nil, fmt.Errorf("Error reading files in algorithm folder %s: %v", algoName, err)
+			}
+
+			for _, file := range algoFiles {
+				files = append(files, FileInfo{
+					Name: fmt.Sprintf("%s/%s", algoName, file.Name()),
+					Type: "Encrypted Data",
+				})
 			}
 		}
+
+		extraFiles := []string{"encrypted_passphrase.key", "signature.sig"}
+		for _, file := range extraFiles {
+			filePath := filepath.Join(mainFolderPath, file)
+			if _, err := os.Stat(filePath); err == nil {
+				fileType := "Key File"
+				if file == "signature.sig" {
+					fileType = "Signature File"
+				}
+				files = append(files, FileInfo{
+					Name: file,
+					Type: fileType,
+				})
+			}
+		}
+
+		folders = append(folders, FolderInfo{
+			Name:  folderName,
+			Files: files,
+		})
 	}
 
-	return keyFiles, nil
+	return folders, nil
 }

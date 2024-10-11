@@ -6,6 +6,6 @@ export function DeleteKey(arg1:keys.KeyInfo):Promise<boolean>;
 
 export function LoadEncryptedKeyContent(arg1:string,arg2:string):Promise<string>;
 
-export function RetrieveAsymmetricKeys():Promise<Array<keys.KeyInfo>>;
+export function RetrieveAsymmetricKeys():Promise<Array<keys.FolderInfo>>;
 
 export function RetrieveSymmetricKeys():Promise<Array<keys.KeyInfo>>;
