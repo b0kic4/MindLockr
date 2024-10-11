@@ -6,11 +6,14 @@ import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile"
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
 import { LoadAsymmetricEnData } from "@wailsjs/go/keys/KeyRetrieve";
+import { PacmanLoader } from "react-spinners";
 
 const PassphraseFormDecryption = () => {
   const [privKey, setPrivKey] = React.useState<string>("");
   const [decryptedPassphrase, setDecryptedPassphrase] =
     React.useState<string>("");
+
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { selectedFile } = useSelectedAsymmetricFileStore();
   const { toast } = useToast();
 
@@ -27,6 +30,7 @@ const PassphraseFormDecryption = () => {
     if (!selectedFile) return;
 
     try {
+      setIsLoading(true);
       const loadedPassphraseFromFS = await LoadAsymmetricEnData(
         selectedFile.path,
       );
@@ -42,9 +46,9 @@ const PassphraseFormDecryption = () => {
         loadedPassphraseFromFS,
         privKey,
       );
-      LogInfo(`Decrypted Passphrase: ${decryptedPassphrase}`);
       setDecryptedPassphrase(decryptedPassphrase);
     } catch (error) {
+      setIsLoading(false);
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -58,6 +62,8 @@ const PassphraseFormDecryption = () => {
         title: "Decryption failed",
         description: "Please check your private key or passphrase.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -81,7 +87,7 @@ const PassphraseFormDecryption = () => {
         variant="secondary"
         className="w-full text-foreground"
       >
-        Decrypt
+        {isLoading ? <PacmanLoader size={8} color="#fff" /> : "Decrypt"}
       </Button>
       {decryptedPassphrase && (
         <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-inner">

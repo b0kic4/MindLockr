@@ -62,7 +62,7 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
           <>
             {isLoading ? (
               <div className="flex justify-center items-center">
-                <PacmanLoader speedMultiplier={3} color="#ffde08" />
+                <PacmanLoader size={8} color="#fff" />
               </div>
             ) : (
               <PassphraseDialog
