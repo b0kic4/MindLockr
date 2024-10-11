@@ -42,8 +42,6 @@ type SaveAsymmetricDataRequest struct {
 }
 
 func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, error) {
-	fmt.Println("Data received:", req)
-
 	pubKey, err := ParsePublicKey(req.PubKey)
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to parse public key: %v", err)
@@ -64,7 +62,6 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("Encryption Failed: %v", err)
 	}
-	fmt.Println("AES Encrypted Data:", aesRes)
 
 	// Encrypt the AES passphrase with the recipient's public key
 	encPassphrase, err := encryptWithPublicKey([]byte(req.Passphrase), pubKey)
