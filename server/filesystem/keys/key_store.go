@@ -28,25 +28,6 @@ func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent, algorithm
 	return nil
 }
 
-// SaveAsymmetricKey saves a symmetric encryption key to the specified folder
-func (ks *KeyStore) SaveAsymmetricKey(folderPath, fileName, keyContent string, algorithmUsed string) error {
-	// Ensure the 'keys/symmetric' subdirectory exists
-	keysDir := filepath.Join(folderPath, "keys/asymmetric", algorithmUsed)
-	if err := os.MkdirAll(keysDir, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create keys/asymmetric directory: %v", err)
-	}
-
-	// Create the full path for the key file (with .key extension)
-	keyFilePath := filepath.Join(keysDir, fileName+".key")
-
-	// Write the key content to the file
-	if err := os.WriteFile(keyFilePath, []byte(keyContent), 0644); err != nil {
-		return fmt.Errorf("failed to write key to file: %v", err)
-	}
-
-	return nil
-}
-
 // 1. creating the keys dir
 // 2. opening file for writing
 // 3. writing the encrypted key to file
@@ -114,5 +95,54 @@ func SavePublicKey(pubKey []byte) error {
 		return fmt.Errorf("failed to write public key to file: %v", err)
 	}
 
+	return nil
+}
+
+type HybridRequestData struct {
+	SymmetricData       string
+	EncyrptedPassphrase string
+	Signature           string
+	FolderName          string
+}
+
+func (ks *KeyStore) SaveAsymmetricData(req HybridRequestData) error {
+	folderInstance := filesystem.GetFolderInstance()
+	folderPath := folderInstance.GetFolderPath()
+
+	if folderPath == "" {
+		return fmt.Errorf("Please initialize the folder where you want to store data")
+	}
+
+	keysDir := filepath.Join(folderPath, "keys/asymmetric", req.FolderName)
+
+	err := os.MkdirAll(keysDir, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to create directory: %v", err)
+	}
+
+	// Define file paths for each data component
+	symmetricDataFilePath := filepath.Join(keysDir, "symmetric_data.enc")
+	encryptedPassphraseFilePath := filepath.Join(keysDir, "encrypted_passphrase.key")
+	signatureFilePath := filepath.Join(keysDir, "signature.sig")
+
+	// Write the Symmetric Data
+	err = os.WriteFile(symmetricDataFilePath, []byte(req.SymmetricData), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write symmetric data: %v", err)
+	}
+
+	// Write the Encrypted Passphrase
+	err = os.WriteFile(encryptedPassphraseFilePath, []byte(req.EncyrptedPassphrase), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write encrypted passphrase: %v", err)
+	}
+
+	// Write the Signature
+	err = os.WriteFile(signatureFilePath, []byte(req.Signature), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write signature: %v", err)
+	}
+
+	fmt.Printf("Data saved successfully in %s\n", keysDir)
 	return nil
 }

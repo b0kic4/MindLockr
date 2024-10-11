@@ -5,6 +5,7 @@ import { useSaveKey } from "@/hooks/keys/useSaveKey";
 import { useToast } from "@/hooks/use-toast";
 import usePubPrivAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption";
+import { hybridencryption } from "@wailsjs/go/models";
 import React from "react";
 import AlgorithmSelector from "./components/key-gen/AlgorithmSelector";
 import AsymmetricKeyEncryptionForm from "./components/key-gen/AsymmetricEncryptionForm";
@@ -85,16 +86,6 @@ export default function KeysGen() {
     }
   };
 
-  type RequestData = {
-    Data: string;
-    Passphrase: string;
-    Algorithm: string;
-    AlgorithmType: string;
-    FolderName: string;
-    PubKey: string;
-    PrivKey: string;
-  };
-
   const handleGenerateSharableData = async () => {
     const missingFields = [];
 
@@ -118,19 +109,43 @@ export default function KeysGen() {
       return;
     }
 
-    const reqData: RequestData = {
-      Data: data,
-      Passphrase: passphrase,
-      Algorithm: algorithm,
-      AlgorithmType: algorithmType,
-      FolderName: folderName,
-      PubKey: providedPubKey,
-      PrivKey: providedPrivKey,
+    const reqData: hybridencryption.RequestData = {
+      data,
+      passphrase,
+      algorithm,
+      algorithmType,
+      folderName,
+      pubKey: providedPubKey,
+      privKey: providedPrivKey,
     };
 
-    EncryptSharedData(reqData as any);
+    try {
+      const response: hybridencryption.ResponseData =
+        await EncryptSharedData(reqData);
 
-    // LogInfo(JSON.stringify(reqData));
+      setEncryptedData(response.SymmetricData);
+
+      toast({
+        variant: "default",
+        title: "Encryption Successful",
+        description: "Your data and passphrase have been encrypted.",
+      });
+    } catch (error) {
+      console.error("Encryption failed:", error);
+      if (error instanceof Error) {
+        toast({
+          variant: "destructive",
+          title: "Encryption Failed",
+          description: error.message || "An error occurred during encryption.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Encryption Failed",
+          description: "An unknown error occurred during encryption.",
+        });
+      }
+    }
   };
 
   const handleSaveKey = async () => {
@@ -221,7 +236,7 @@ export default function KeysGen() {
 
       <EncryptedDataDisplay encryptedData={encryptedData} />
 
-      {encryptedData && (
+      {encryptedData && keyType == "symmetric" && (
         <KeySaveForm
           keyFileName={keyFileName}
           setKeyFileName={setKeyFileName}
