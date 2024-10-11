@@ -34,6 +34,17 @@ func (kr *KeyRetrieve) LoadEncryptedKeyContent(keyName string, algorithmType str
 	return string(content), nil
 }
 
+func (kr *KeyRetrieve) LoadAsymmetricEnData(dataFilePath string) (string, error) {
+	dataPath := filepath.Join(dataFilePath)
+
+	content, err := os.ReadFile(dataPath)
+	if err != nil {
+		return "", fmt.Errorf("Error ocurred when reading content from file path: %v", err)
+	}
+
+	return string(content), nil
+}
+
 func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()
@@ -87,11 +98,13 @@ func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 type FileInfo struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
+	Path string `json:"path"`
 }
 
 type FolderInfo struct {
 	Name  string     `json:"name"`
 	Files []FileInfo `json:"files"`
+	Path  string     `json:"path"`
 }
 
 func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]FolderInfo, error) {
@@ -138,6 +151,7 @@ func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]FolderInfo, error) {
 				files = append(files, FileInfo{
 					Name: fmt.Sprintf("%s/%s", algoName, file.Name()),
 					Type: "Encrypted Data",
+					Path: filepath.Join(algoFolderPath, file.Name()),
 				})
 			}
 		}
@@ -153,6 +167,7 @@ func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]FolderInfo, error) {
 				files = append(files, FileInfo{
 					Name: file,
 					Type: fileType,
+					Path: filePath,
 				})
 			}
 		}
@@ -160,6 +175,7 @@ func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]FolderInfo, error) {
 		folders = append(folders, FolderInfo{
 			Name:  folderName,
 			Files: files,
+			Path:  mainFolderPath,
 		})
 	}
 

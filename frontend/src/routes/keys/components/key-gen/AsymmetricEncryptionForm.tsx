@@ -38,32 +38,30 @@ export default function AsymmetricKeyEncryptionForm() {
 
   // assigning decrypted key to the provided private key input
   React.useEffect(() => {
-    if (decryptedPrivKey.length != 0) {
+    if (decryptedPrivKey.length !== 0) {
       setProvidedPrivateKey(decryptedPrivKey);
     }
 
-    if (providedPrivateKey.length != 0) {
+    if (providedPrivateKey.length !== 0) {
       const cleanedPrivKey = providedPrivateKey
         .replace(/-----BEGIN EC PRIVATE KEY-----/g, "")
         .replace(/-----END EC PRIVATE KEY-----/g, "")
-        .replace(/\n/g, "")
+        .replace(/\s+/g, "")
         .trim();
 
       setProvidedPrivateKey(cleanedPrivKey);
-      // store value
       setProvidedPrivKey(cleanedPrivKey);
     }
   }, [decryptedPrivKey, providedPrivateKey]);
 
-  // when clicked on the use my public key
   const handleUseMyPublicKey = () => {
     const cleanedPublicKey = pubKey
       .replace(/-----BEGIN PUBLIC KEY-----/g, "")
       .replace(/-----END PUBLIC KEY-----/g, "")
-      .replace(/\n/g, "")
+      .replace(/\s+/g, "")
       .trim();
+
     setPublicKeyInput(cleanedPublicKey);
-    // store value
     setProvidedPubKey(cleanedPublicKey);
   };
 

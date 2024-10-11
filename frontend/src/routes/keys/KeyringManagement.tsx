@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { useKeys } from "@/hooks/keys/useKeys";
 import { useDeleteKey } from "@/hooks/keys/useDeleteKey";
 import { KeyInfo } from "@/lib/types/keys";
+import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import { TextSearchIcon } from "lucide-react";
 import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
 import { FileTreeAccordion } from "./components/keyring-management/AsymmetricFileTreeAccordion";
+import AsymmetricDecryption from "./components/keyring-management/AsymmetricDecryption";
 
 export default function KeyringManagement() {
   const { keys, fetchKeys } = useKeys();
@@ -18,6 +20,7 @@ export default function KeyringManagement() {
   const [isDecrypted, setIsDecrypted] = React.useState(false);
 
   const { handleDelete } = useDeleteKey({ fetchKeys });
+  const { selectedFile } = useSelectedAsymmetricFileStore();
 
   const handleDecrypt = (key: KeyInfo) => {
     // this is passed to KeyColumns
@@ -45,7 +48,12 @@ export default function KeyringManagement() {
     if (filterKeyType === "Symmetric") {
       return <DataTable data={symmetricFilteredKeys} columns={columns} />;
     } else if (filterKeyType === "Asymmetric") {
-      return <FileTreeAccordion />;
+      return (
+        <div className="flex">
+          <FileTreeAccordion />
+          {selectedFile && <AsymmetricDecryption />}
+        </div>
+      );
     } else {
       return (
         <p className="text-muted">

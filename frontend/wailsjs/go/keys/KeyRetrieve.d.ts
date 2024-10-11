@@ -4,6 +4,8 @@ import {keys} from '../models';
 
 export function DeleteKey(arg1:keys.KeyInfo):Promise<boolean>;
 
+export function LoadAsymmetricEnData(arg1:string):Promise<string>;
+
 export function LoadEncryptedKeyContent(arg1:string,arg2:string):Promise<string>;
 
 export function RetrieveAsymmetricKeys():Promise<Array<keys.FolderInfo>>;

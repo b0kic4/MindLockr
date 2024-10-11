@@ -12,11 +12,13 @@ import {
 interface FileInfo {
   name: string;
   type: string;
+  path: string;
 }
 
 interface FolderInfo {
   name: string;
   files: FileInfo[];
+  path: string;
 }
 
 interface SymmetricKey {
