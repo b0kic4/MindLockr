@@ -3,19 +3,30 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
+import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
 import { LoadAsymmetricEnData } from "@wailsjs/go/keys/KeyRetrieve";
 import { PacmanLoader } from "react-spinners";
+import { EyeOffIcon, EyeIcon } from "lucide-react";
+import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
 
 const PassphraseFormDecryption = () => {
+  // form inputs
   const [privKey, setPrivKey] = React.useState<string>("");
   const [decryptedPassphrase, setDecryptedPassphrase] =
     React.useState<string>("");
 
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const { selectedFile } = useSelectedAsymmetricFileStore();
+  // utils
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+  const [showDecryptedPassphrase, setShowDecryptedPassphrae] =
+    React.useState<boolean>(false);
+
+  // zustand hooks
+  const { selectedFile } = useSelectedAsymmetricFileStore();
+  const { setPassphrase } = useLastDecryptedPassphrase();
 
   const handlePrivateKeyChange = (key: string) => {
     const cleanedPrivKey = key
@@ -25,6 +36,11 @@ const PassphraseFormDecryption = () => {
       .trim();
     setPrivKey(cleanedPrivKey);
   };
+
+  // path to be displayed
+  const displayPath = selectedFile
+    ? selectedFile.path.split("/").slice(-3).join("/")
+    : "";
 
   const handleDecrypt = async () => {
     if (!selectedFile) return;
@@ -47,6 +63,14 @@ const PassphraseFormDecryption = () => {
         privKey,
       );
       setDecryptedPassphrase(decryptedPassphrase);
+      setPassphrase(decryptedPassphrase);
+
+      toast({
+        variant: "default",
+        className: "bg-green-500 border-0",
+        title: "Passphrase Decrypted Successfully",
+        description: "The passphrase is saved for one time use only",
+      });
     } catch (error) {
       setIsLoading(false);
       const errorMessage =
@@ -72,9 +96,10 @@ const PassphraseFormDecryption = () => {
       <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">
         Perform decryption with recipient's private key
       </h3>
-      <p className="text-sm text-foreground dark:text-foreground-dark text-center mb-4">
-        File: {selectedFile && selectedFile.name}
-      </p>
+      <div className="flex flex-col text-foreground dark:text-foreground-dark text-center mb-4">
+        <p>File: {selectedFile && selectedFile.name}</p>
+        <p>Path: {displayPath}</p>
+      </div>
       <Input
         value={privKey}
         onChange={(e) => handlePrivateKeyChange(e.target.value)}
@@ -94,9 +119,20 @@ const PassphraseFormDecryption = () => {
           <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-2">
             Decrypted Passphrase
           </h4>
-          <p className="text-lg font-mono text-purple-600 dark:text-purple-400 break-words">
-            {decryptedPassphrase}
-          </p>
+          <div className="flex items-center">
+            <p className="text-lg font-mono text-purple-600 dark:text-purple-400 break-words">
+              {showDecryptedPassphrase ? decryptedPassphrase : "••••••••"}
+            </p>
+            <button
+              onClick={() =>
+                setShowDecryptedPassphrae(!showDecryptedPassphrase)
+              }
+              className="ml-2 focus:outline-none"
+              aria-label="Toggle passphrase visibility"
+            >
+              {showDecryptedPassphrase ? <EyeOffIcon /> : <EyeIcon />}
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -116,9 +152,95 @@ const SignatureFormValidation = () => {
   );
 };
 
+type DataToDecrypt = {
+  encryptedData: string;
+  passphrase: string;
+};
+
 const SymmetricDataDecryptionForm = () => {
+  // form inputs
+  const [passphraseInput, setPassphraseInput] = React.useState<string>("");
+  const { passphrase, clearLastDecPassphrase } = useLastDecryptedPassphrase();
+
+  // utils
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [decryptedData, setDecryptedData] = React.useState<string>("");
+  const [showDecryptedData, setShowDecryptedData] =
+    React.useState<boolean>(false);
+
+  // zustand hooks
+  const { selectedFile } = useSelectedAsymmetricFileStore();
+
+  // Extracting AES algorithm type dynamically from the path
+  const getAlgorithmType = (path: string) => {
+    const match = path.match(/AES-(128|192|256)/);
+    return match ? match[0] : "Unknown";
+  };
+
+  const algorithmType = selectedFile
+    ? getAlgorithmType(selectedFile.path)
+    : "Unknown";
+
+  // Display path dynamically
+  const displayPath = selectedFile
+    ? selectedFile.path.split("/").slice(-3).join("/")
+    : "";
+
+  const handleDecrypt = async () => {
+    try {
+      if (!selectedFile) return;
+      setIsLoading(true);
+      const loadedSymmetricData = await LoadAsymmetricEnData(selectedFile.path);
+
+      LogInfo(algorithmType);
+
+      const dataToDecrypt: DataToDecrypt = {
+        encryptedData: loadedSymmetricData,
+        passphrase: passphraseInput,
+      };
+
+      const decrypted = await DecryptAES(algorithmType, dataToDecrypt);
+      setDecryptedData(decrypted);
+
+      toast({
+        variant: "default",
+        className: "bg-green-500 border-0",
+        title: "Data Decrypted Successfully",
+        description: "The data has been decrypted successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Decryption failed",
+        description: "An error occurred during decryption.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePassphraseChange = (passphrase: string) => {
+    setPassphraseInput(passphrase);
+  };
+
+  const useLastDecryptedPassphraseInput = () => {
+    toast({
+      variant: "default",
+      className: "bg-green-500 border-0",
+      title: "Latest Decrypted Passphrase Retrieved",
+      description:
+        "Passphrase obtained. For future use, please re-enter the passphrase manually.",
+    });
+
+    setPassphraseInput(passphrase);
+
+    clearLastDecPassphrase();
+  };
+
   return (
-    <div className="p-4 bg-card dark:bg-card-dark rounded-md shadow-md">
+    <div className="p-6 bg-background dark:bg-background-dark rounded-md shadow-md space-y-4">
       <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-2">
         Decrypt the data using the passphrase.
       </h3>
@@ -126,6 +248,48 @@ const SymmetricDataDecryptionForm = () => {
         Ensure that you have successfully decrypted the passphrase before
         proceeding.
       </p>
+      <div className="flex flex-col text-foreground dark:text-foreground-dark text-center mb-4">
+        <p>File: {selectedFile && selectedFile.name}</p>
+        <p>Path: {displayPath}</p>
+      </div>
+      {passphrase && (
+        <Button onClick={useLastDecryptedPassphraseInput}>
+          Use Last Decrypted Passphrase
+        </Button>
+      )}
+      <Input
+        value={passphraseInput}
+        onChange={(e) => handlePassphraseChange(e.target.value)}
+        type="password"
+        placeholder="Enter decrypted passphrase"
+        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-foreground"
+      />
+      <Button
+        onClick={handleDecrypt}
+        variant="secondary"
+        className="w-full text-foreground"
+      >
+        {isLoading ? <PacmanLoader size={8} color="#fff" /> : "Decrypt"}
+      </Button>
+      {decryptedData && (
+        <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-inner">
+          <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Decrypted Data
+          </h4>
+          <div className="flex items-center">
+            <p className="text-lg font-mono text-purple-600 dark:text-purple-400 break-words">
+              {showDecryptedData ? decryptedData : "••••••••"}
+            </p>
+            <button
+              onClick={() => setShowDecryptedData(!showDecryptedData)}
+              className="ml-2 focus:outline-none"
+              aria-label="Toggle data visibility"
+            >
+              {showDecryptedData ? <EyeOffIcon /> : <EyeIcon />}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
