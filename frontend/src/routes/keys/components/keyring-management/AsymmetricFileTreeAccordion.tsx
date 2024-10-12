@@ -24,25 +24,9 @@ export function FileTreeAccordion() {
   };
 
   // TODO:
-  // i need to implement funcitonality
-  // when clicked on one of the files from
-  // FileTreeAccordion to show the decryption logic
-  // for the file that is selected
-
   // signature:
   // 1. provide the signature file
   // 2. provide senders public key to validate the authority
-  //
-  // passphrase decryption:
-  // 1. provide the encrypted passphrase file
-  // 2. and recievers private key
-  //
-  // symmetric_data:
-  // 1. provide the symmetric_data (load it)
-  // 2. provide the decrypted passphrase
-
-  // I need to implement in here being able to select the file that
-  // needs to be decrypted or verified (into zustand store)
 
   return (
     <div className="w-1/3 space-y-2 pt-2">

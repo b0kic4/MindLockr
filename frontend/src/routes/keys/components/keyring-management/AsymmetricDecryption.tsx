@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
+import { LogError } from "@wailsjs/runtime/runtime";
 import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
 import { LoadAsymmetricEnData } from "@wailsjs/go/keys/KeyRetrieve";
 import { PacmanLoader } from "react-spinners";
