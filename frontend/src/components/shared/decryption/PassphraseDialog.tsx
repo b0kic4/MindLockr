@@ -64,9 +64,7 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
                 Cancel
               </Button>
             </DialogClose>
-            <DialogClose>
-              <Button type="submit">Decrypt</Button>
-            </DialogClose>
+            <Button type="submit">Decrypt</Button>
           </DialogFooter>
         </form>
       </DialogContent>
