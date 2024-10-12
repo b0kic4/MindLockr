@@ -66,6 +66,7 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
               </div>
             ) : (
               <PassphraseDialog
+                onClose={onClose}
                 onSubmit={handleDecryptPassphraseSubmit}
                 keyName={keyInfo.name}
               />

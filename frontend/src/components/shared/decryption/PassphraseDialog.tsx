@@ -1,34 +1,29 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { DialogClose } from "@radix-ui/react-dialog";
 import { KeyRound } from "lucide-react";
 import React from "react";
 
 interface PassphraseDialogProps {
   onSubmit: (passphrase: string) => void;
   keyName: string;
+  onClose: () => void;
 }
 
 export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
   onSubmit,
   keyName,
+  onClose,
 }) => {
   const [passphrase, setPassphrase] = React.useState("");
-
-  // FIXME:
-  // this component is used in the Keyring Mangement
-  // getKeyColumns modifys the state
-  // displaying the DecryptedDataComponent
-  // and the Passphrase Dialog is rendered there
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +32,14 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
   };
 
   return (
-    <Dialog defaultOpen>
+    <Dialog
+      defaultOpen
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose();
+        }
+      }}
+    >
       <DialogTrigger>
         <KeyRound />
       </DialogTrigger>
@@ -58,7 +60,9 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
           </div>
           <DialogFooter>
             <DialogClose>
-              <Button variant="ghost">Cancel</Button>
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
             </DialogClose>
             <DialogClose>
               <Button type="submit">Decrypt</Button>
