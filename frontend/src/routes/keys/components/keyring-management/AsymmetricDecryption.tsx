@@ -4,7 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
-import { LogError } from "@wailsjs/runtime/runtime";
+import { VerifyData } from "@wailsjs/go/validation/Validatior";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
 import { LoadAsymmetricEnData } from "@wailsjs/go/keys/KeyRetrieve";
 import { PacmanLoader } from "react-spinners";
@@ -140,6 +141,33 @@ const PassphraseFormDecryption = () => {
 };
 
 const SignatureFormValidation = () => {
+  // currently implemeting this
+
+  const { selectedFile } = useSelectedAsymmetricFileStore();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [aesFolderPath, setAesFolderPath] = React.useState<string>("");
+
+  const displayPath = selectedFile
+    ? selectedFile.path.split("/").slice(-3).join("/")
+    : "";
+
+  LogInfo(displayPath);
+
+  const handleValidate = async () => {
+    try {
+      if (!selectedFile) return;
+
+      setIsLoading(true);
+      // const loadedSymmetricData = await LoadAsymmetricEnData()
+      // const loadedValidatioFile = await LoadAsymmetricEnData(selectedFile.path);
+      // const response = await VerifyData()
+    } catch (error) {
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="p-4 bg-card dark:bg-card-dark rounded-md shadow-md">
       <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -148,6 +176,10 @@ const SignatureFormValidation = () => {
       <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
         This process will verify the authenticity of the data.
       </p>
+      <div className="flex flex-col text-foreground dark:text-foreground-dark text-center mb-4">
+        <p>Validation File: {selectedFile && selectedFile.name}</p>
+        <p>Symmetric Data: {selectedFile && selectedFile.name}</p>
+      </div>
     </div>
   );
 };

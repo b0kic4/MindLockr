@@ -3,6 +3,7 @@ package main
 import (
 	hybriddecryption "MindLockr/server/cryptography/decryption/hybrid_decryption"
 	symmetricdecryption "MindLockr/server/cryptography/decryption/symmetric_decryption"
+	"MindLockr/server/cryptography/decryption/validation"
 	hybridencryption "MindLockr/server/cryptography/encryption/hybrid_encryption"
 	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
 	"MindLockr/server/filesystem"
@@ -26,6 +27,7 @@ func main() {
 	symmetric_decryption := &symmetricdecryption.Cryptography{}
 	hybrid_encryption := &hybridencryption.HybridEncryption{}
 	hybrid_decryption := &hybriddecryption.HybridPassphraseDecryption{}
+	validator := &validation.Validatior{}
 	folder := filesystem.GetFolderInstance()
 	keyRetrieve := keys.NewKeyRetrieve(folder)
 	keyStore := &keys.KeyStore{}
@@ -102,6 +104,7 @@ func main() {
 			pubPrivKeys,
 			hybrid_encryption,
 			hybrid_decryption,
+			validator,
 		},
 	})
 	if err != nil {
