@@ -193,8 +193,6 @@ const SymmetricDataDecryptionForm = () => {
       setIsLoading(true);
       const loadedSymmetricData = await LoadAsymmetricEnData(selectedFile.path);
 
-      LogInfo(algorithmType);
-
       const dataToDecrypt: DataToDecrypt = {
         encryptedData: loadedSymmetricData,
         passphrase: passphraseInput,
