@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
   data: string;
@@ -15,9 +16,8 @@ export default function EncryptionForm({
 }: Props) {
   return (
     <>
-      <Input
-        type="text"
-        placeholder="Data to be encrypted"
+      <Textarea
+        placeholder="Type your message in here"
         value={data}
         onChange={(e) => setData(e.target.value)}
         className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"

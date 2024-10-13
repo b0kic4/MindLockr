@@ -12,7 +12,7 @@ import {
   LoadAsymmetricEnData,
 } from "@wailsjs/go/keys/KeyRetrieve";
 import { PacmanLoader } from "react-spinners";
-import { EyeOffIcon, EyeIcon } from "lucide-react";
+import { EyeOffIcon, EyeIcon, XSquareIcon } from "lucide-react";
 import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
 
 const PassphraseFormDecryption = () => {
@@ -194,8 +194,6 @@ const SignatureFormValidation = () => {
             "The signature is invalid or does not match the provided public key.",
         });
       }
-
-      LogInfo(JSON.stringify(response));
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -390,7 +388,7 @@ const SymmetricDataDecryptionForm = () => {
 };
 
 const RenderContent = () => {
-  const { selectedFile } = useSelectedAsymmetricFileStore();
+  const { selectedFile, setSelectedFile } = useSelectedAsymmetricFileStore();
 
   if (!selectedFile) return null;
 
@@ -407,7 +405,7 @@ const RenderContent = () => {
       contentComponent = <SignatureFormValidation />;
       break;
     case "Encrypted Data":
-      contentText = "Decrypt Data with Passphrase";
+      contentText = "Decrypt Data";
       contentComponent = <SymmetricDataDecryptionForm />;
       break;
     default:
@@ -417,11 +415,24 @@ const RenderContent = () => {
   }
 
   return (
-    <div className="space-y-4 text-center">
-      <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200">
+    <div className="relative p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <Button
+        variant="ghost"
+        className="absolute top-2 right-2"
+        onClick={() => {
+          setSelectedFile(null as any);
+        }}
+      >
+        <XSquareIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+      </Button>
+
+      <h2 className="text-center font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">
         {contentText}
       </h2>
-      {contentComponent}
+
+      <div className="flex flex-col items-center space-y-4">
+        {contentComponent}
+      </div>
     </div>
   );
 };
