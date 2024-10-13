@@ -221,7 +221,7 @@ const SignatureFormValidation = () => {
   };
 
   return (
-    <div className="p-4 bg-card dark:bg-card-dark rounded-md shadow-md">
+    <div className="p-4 bg-background dark:bg-background-dark rounded-md shadow-md">
       <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-2">
         Provide the sender’s public key to validate the signature.
       </h3>
