@@ -35,25 +35,25 @@ export function FileTreeAccordion() {
         <Accordion type="multiple">
           {keys.asymmetric.map((folder) => (
             <AccordionItem key={folder.name} value={folder.name}>
-              <AccordionTrigger className="flex justify-start space-x-4">
+              <AccordionTrigger className="flex justify-start space-x-4 text-lg">
                 <FolderIcon className="w-4 h-4 text-gray-600" />
                 <span>{folder.name}</span>
               </AccordionTrigger>
               <AccordionContent>
-                <ul className="ml-6 space-y-2 text-sm">
+                <ul className="ml-6 space-y-2">
                   {folder.files.map((file) => {
                     const isAlgorithmFolder = file.name.includes("/");
                     const [algoFolder, fileName] = file.name.split("/");
 
                     return isAlgorithmFolder ? (
-                      <li key={fileName} className="ml-4">
-                        <span className="flex gap-2 items-center text-center font-semibold">
+                      <li key={fileName} className="ml-4 text-lg">
+                        <span className="flex gap-2 items-center text-center text-lg font-semibold">
                           <FolderIcon className="w-4 h-4 text-gray-600" />
                           {algoFolder}
                         </span>
                         <ul className="ml-4 space-y-1">
                           <li
-                            className="flex items-center space-x-2 cursor-pointer"
+                            className="flex text-lg items-center space-x-2 cursor-pointer"
                             onClick={() =>
                               handleFileClick({
                                 name: fileName,
@@ -63,14 +63,14 @@ export function FileTreeAccordion() {
                             }
                           >
                             <FileTextIcon className="w-4 h-4 text-gray-400" />
-                            <span>{fileName}</span>
+                            <span className="text-lg">{fileName}</span>
                           </li>
                         </ul>
                       </li>
                     ) : (
                       <li
                         key={file.name}
-                        className="flex items-center space-x-2 py-1 cursor-pointer"
+                        className="flex text-lg items-center space-x-2 py-1 cursor-pointer"
                         onClick={() =>
                           handleFileClick({
                             name: file.name,

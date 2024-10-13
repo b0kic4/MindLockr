@@ -17,9 +17,7 @@ type ECDSASignature struct {
 type Validator struct{}
 
 func (v *Validator) VerifyData(data string, sig string, pubKey string) (bool, error) {
-	encData := []byte(data)
-
-	hash := sha256.Sum256(encData)
+	hash := sha256.Sum256([]byte(data))
 
 	// Decode the base64-encoded signature
 	encSig, err := base64.StdEncoding.DecodeString(sig)
