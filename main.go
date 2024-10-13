@@ -27,7 +27,7 @@ func main() {
 	symmetric_decryption := &symmetricdecryption.Cryptography{}
 	hybrid_encryption := &hybridencryption.HybridEncryption{}
 	hybrid_decryption := &hybriddecryption.HybridPassphraseDecryption{}
-	validator := &validation.Validatior{}
+	validator := &validation.Validator{}
 	folder := filesystem.GetFolderInstance()
 	keyRetrieve := keys.NewKeyRetrieve(folder)
 	keyStore := &keys.KeyStore{}

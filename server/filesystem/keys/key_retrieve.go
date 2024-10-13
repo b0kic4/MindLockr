@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type KeyRetrieve struct {
@@ -43,6 +44,49 @@ func (kr *KeyRetrieve) LoadAsymmetricEnData(dataFilePath string) (string, error)
 	}
 
 	return string(content), nil
+}
+
+func (kr *KeyRetrieve) GetEncryptionFromSignature(sigPath string) (string, error) {
+	// Get the directory containing the signature.sig
+	signatureDir := filepath.Dir(sigPath)
+
+	// Go one directory up (the parent directory, which contains the AES-* folder)
+	parentDir := filepath.Dir(signatureDir)
+
+	folderName := filepath.Base(signatureDir)
+
+	// Walk the parent directory to find AES-* folder
+	var aesFolder string
+	err := filepath.Walk(parentDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Check if the folder name matches AES-128, AES-192, or AES-256
+		if info.IsDir() && (strings.Contains(info.Name(), "AES-128") ||
+			strings.Contains(info.Name(), "AES-192") ||
+			strings.Contains(info.Name(), "AES-256")) {
+			aesFolder = info.Name()
+			return filepath.SkipDir
+		}
+		return nil
+	})
+	if err != nil {
+		return "", fmt.Errorf("error walking file tree: %v", err)
+	}
+
+	if aesFolder == "" {
+		return "", fmt.Errorf("AES folder not found in: %s", parentDir)
+	}
+
+	newPath := filepath.Join(parentDir, folderName, aesFolder, "symmetric_data.enc")
+
+	dataContent, err := kr.LoadAsymmetricEnData(newPath)
+	if err != nil {
+		return newPath, fmt.Errorf("failed to load en data content. path is returned: %s", err)
+	}
+
+	return dataContent, nil
 }
 
 func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
