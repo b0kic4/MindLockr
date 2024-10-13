@@ -11,9 +11,11 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/x509"
+	"encoding/asn1"
 	"encoding/base64"
 	"fmt"
 	"io"
+	"math/big"
 )
 
 type HybridEncryption struct{}
@@ -168,12 +170,21 @@ func encryptWithPublicKey(data []byte, pubKey *ecdsa.PublicKey) ([]byte, error) 
 	return buf.Bytes(), nil
 }
 
-// Signs the data using ECDSA with SHA-256
+type ECDSASignature struct {
+	R, S *big.Int
+}
+
 func signData(data []byte, privKey *ecdsa.PrivateKey) ([]byte, error) {
 	hash := sha256.Sum256(data)
 	r, s, err := ecdsa.Sign(rand.Reader, privKey, hash[:])
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign data: %v", err)
 	}
-	return append(r.Bytes(), s.Bytes()...), nil
+
+	// Encode r and s as ASN.1 DER
+	sig, err := asn1.Marshal(ECDSASignature{R: r, S: s})
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode signature: %v", err)
+	}
+	return sig, nil
 }

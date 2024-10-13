@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/asn1"
 	"encoding/base64"
-	"encoding/pem"
 	"fmt"
 	"math/big"
 )
@@ -15,14 +14,10 @@ type ECDSASignature struct {
 	R, S *big.Int
 }
 
-type Validatior struct{}
+type Validator struct{}
 
-func (v *Validatior) VerifyData(data string, sig string, pubKey string) (bool, error) {
-	// Hash the data with SHA-256
-	encData, err := base64.StdEncoding.DecodeString(data)
-	if err != nil {
-		return false, fmt.Errorf("failed to decode data: %v", err)
-	}
+func (v *Validator) VerifyData(data string, sig string, pubKey string) (bool, error) {
+	encData := []byte(data)
 
 	hash := sha256.Sum256(encData)
 
@@ -47,28 +42,24 @@ func (v *Validatior) VerifyData(data string, sig string, pubKey string) (bool, e
 	// Verify the signature using ECDSA
 	isValid := ecdsa.Verify(parsedPubKey, hash[:], signature.R, signature.S)
 	if !isValid {
-		return false, nil // Verification failed, but no error in processing
+		return false, nil // Verification failed
 	}
 
 	return true, nil // Verification succeeded
 }
 
-// Helper function to parse a PEM-formatted public key
-func parsePublicKey(pubKeyPem string) (*ecdsa.PublicKey, error) {
-	block, _ := pem.Decode([]byte(pubKeyPem))
-	if block == nil || block.Type != "PUBLIC KEY" {
-		return nil, fmt.Errorf("failed to decode public key from PEM format")
-	}
-
-	pubKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+func parsePublicKey(pubKey string) (*ecdsa.PublicKey, error) {
+	pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse public key: %v", err)
+		return nil, fmt.Errorf("error decoding public key: %v", err)
 	}
-
-	pubKey, ok := pubKeyInterface.(*ecdsa.PublicKey)
+	publicKeyInterface, err := x509.ParsePKIXPublicKey(pubKeyBytes)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing public key: %v", err)
+	}
+	ecdsaPubKey, ok := publicKeyInterface.(*ecdsa.PublicKey)
 	if !ok {
 		return nil, fmt.Errorf("not an ECDSA public key")
 	}
-
-	return pubKey, nil
+	return ecdsaPubKey, nil
 }

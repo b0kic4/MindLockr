@@ -4,10 +4,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
-import { VerifyData } from "@wailsjs/go/validation/Validatior";
+import { VerifyData } from "@wailsjs/go/validation/Validator";
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
-import { LoadAsymmetricEnData } from "@wailsjs/go/keys/KeyRetrieve";
+import {
+  GetEncryptionFromSignature,
+  LoadAsymmetricEnData,
+} from "@wailsjs/go/keys/KeyRetrieve";
 import { PacmanLoader } from "react-spinners";
 import { EyeOffIcon, EyeIcon } from "lucide-react";
 import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
@@ -141,31 +144,80 @@ const PassphraseFormDecryption = () => {
 };
 
 const SignatureFormValidation = () => {
-  // currently implemeting this
-
   const { selectedFile } = useSelectedAsymmetricFileStore();
+
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [aesFolderPath, setAesFolderPath] = React.useState<string>("");
+  const [pubKey, setPubKey] = React.useState<string>("");
+
+  const { toast } = useToast();
 
   const displayPath = selectedFile
     ? selectedFile.path.split("/").slice(-3).join("/")
     : "";
 
-  LogInfo(displayPath);
-
   const handleValidate = async () => {
     try {
       if (!selectedFile) return;
-
       setIsLoading(true);
-      // const loadedSymmetricData = await LoadAsymmetricEnData()
-      // const loadedValidatioFile = await LoadAsymmetricEnData(selectedFile.path);
-      // const response = await VerifyData()
+
+      const foundSymmetricData = await GetEncryptionFromSignature(
+        selectedFile.path,
+      );
+      const loadedValidationFile = await LoadAsymmetricEnData(
+        selectedFile.path,
+      );
+
+      const response = await VerifyData(
+        foundSymmetricData.replace(/\s+/g, "").trim(),
+        loadedValidationFile.replace(/\s+/g, "").trim(),
+        pubKey
+          .replace(/-----BEGIN PUBLIC KEY-----/g, "")
+          .replace(/-----END PUBLIC KEY-----/g, "")
+          .replace(/\s+/g, "")
+          .trim(),
+      );
+
+      if (response) {
+        toast({
+          variant: "default",
+          className: "bg-green-500 border-0",
+          title: "Signature Valid",
+          description:
+            "The signature is valid and matches the provided public key.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          className: "bg-red-500 border-0",
+          title: "Signature Validation Failed",
+          description:
+            "The signature is invalid or does not match the provided public key.",
+        });
+      }
+
+      LogInfo(JSON.stringify(response));
     } catch (error) {
-      setIsLoading(false);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : JSON.stringify(error);
+      LogError(errorMessage);
+
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Validation Error",
+        description: "An error occurred during signature validation.",
+      });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePubKeyChange = (pubKey: string) => {
+    setPubKey(pubKey);
   };
 
   return (
@@ -176,9 +228,22 @@ const SignatureFormValidation = () => {
       <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
         This process will verify the authenticity of the data.
       </p>
-      <div className="flex flex-col text-foreground dark:text-foreground-dark text-center mb-4">
-        <p>Validation File: {selectedFile && selectedFile.name}</p>
-        <p>Symmetric Data: {selectedFile && selectedFile.name}</p>
+      <div className="flex flex-col text-foreground dark:text-foreground-dark text-center mb-4 gap-3">
+        <p>Validation File: {displayPath}</p>
+        <Input
+          value={pubKey}
+          onChange={(e) => handlePubKeyChange(e.target.value)}
+          type="password"
+          placeholder="Enter senders's public key"
+          className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-foreground"
+        />
+        <Button
+          onClick={handleValidate}
+          variant="secondary"
+          className="w-full text-foreground"
+        >
+          {isLoading ? <PacmanLoader size={8} color="#fff" /> : "Validate"}
+        </Button>
       </div>
     </div>
   );
