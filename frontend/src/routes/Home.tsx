@@ -20,6 +20,15 @@ export default function Home() {
     handleHidePrivKey,
   } = usePrivateKeyDecryption();
 
+  // when the user clicks on
+  // generate keys (pub and priv keys)
+  // are generated,
+  // and those keys can be used for whatever
+  //
+  // but when generating the pub and priv keys
+  // we would need to specify the folder for those keys
+  // for the user to know for what is it used for
+
   return (
     <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen max-w-4xl mx-auto mt-6 space-y-8">
       <div className="text-center">

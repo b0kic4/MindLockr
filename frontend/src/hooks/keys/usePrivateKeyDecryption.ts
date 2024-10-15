@@ -15,7 +15,7 @@ export function usePrivateKeyDecryption() {
       setDecryptedPrivKey(decrypted);
       setIsPrivKeyVisible(true);
 
-      // Hide the decrypted private key after 50 seconds
+      // Hide the decrypted private key after 30 seconds
       setTimeout(() => {
         setDecryptedPrivKey("");
         setIsPrivKeyVisible(false);
