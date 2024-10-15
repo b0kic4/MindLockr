@@ -74,6 +74,17 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
     }
   };
 
+  // the folderName for those keys
+  // should associate for what the keys
+  // are being used (thats what we need to show)
+
+  // add in here folder path input where keys
+  // will be stored
+  // live preview of where the keys is stored
+  //
+  // when user confirms the path
+  // we should prompt the passphrase
+
   return (
     <Dialog>
       <DialogTrigger asChild>
