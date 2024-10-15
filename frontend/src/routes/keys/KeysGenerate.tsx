@@ -16,6 +16,25 @@ import KeySaveForm from "./components/key-gen/KeySaveForm";
 import KeyTypeTabs from "./components/key-gen/KeyTypeTabs";
 import Questions from "./components/key-gen/Questions";
 
+// I actually need for the users
+// to be able to generate more
+// public and private keys
+//
+// we should have setting the name
+// like a something that will refrease
+// to the usage of the key
+//
+// and for the user to be able to chose
+// which pub priv key he want to use
+//
+// also I need to implement RSA
+//
+// and thats when the importing and exporting
+// comes into play
+// we can import and export from GNU GPA and etc
+// need to test that on linux how they should be
+// working together
+
 export default function KeysGen() {
   // data for encryption (symmetric)
   const [data, setData] = React.useState("");
