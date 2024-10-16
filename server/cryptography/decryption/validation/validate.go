@@ -1,9 +1,9 @@
 package validation
 
 import (
+	"MindLockr/server/cryptography/cryptohelper"
 	"crypto/ecdsa"
 	"crypto/sha256"
-	"crypto/x509"
 	"encoding/asn1"
 	"encoding/base64"
 	"fmt"
@@ -32,7 +32,7 @@ func (v *Validator) VerifyData(data string, sig string, pubKey string) (bool, er
 	}
 
 	// Parse the PEM-encoded public key
-	parsedPubKey, err := parsePublicKey(pubKey)
+	parsedPubKey, err := cryptohelper.ParsePublicKey(pubKey)
 	if err != nil {
 		return false, fmt.Errorf("failed to parse public key: %v", err)
 	}
@@ -44,20 +44,4 @@ func (v *Validator) VerifyData(data string, sig string, pubKey string) (bool, er
 	}
 
 	return true, nil // Verification succeeded
-}
-
-func parsePublicKey(pubKey string) (*ecdsa.PublicKey, error) {
-	pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKey)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding public key: %v", err)
-	}
-	publicKeyInterface, err := x509.ParsePKIXPublicKey(pubKeyBytes)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing public key: %v", err)
-	}
-	ecdsaPubKey, ok := publicKeyInterface.(*ecdsa.PublicKey)
-	if !ok {
-		return nil, fmt.Errorf("not an ECDSA public key")
-	}
-	return ecdsaPubKey, nil
 }

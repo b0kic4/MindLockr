@@ -3,35 +3,22 @@ import { usePubPriv } from "@/hooks/keys/usePubPrivKeys";
 import usePubPrivStore from "@/lib/store/usePubPrivStore";
 
 export default function YourKeys() {
-  // i need a route where the public and private keys
-  // are displayed.
-  // the keys are stored in the priv-pub/folderName
-  // we have to list them and every key pair will have passphrase
-  // we need to have the public and private keys for chatting
-  // we should prompt the user to ackowlegde them (but that comes later)
-
   const { folderPath } = useFolderPath();
   const { privKey, setPrivKey, pubKey, setPubKey } = usePubPriv({
     folderPath: folderPath,
   });
 
-  // RSA algorithm invlovles four steps
+  // 1. Removing the algorithm type specification in folder paths
+  // (We can determine the encryption alg by leveraging the
+  // metadata embedded withing the key files and encrypted messages themselves)
   //
-  // key gen
-  // key distribution
-  // key encryption
-  // key decryption
-
-  // asymmetric alg:
-  // add RSA > 2048 bits <= (4096 bits)
-  // hashing:
-  // add SHA-2 Family (SHA-256, SHA-384, SHA-512)
-  // Use SHA-256: As a standard hash function for general purposes.
-  // Use SHA-512: When higher security is required.
-
-  // in here we are listing the pgp keys
-  // and as well funcitonality for adding new
-  // pgp keys
+  // 2. RSA asymmetric encryption decryption algorithm should be implemented
+  //
+  // 3. Keys import export
+  //
+  // 4. Reorganizing the public and private pgp keys generation we should
+  // have them in our PGP keys section.
+  // (Currently we have only one generation of the pub and priv keys and they are displayed in home) but we should have that in seperate route and generate as much as we want and specify the usage of them
 
   return <div>Users Dashboard</div>;
 }

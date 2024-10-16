@@ -7,6 +7,7 @@ interface UseDeleteKeyParams {
   fetchKeys: () => Promise<void>;
 }
 
+// this work only for symmetric encryption
 export function useDeleteKey({ fetchKeys }: UseDeleteKeyParams) {
   const { toast } = useToast();
 

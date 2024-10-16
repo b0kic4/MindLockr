@@ -14,7 +14,6 @@ type HybridPassphraseDecryption struct{}
 
 func (hpd *HybridPassphraseDecryption) DecryptPassphrase(encryptedPassphraseB64 string, privKeyB64 string) (string, error) {
 	// Decode the base64-encoded encrypted passphrase
-
 	encPassphrase, err := base64.StdEncoding.DecodeString(encryptedPassphraseB64)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode encrypted passphrase: %v", err)

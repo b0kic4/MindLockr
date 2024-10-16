@@ -44,8 +44,8 @@ export default function AsymmetricKeyEncryptionForm() {
 
     if (providedPrivateKey.length !== 0) {
       const cleanedPrivKey = providedPrivateKey
-        .replace(/-----BEGIN EC PRIVATE KEY-----/g, "")
-        .replace(/-----END EC PRIVATE KEY-----/g, "")
+        .replace(/-----BEGIN PGP PRIVATE KEY-----/g, "")
+        .replace(/-----END PGP PRIVATE KEY-----/g, "")
         .replace(/\s+/g, "")
         .trim();
 
@@ -56,8 +56,8 @@ export default function AsymmetricKeyEncryptionForm() {
 
   const handleUseMyPublicKey = () => {
     const cleanedPublicKey = pubKey
-      .replace(/-----BEGIN PUBLIC KEY-----/g, "")
-      .replace(/-----END PUBLIC KEY-----/g, "")
+      .replace(/-----BEGIN PGP PUBLIC KEY-----/g, "")
+      .replace(/-----END PGP PUBLIC KEY-----/g, "")
       .replace(/\s+/g, "")
       .trim();
 

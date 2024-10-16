@@ -34,8 +34,8 @@ const PassphraseFormDecryption = () => {
 
   const handlePrivateKeyChange = (key: string) => {
     const cleanedPrivKey = key
-      .replace(/-----BEGIN EC PRIVATE KEY-----/g, "")
-      .replace(/-----END EC PRIVATE KEY-----/g, "")
+      .replace(/-----BEGIN PGP PRIVATE KEY-----/g, "")
+      .replace(/-----END PGP PRIVATE KEY-----/g, "")
       .replace(/\s+/g, "")
       .trim();
     setPrivKey(cleanedPrivKey);
@@ -171,8 +171,8 @@ const SignatureFormValidation = () => {
         foundSymmetricData.replace(/\s+/g, "").trim(),
         loadedValidationFile.replace(/\s+/g, "").trim(),
         pubKey
-          .replace(/-----BEGIN PUBLIC KEY-----/g, "")
-          .replace(/-----END PUBLIC KEY-----/g, "")
+          .replace(/-----BEGIN PGP PUBLIC KEY-----/g, "")
+          .replace(/-----END PGP PUBLIC KEY-----/g, "")
           .replace(/\s+/g, "")
           .trim(),
       );

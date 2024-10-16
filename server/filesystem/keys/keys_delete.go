@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 )
 
+// TODO: need to refactor this
 func (kr *KeyRetrieve) DeleteKey(ki KeyInfo) bool {
 	folderPath := kr.folderInstance.GetFolderPath()
 	keyFilePath := filepath.Join(folderPath, "keys", "symmetric", ki.Algorithm, ki.Name)
