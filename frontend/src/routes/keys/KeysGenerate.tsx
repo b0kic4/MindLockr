@@ -94,8 +94,7 @@ export default function KeysGen() {
     }
   };
 
-  // for MVP we should have only ECC
-  // later add RSA and DSA
+  // adding now RSA
   const handleGenerateSharableData = async () => {
     const missingFields = [];
 

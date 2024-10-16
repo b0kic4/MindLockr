@@ -44,7 +44,7 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 	}
 
 	privKeyPEM := pem.EncodeToMemory(&pem.Block{
-		Type:  "EC PRIVATE KEY",
+		Type:  "PGP PRIVATE KEY",
 		Bytes: privKeyBytes,
 	})
 
@@ -69,7 +69,7 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 	}
 
 	pubKeyPEM := pem.EncodeToMemory(&pem.Block{
-		Type:  "PUBLIC KEY",
+		Type:  "PGP PUBLIC KEY",
 		Bytes: pubKeyBytes,
 	})
 
