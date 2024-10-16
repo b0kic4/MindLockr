@@ -14,11 +14,13 @@ import (
 	"path/filepath"
 )
 
-type PubPrvKeyGen struct{}
-
-type RequestData struct {
-	Passphrase string
-}
+type (
+	PubPrvKeyGen struct{}
+	RequestData  struct {
+		Usage      string
+		Passphrase string
+	}
+)
 
 type ReturnType struct {
 	PrivKey string
@@ -58,7 +60,7 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 		return ReturnType{}, fmt.Errorf("encryption failed: %v", err)
 	}
 
-	err = SavePrivateKey(encryptedPrivKey)
+	err = SavePgpPrivKey(encryptedPrivKey, req.Usage)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
 	}
@@ -73,7 +75,7 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 		Bytes: pubKeyBytes,
 	})
 
-	err = SavePublicKey(pubKeyPEM)
+	err = SavePgpPublicKey(pubKeyPEM, req.Usage)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
 	}
@@ -84,39 +86,10 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 	}, nil
 }
 
-func (pubpriv *PubPrvKeyGen) RetrievePubKey() (string, error) {
+func (pubpriv *PubPrvKeyGen) DecryptPgpPrivKey(passphrase string, keyName string) (string, error) {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
-	keysDir := filepath.Join(folderPath, "priv-pub")
-	pubKeyPath := filepath.Join(keysDir, "public.pem")
-
-	// Read the public key file
-	pubKeyPEM, err := os.ReadFile(pubKeyPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read public key file: %v", err)
-	}
-
-	return string(pubKeyPEM), nil
-}
-
-func (pubpriv *PubPrvKeyGen) RetrievePrivKey() (string, error) {
-	folderInstance := filesystem.GetFolderInstance()
-	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
-	privKeyPath := filepath.Join(keysDir, "private.pem")
-
-	// Read the encrypted private key file
-	encryptedPrivKeyHex, err := os.ReadFile(privKeyPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read private key file: %v", err)
-	}
-
-	return string(encryptedPrivKeyHex), nil
-}
-
-func (pubpriv *PubPrvKeyGen) DecryptPrivKey(passphrase string) (string, error) {
-	folderInstance := filesystem.GetFolderInstance()
-	folderPath := folderInstance.GetFolderPath()
-	keysDir := filepath.Join(folderPath, "priv-pub")
+	keysDir := filepath.Join(folderPath, "pgp", keyName)
 	privKeyPath := filepath.Join(keysDir, "private.pem")
 
 	// Read the encrypted private key file

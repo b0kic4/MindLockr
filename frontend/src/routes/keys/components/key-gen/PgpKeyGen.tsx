@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GeneratePrivatePublicKeys } from "@wailsjs/go/keys/PubPrvKeyGen";
 import {
-  GeneratePrivatePublicKeys,
-  RetrievePrivKey,
-  RetrievePubKey,
-} from "@wailsjs/go/keys/PubPrvKeyGen";
+  RetrievePgpPrivKey,
+  RetrievePgpPubKey,
+} from "@wailsjs/go/keys/KeyRetrieve";
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LogError } from "@wailsjs/runtime/runtime";
@@ -24,7 +24,8 @@ type Props = {
   setPubKey: (value: string) => void;
 };
 
-export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
+export function PgpKeyGen({ setPrivKey, setPubKey }: Props) {
+  const [keyName, setKeyName] = React.useState<string>("");
   const [passphrase, setPassphrase] = React.useState<string>("");
   const { toast } = useToast();
 
@@ -33,15 +34,16 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
 
     try {
       const response = await GeneratePrivatePublicKeys({
+        Usage: keyName,
         Passphrase: passphrase,
       });
 
       if (response.PubKey && response.PrivKey) {
         try {
-          const publicKey = await RetrievePubKey();
+          const publicKey = await RetrievePgpPubKey(keyName);
           setPubKey(publicKey);
 
-          const privateKey = await RetrievePrivKey();
+          const privateKey = await RetrievePgpPrivKey(keyName);
           setPrivKey(privateKey);
 
           toast({
@@ -61,8 +63,6 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
           });
         }
       }
-
-      setPassphrase("");
     } catch (err) {
       toast({
         variant: "destructive",
@@ -71,6 +71,9 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
         description:
           "Failed to generate keys. Please check if you initialized folder path.",
       });
+    } finally {
+      setKeyName("");
+      setPassphrase("");
     }
   };
 
@@ -95,7 +98,7 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
           Generate Keys
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Generate Keys</DialogTitle>
           <DialogDescription>
@@ -106,6 +109,17 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
         <form onSubmit={genKeys}>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="keyName" className="text-right">
+                Key Name
+              </Label>
+              <Input
+                value={keyName}
+                onChange={(e) => setKeyName(e.target.value)}
+                id="keyName"
+                type="text"
+                className="col-span-3"
+                placeholder="Please provide a key name that reflects its intended usage."
+              />
               <Label htmlFor="passphrase" className="text-right">
                 Passphrase
               </Label>
@@ -120,7 +134,7 @@ export function PubPrivKeyGen({ setPrivKey, setPubKey }: Props) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={!passphrase}>
+            <Button type="submit" disabled={!passphrase || !keyName}>
               Generate
             </Button>
           </DialogFooter>

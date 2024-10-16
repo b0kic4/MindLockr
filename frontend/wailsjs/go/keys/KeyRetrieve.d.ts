@@ -12,4 +12,10 @@ export function LoadEncryptedKeyContent(arg1:string,arg2:string):Promise<string>
 
 export function RetrieveAsymmetricKeys():Promise<Array<keys.FolderInfo>>;
 
+export function RetrievePgpKeys():Promise<Array<keys.PgpKeyInfo>>;
+
+export function RetrievePgpPrivKey(arg1:string):Promise<string>;
+
+export function RetrievePgpPubKey(arg1:string):Promise<string>;
+
 export function RetrieveSymmetricKeys():Promise<Array<keys.KeyInfo>>;

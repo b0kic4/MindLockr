@@ -3,17 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePubPrivAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import usePubPrivStore from "@/lib/store/usePubPrivStore";
+import usePubPrivStore from "@/lib/store/useMsgKeysStore";
 import { EyeOff, Eye } from "lucide-react";
 import React from "react";
 
 export default function AsymmetricKeyEncryptionForm() {
   const { privKey, pubKey } = usePubPrivStore();
 
-  // FIXME:
-  // Here might be a bug when getting the users private key
-  // and then trying to provide some other private key
-  // need to test that
+  // TODO: This needs to be rewritten
 
   const [isPrivateKeyVisible, setIsPrivateKeyVisible] =
     React.useState<boolean>(false);
@@ -21,8 +18,15 @@ export default function AsymmetricKeyEncryptionForm() {
   // local input
   const [publicKeyInput, setPublicKeyInput] = React.useState("");
 
-  // decryption of the users key
-  const { decryptedPrivKey, handleDecryptPrivKey } = usePrivateKeyDecryption();
+  // TODO:
+  // User needs to chose the pgp key pair for encryption
+  // UI (select box for pgp key pair)
+  //
+  //
+  // FIXME: this needs to be changed for dynamic input
+  const { decryptedPrivKey, handleDecryptPrivKey } = usePrivateKeyDecryption({
+    keyName: "msg",
+  });
 
   // zustand store
   const { setProvidedPrivKey, setProvidedPubKey } =
@@ -68,6 +72,14 @@ export default function AsymmetricKeyEncryptionForm() {
   const handleGetEncryptedPrivateKey = async () => {
     setEncryptedPrivateKeyInput(privKey);
   };
+
+  // instead of use my public key
+  // and instead of use my private key
+  // we should have the ui when clicked on
+  // chose pgp key pair
+  // to show all of the generated keys
+  // and selecting the key pair or adding
+  // the new key pair
 
   return (
     <div className="space-y-4 p-4 bg-muted dark:bg-muted-dark mt-4 rounded-lg">

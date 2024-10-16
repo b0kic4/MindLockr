@@ -3,12 +3,11 @@ import { TopNav } from "./components/shared/navbar/TopNav";
 import { Sidebar } from "./components/shared/sidebar/Sidebar";
 import Home from "./routes/Home";
 import KeysNav from "./routes/keys/components/KeysNav";
-import KeysIndex from "./routes/keys/YourKeys";
 import KeyringManagement from "./routes/keys/KeyringManagement";
 import KeysGen from "./routes/keys/KeysGenerate";
 import KeysIE from "./routes/keys/KeysImportExport";
 import KeysSigningSignature from "./routes/keys/KeysSigningSignature";
-import YourKeys from "./routes/keys/YourKeys";
+import PGPKeys from "./routes/keys/PGPKeys";
 
 // Layout for the /keys route
 const KeysLayout = () => {
@@ -32,7 +31,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/keys" element={<KeysLayout />}>
-              <Route index element={<YourKeys />} />
+              <Route index element={<PGPKeys />} />
               <Route path="generate" element={<KeysGen />} />
               <Route path="import-export" element={<KeysIE />} />
               <Route path="keyring" element={<KeyringManagement />} />

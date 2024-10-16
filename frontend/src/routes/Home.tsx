@@ -2,14 +2,14 @@ import { DecryptButton } from "@/components/shared/decryption/DecryptButton.js";
 import { Button } from "@/components/ui/button.js";
 import { useFolderPath } from "@/hooks/folder/useFolderPath.js";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption.js";
-import { usePubPriv } from "@/hooks/keys/usePubPrivKeys.js";
+import { useMsgPubPriv } from "@/hooks/keys/useMsgPubPrivKeys.js";
 import { EyeOff } from "lucide-react";
-import { PubPrivKeyGen } from "./keys/components/key-gen/PublicPrivateKeysGen.js";
+import { MessagingKeysGen } from "./keys/components/key-gen/MessagingPubPrivKeysGen.js";
 
 export default function Home() {
   // hooks
   const { folderPath, pickFolder, removeFolderPath } = useFolderPath();
-  const { privKey, setPrivKey, pubKey, setPubKey } = usePubPriv({
+  const { privKey, setPrivKey, pubKey, setPubKey } = useMsgPubPriv({
     folderPath: folderPath,
   });
 
@@ -18,7 +18,7 @@ export default function Home() {
     isPrivKeyVisible,
     handleDecryptPrivKey,
     handleHidePrivKey,
-  } = usePrivateKeyDecryption();
+  } = usePrivateKeyDecryption({ keyName: "msg" });
 
   // when the user clicks on
   // generate keys (pub and priv keys)
@@ -28,6 +28,16 @@ export default function Home() {
   // but when generating the pub and priv keys
   // we would need to specify the folder for those keys
   // for the user to know for what is it used for
+
+  // I should add the generate keys
+  // for sharing the messages between machines
+  // for the chatting application
+  //
+  // also those keys needs to re-generated
+  // every time the user wants to change the keys
+  // maybe I should have the linked list that
+  // old public key will point to the new one
+  // I should add setting usernames
 
   return (
     <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen max-w-4xl mx-auto mt-6 space-y-8">
@@ -76,24 +86,29 @@ export default function Home() {
 
       {!pubKey && !privKey && (
         <div className="w-full p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Key Generation</h2>
+          <h2 className="text-2xl font-semibold mb-4">
+            Messages Key Generation
+          </h2>
           <div className="text-center">
             <p className="text-md text-gray-700 dark:text-gray-300">
-              Generate your Public/Private keys
+              Generate your Public/Private Messaging keys
             </p>
             <p className="mt-4 text-red-500 font-bold">
               Please generate Public/Private keys for this machine.
+              <br /> Those keys will be used for the Message exchanging
             </p>
-            <PubPrivKeyGen setPrivKey={setPrivKey} setPubKey={setPubKey} />
+            <MessagingKeysGen setPrivKey={setPrivKey} setPubKey={setPubKey} />
           </div>
         </div>
       )}
 
       {pubKey && privKey && (
         <div className="w-full p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Generated Keys</h2>
+          <h2 className="text-2xl font-semibold mb-4">
+            Generated Messaging Keys
+          </h2>
           <div className="mb-4">
-            <h3 className="text-lg font-semibold">Public Key:</h3>
+            <h3 className="text-lg font-semibold">PGP Public Key:</h3>
             <textarea
               readOnly
               value={pubKey}
@@ -101,14 +116,14 @@ export default function Home() {
             />
           </div>
           <div className="relative mb-4 p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold mb-2 sm:mb-0">
-                Private Key:
+            <div className="flex flex-col gap-2 sm:flex-row items-start sm:items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold mb-2 sm:mb-0 text-nowrap">
+                PGP Private Key:
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                <em className="text-red-500">
+                <em className="text-red-500 text-nowrap">
                   Private key is initially encrypted. Use the decryption
-                  passphrase to retrieve the private key.
+                  passphrase to retrieve the pgp key.
                 </em>
               </p>
             </div>

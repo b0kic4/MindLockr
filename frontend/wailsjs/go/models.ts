@@ -129,7 +129,26 @@ export namespace keys {
 	        this.algorithm = source["algorithm"];
 	    }
 	}
+	export class PgpKeyInfo {
+	    name: string;
+	    publicKey: string;
+	    privateKey: string;
+	    folderPath: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PgpKeyInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.publicKey = source["publicKey"];
+	        this.privateKey = source["privateKey"];
+	        this.folderPath = source["folderPath"];
+	    }
+	}
 	export class RequestData {
+	    Usage: string;
 	    Passphrase: string;
 	
 	    static createFrom(source: any = {}) {
@@ -138,6 +157,7 @@ export namespace keys {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Usage = source["Usage"];
 	        this.Passphrase = source["Passphrase"];
 	    }
 	}

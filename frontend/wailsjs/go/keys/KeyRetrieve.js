@@ -22,6 +22,18 @@ export function RetrieveAsymmetricKeys() {
   return window['go']['keys']['KeyRetrieve']['RetrieveAsymmetricKeys']();
 }
 
+export function RetrievePgpKeys() {
+  return window['go']['keys']['KeyRetrieve']['RetrievePgpKeys']();
+}
+
+export function RetrievePgpPrivKey(arg1) {
+  return window['go']['keys']['KeyRetrieve']['RetrievePgpPrivKey'](arg1);
+}
+
+export function RetrievePgpPubKey(arg1) {
+  return window['go']['keys']['KeyRetrieve']['RetrievePgpPubKey'](arg1);
+}
+
 export function RetrieveSymmetricKeys() {
   return window['go']['keys']['KeyRetrieve']['RetrieveSymmetricKeys']();
 }
