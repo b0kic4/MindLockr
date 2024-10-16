@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GeneratePrivatePublicKeys } from "@wailsjs/go/keys/PubPrvKeyGen";
 import {
-  GeneratePrivatePublicKeys,
-  RetrievePrivKey,
-  RetrievePubKey,
-} from "@wailsjs/go/keys/PubPrvKeyGen";
+  RetrievePgpPubKey,
+  RetrievePgpPrivKey,
+} from "@wailsjs/go/keys/KeyRetrieve";
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LogError } from "@wailsjs/runtime/runtime";
@@ -40,10 +40,10 @@ export function MessagingKeysGen({ setPrivKey, setPubKey }: Props) {
 
       if (response.PubKey && response.PrivKey) {
         try {
-          const publicKey = await RetrievePubKey(keyName);
+          const publicKey = await RetrievePgpPubKey(keyName);
           setPubKey(publicKey);
 
-          const privateKey = await RetrievePrivKey(keyName);
+          const privateKey = await RetrievePgpPrivKey(keyName);
           setPrivKey(privateKey);
 
           toast({

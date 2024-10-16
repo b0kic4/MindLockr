@@ -22,8 +22,6 @@ export default function AsymmetricKeyEncryptionForm() {
   // User needs to chose the pgp key pair for encryption
   // UI (select box for pgp key pair)
   //
-  // FIXME: UBICU SE
-
   //
   // FIXME: this needs to be changed for dynamic input
   const { decryptedPrivKey, handleDecryptPrivKey } = usePrivateKeyDecryption({

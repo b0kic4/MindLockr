@@ -1,5 +1,5 @@
 import React from "react";
-import { DecryptPrivKey } from "@wailsjs/go/keys/PubPrvKeyGen.js";
+import { DecryptPgpPrivKey } from "@wailsjs/go/keys/PubPrvKeyGen.js";
 import { LogError } from "@wailsjs/runtime/runtime.js";
 import { useToast } from "../use-toast";
 
@@ -15,7 +15,7 @@ export function usePrivateKeyDecryption({ keyName }: Props) {
 
   const handleDecryptPrivKey = async (passphrase: string) => {
     try {
-      const decrypted = await DecryptPrivKey(passphrase, keyName);
+      const decrypted = await DecryptPgpPrivKey(passphrase, keyName);
       setDecryptedPrivKey(decrypted);
       setIsPrivKeyVisible(true);
 

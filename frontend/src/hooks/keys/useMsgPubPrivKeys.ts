@@ -1,8 +1,8 @@
 import React from "react";
 import {
-  RetrievePrivKey,
-  RetrievePubKey,
-} from "@wailsjs/go/keys/PubPrvKeyGen.js";
+  RetrievePgpPrivKey,
+  RetrievePgpPubKey,
+} from "@wailsjs/go/keys/KeyRetrieve";
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
 import { useToast } from "../use-toast";
 import useMsgKeysStore from "@/lib/store/useMsgKeysStore";
@@ -24,7 +24,7 @@ export function useMsgPubPriv({ folderPath }: Props) {
 
     async function getPubPrivKeys() {
       try {
-        const publicKey = await RetrievePubKey("msg");
+        const publicKey = await RetrievePgpPubKey("msg");
         setPubKey(publicKey);
       } catch (error) {
         LogError("Error retrieving public key");
@@ -41,7 +41,7 @@ export function useMsgPubPriv({ folderPath }: Props) {
       }
 
       try {
-        const privateKey = await RetrievePrivKey("msg");
+        const privateKey = await RetrievePgpPrivKey("msg");
         setPrivKey(privateKey);
       } catch (error) {
         LogError("Error retrieving private key");
