@@ -16,7 +16,12 @@ import (
 
 type PubPrvKeyGen struct{}
 
+// i need to add in here the
+// some kind of name for what
+// pub and priv keys are being used
+
 type RequestData struct {
+	Usage      string
 	Passphrase string
 }
 
@@ -58,7 +63,7 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 		return ReturnType{}, fmt.Errorf("encryption failed: %v", err)
 	}
 
-	err = SavePrivateKey(encryptedPrivKey)
+	err = SavePrivateKey(encryptedPrivKey, req.Usage)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
 	}
@@ -73,7 +78,7 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 		Bytes: pubKeyBytes,
 	})
 
-	err = SavePublicKey(pubKeyPEM)
+	err = SavePublicKey(pubKeyPEM, req.Usage)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
 	}
@@ -84,10 +89,15 @@ func (pubpriv *PubPrvKeyGen) GeneratePrivatePublicKeys(req RequestData) (ReturnT
 	}, nil
 }
 
-func (pubpriv *PubPrvKeyGen) RetrievePubKey() (string, error) {
+func GetPgpKeys() {
+}
+
+// this function should recieve the path of the
+// which pgp key we are retrieving
+func (pubpriv *PubPrvKeyGen) RetrievePubKey(keyName string) (string, error) {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
-	keysDir := filepath.Join(folderPath, "priv-pub")
+	keysDir := filepath.Join(folderPath, "priv-pub", keyName)
 	pubKeyPath := filepath.Join(keysDir, "public.pem")
 
 	// Read the public key file
@@ -99,9 +109,11 @@ func (pubpriv *PubPrvKeyGen) RetrievePubKey() (string, error) {
 	return string(pubKeyPEM), nil
 }
 
-func (pubpriv *PubPrvKeyGen) RetrievePrivKey() (string, error) {
+// this function should recieve the path of the
+// which pgp key we are retrieving
+func (pubpriv *PubPrvKeyGen) RetrievePrivKey(keyName string) (string, error) {
 	folderInstance := filesystem.GetFolderInstance()
-	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub")
+	keysDir := filepath.Join(folderInstance.GetFolderPath(), "priv-pub", keyName)
 	privKeyPath := filepath.Join(keysDir, "private.pem")
 
 	// Read the encrypted private key file
@@ -113,10 +125,12 @@ func (pubpriv *PubPrvKeyGen) RetrievePrivKey() (string, error) {
 	return string(encryptedPrivKeyHex), nil
 }
 
-func (pubpriv *PubPrvKeyGen) DecryptPrivKey(passphrase string) (string, error) {
+// this function should recieve the path of the
+// which pgp key we are retrieving
+func (pubpriv *PubPrvKeyGen) DecryptPrivKey(passphrase string, keyName string) (string, error) {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
-	keysDir := filepath.Join(folderPath, "priv-pub")
+	keysDir := filepath.Join(folderPath, "priv-pub", keyName)
 	privKeyPath := filepath.Join(keysDir, "private.pem")
 
 	// Read the encrypted private key file

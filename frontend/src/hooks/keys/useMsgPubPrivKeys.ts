@@ -5,15 +5,15 @@ import {
 } from "@wailsjs/go/keys/PubPrvKeyGen.js";
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
 import { useToast } from "../use-toast";
-import usePubPrivStore from "@/lib/store/usePubPrivStore";
+import useMsgKeysStore from "@/lib/store/useMsgKeysStore";
 
 interface Props {
   folderPath: string;
 }
 
-export function usePubPriv({ folderPath }: Props) {
+export function useMsgPubPriv({ folderPath }: Props) {
   const { setPrivKey, setPubKey, clearKeys, privKey, pubKey } =
-    usePubPrivStore();
+    useMsgKeysStore();
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -24,7 +24,7 @@ export function usePubPriv({ folderPath }: Props) {
 
     async function getPubPrivKeys() {
       try {
-        const publicKey = await RetrievePubKey();
+        const publicKey = await RetrievePubKey("msg");
         setPubKey(publicKey);
       } catch (error) {
         LogError("Error retrieving public key");
@@ -41,7 +41,7 @@ export function usePubPriv({ folderPath }: Props) {
       }
 
       try {
-        const privateKey = await RetrievePrivKey();
+        const privateKey = await RetrievePrivKey("msg");
         setPrivKey(privateKey);
       } catch (error) {
         LogError("Error retrieving private key");

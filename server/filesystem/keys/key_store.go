@@ -32,7 +32,7 @@ func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent, algorithm
 // 2. opening file for writing
 // 3. writing the encrypted key to file
 
-func SavePrivateKey(privKey string) error {
+func SavePrivateKey(privKey, keyName string) error {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
 
@@ -40,7 +40,7 @@ func SavePrivateKey(privKey string) error {
 		return fmt.Errorf("Please initialize the folder where you want to store private key")
 	}
 
-	keysDir := filepath.Join(folderPath, "priv-pub")
+	keysDir := filepath.Join(folderPath, "priv-pub", keyName)
 
 	err := os.MkdirAll(keysDir, os.ModePerm)
 	if err != nil {
@@ -67,7 +67,7 @@ func SavePrivateKey(privKey string) error {
 // 2. open the file for writing
 // 3. write the public key to the file
 
-func SavePublicKey(pubKey []byte) error {
+func SavePublicKey(pubKey []byte, keyName string) error {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
 
@@ -75,7 +75,7 @@ func SavePublicKey(pubKey []byte) error {
 		return fmt.Errorf("Please initialize the folder where you want to store public key")
 	}
 
-	keysDir := filepath.Join(folderPath, "priv-pub")
+	keysDir := filepath.Join(folderPath, "priv-pub", keyName)
 
 	err := os.MkdirAll(keysDir, os.ModePerm)
 	if err != nil {

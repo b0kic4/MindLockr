@@ -1,17 +1,17 @@
 import { create } from "zustand";
 
-type PrivPubState = {
+type MsgKeyState = {
   privKey: string;
   pubKey: string;
 };
 
-type PrivPubActions = {
+type MsgKeyActions = {
   setPrivKey: (privKey: string) => void;
   setPubKey: (pubKey: string) => void;
   clearKeys: () => void;
 };
 
-const usePubPrivStore = create<PrivPubState & PrivPubActions>((set) => ({
+const useMsgKeysStore = create<MsgKeyState & MsgKeyActions>((set) => ({
   privKey: "",
   pubKey: "",
 
@@ -20,4 +20,4 @@ const usePubPrivStore = create<PrivPubState & PrivPubActions>((set) => ({
   clearKeys: () => set({ privKey: "", pubKey: "" }),
 }));
 
-export default usePubPrivStore;
+export default useMsgKeysStore;
