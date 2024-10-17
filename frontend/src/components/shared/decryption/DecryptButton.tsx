@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -32,7 +31,7 @@ export const DecryptButton: React.FC<PassphraseDialogProps> = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Decrypt</Button>
+        <Button className="text-foreground-dark">Decrypt</Button>
       </DialogTrigger>
       <DialogContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark dark:border-0">
         <DialogHeader>

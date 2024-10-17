@@ -64,6 +64,7 @@ export default function AsymmetricKeyEncryptionForm() {
 
       setProvidedPrivateKey(cleanedPrivKey);
 
+      // Also set it into providedPrivKey for further use
       setProvidedPrivKey(cleanedPrivKey);
     }
   }, [decryptedPrivKey, setProvidedPrivKey]);
