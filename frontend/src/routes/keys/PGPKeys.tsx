@@ -1,18 +1,20 @@
-import React from "react";
+import { Input } from "@/components/ui/input";
 import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
 import { Accordion } from "@radix-ui/react-accordion";
+import { TextSearchIcon } from "lucide-react";
+import { useDebounce } from "use-debounce";
+import React from "react";
 import PgpKeyAccordionItem from "./components/PGP/PgpKeyAccordionItem";
 import { PgpKeysGenForm } from "./components/PGP/PgpKeysGenForm";
-import { Input } from "@/components/ui/input";
-import { TextSearchIcon } from "lucide-react";
 
 export default function PGPKeys() {
   const { pgpKeys, fetchPgpKeys } = usePgpKeys();
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
 
   // Filtered PGP keys based on the search term
   const filteredKeys = pgpKeys.filter((keyName) =>
-    keyName.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    keyName.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
   );
 
   return (
