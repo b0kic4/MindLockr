@@ -1,6 +1,6 @@
-import React from "react";
-import { DecryptPgpPrivKey } from "@wailsjs/go/keys/PubPrvKeyGen.js";
+import { DecryptPgpPrivKey } from "@wailsjs/go/keys/PgpKeysGen";
 import { LogError } from "@wailsjs/runtime/runtime.js";
+import React from "react";
 import { useToast } from "../use-toast";
 
 interface Props {

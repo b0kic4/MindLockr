@@ -10,22 +10,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GeneratePrivatePublicKeys } from "@wailsjs/go/keys/PubPrvKeyGen";
-import {
-  RetrievePgpPubKey,
-  RetrievePgpPrivKey,
-} from "@wailsjs/go/keys/KeyRetrieve";
-import React from "react";
 import { useToast } from "@/hooks/use-toast";
+import { GeneratePGPKeys } from "@wailsjs/go/keys/PgpKeysGen";
 import { LogError } from "@wailsjs/runtime/runtime";
+import React from "react";
 
 type Props = {
-  setPrivKey: (value: string) => void;
-  setPubKey: (value: string) => void;
+  fetchPgpKeys: () => void;
 };
 
-export function MessagingKeysGen({ setPrivKey, setPubKey }: Props) {
-  const [keyName, setKeyName] = React.useState<string>("msg");
+export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
+  const [keyName, setKeyName] = React.useState<string>("");
   const [passphrase, setPassphrase] = React.useState<string>("");
   const { toast } = useToast();
 
@@ -33,37 +28,29 @@ export function MessagingKeysGen({ setPrivKey, setPubKey }: Props) {
     e.preventDefault();
 
     try {
-      const response = await GeneratePrivatePublicKeys({
+      const response = await GeneratePGPKeys({
         Usage: keyName,
         Passphrase: passphrase,
       });
 
       if (response.PubKey && response.PrivKey) {
-        try {
-          const publicKey = await RetrievePgpPubKey(keyName);
-          setPubKey(publicKey);
+        fetchPgpKeys();
 
-          const privateKey = await RetrievePgpPrivKey(keyName);
-          setPrivKey(privateKey);
-
-          toast({
-            variant: "default",
-            className: "bg-green-500 border-0",
-            title: "Keys Generated Successfully",
-            description:
-              "Public and private keys have been generated and retrieved.",
-          });
-        } catch (error) {
-          LogError("Error retrieving keys");
-          toast({
-            variant: "destructive",
-            className: "bg-red-500 border-0",
-            title: "Uh oh! Something went wrong.",
-            description: "Error retrieving one or both keys.",
-          });
-        }
+        toast({
+          variant: "default",
+          className: "bg-green-500 border-0",
+          title: "Keys Generated Successfully",
+          description: "PGP keys have been generated and retrieved.",
+        });
       }
     } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : JSON.stringify(err);
+      LogError("Failed to generate keys: " + errorMessage);
       toast({
         variant: "destructive",
         className: "bg-red-500 border-0",
@@ -77,17 +64,6 @@ export function MessagingKeysGen({ setPrivKey, setPubKey }: Props) {
     }
   };
 
-  // the folderName for those keys
-  // should associate for what the keys
-  // are being used (thats what we need to show)
-
-  // add in here folder path input where keys
-  // will be stored
-  // live preview of where the keys is stored
-  //
-  // when user confirms the path
-  // we should prompt the passphrase
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -95,12 +71,12 @@ export function MessagingKeysGen({ setPrivKey, setPubKey }: Props) {
           className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow-lg transition-all"
           variant="default"
         >
-          Generate Messaging Keys
+          Generate PGP Keys
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Generate Your Messaging Keys</DialogTitle>
+          <DialogTitle>Generate Your PGP Keys</DialogTitle>
           <DialogDescription>
             Your private key will be encrypted. Please provide a passphrase for
             encryption.
@@ -115,6 +91,7 @@ export function MessagingKeysGen({ setPrivKey, setPubKey }: Props) {
               <Input
                 value={keyName}
                 id="keyName"
+                onChange={(e) => setKeyName(e.target.value)}
                 type="text"
                 className="col-span-3"
                 placeholder="Please provide a key name that reflects its intended usage."

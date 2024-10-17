@@ -2,14 +2,14 @@ import { DecryptButton } from "@/components/shared/decryption/DecryptButton.js";
 import { Button } from "@/components/ui/button.js";
 import { useFolderPath } from "@/hooks/folder/useFolderPath.js";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption.js";
-import { useMsgPubPriv } from "@/hooks/keys/useMsgPubPrivKeys.js";
+import { useMsgPGP } from "@/hooks/keys/useMsgPGP.js";
 import { EyeOff } from "lucide-react";
-import { MessagingKeysGen } from "./keys/components/key-gen/MessagingPubPrivKeysGen.js";
+import { MsgPGPGenForm } from "./keys/components/key-gen/MessagingPgpKeysGenForm.js";
 
 export default function Home() {
   // hooks
   const { folderPath, pickFolder, removeFolderPath } = useFolderPath();
-  const { privKey, setPrivKey, pubKey, setPubKey } = useMsgPubPriv({
+  const { privKey, setPrivKey, pubKey, setPubKey } = useMsgPGP({
     folderPath: folderPath,
   });
 
@@ -97,7 +97,7 @@ export default function Home() {
               Please generate Public/Private keys for this machine.
               <br /> Those keys will be used for the Message exchanging
             </p>
-            <MessagingKeysGen setPrivKey={setPrivKey} setPubKey={setPubKey} />
+            <MsgPGPGenForm setPrivKey={setPrivKey} setPubKey={setPubKey} />
           </div>
         </div>
       )}
@@ -108,7 +108,9 @@ export default function Home() {
             Generated Messaging Keys
           </h2>
           <div className="mb-4">
-            <h3 className="text-lg font-semibold">PGP Public Key:</h3>
+            <h3 className="text-start px-4 text-lg font-semibold">
+              PGP Public Key:
+            </h3>
             <textarea
               readOnly
               value={pubKey}

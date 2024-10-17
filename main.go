@@ -31,7 +31,7 @@ func main() {
 	folder := filesystem.GetFolderInstance()
 	keyRetrieve := keys.NewKeyRetrieve(folder)
 	keyStore := &keys.KeyStore{}
-	pubPrivKeys := &keys.PubPrvKeyGen{}
+	pubPrivKeys := &keys.PgpKeysGen{}
 
 	app := NewApp()
 
