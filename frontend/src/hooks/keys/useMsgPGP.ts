@@ -11,7 +11,7 @@ interface Props {
   folderPath: string;
 }
 
-export function useMsgPubPriv({ folderPath }: Props) {
+export function useMsgPGP({ folderPath }: Props) {
   const { setPrivKey, setPubKey, clearKeys, privKey, pubKey } =
     useMsgKeysStore();
   const { toast } = useToast();

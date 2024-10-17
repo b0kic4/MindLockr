@@ -24,8 +24,8 @@ type Props = {
   setPubKey: (value: string) => void;
 };
 
-export function PgpKeyGen({ setPrivKey, setPubKey }: Props) {
-  const [keyName, setKeyName] = React.useState<string>("");
+export function MsgPGPGenForm({ setPrivKey, setPubKey }: Props) {
+  const [keyName, setKeyName] = React.useState<string>("msg");
   const [passphrase, setPassphrase] = React.useState<string>("");
   const { toast } = useToast();
 
@@ -95,12 +95,12 @@ export function PgpKeyGen({ setPrivKey, setPubKey }: Props) {
           className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow-lg transition-all"
           variant="default"
         >
-          Generate Keys
+          Generate Messaging Keys
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Generate Keys</DialogTitle>
+          <DialogTitle>Generate Your Messaging Keys</DialogTitle>
           <DialogDescription>
             Your private key will be encrypted. Please provide a passphrase for
             encryption.
@@ -114,7 +114,6 @@ export function PgpKeyGen({ setPrivKey, setPubKey }: Props) {
               </Label>
               <Input
                 value={keyName}
-                onChange={(e) => setKeyName(e.target.value)}
                 id="keyName"
                 type="text"
                 className="col-span-3"

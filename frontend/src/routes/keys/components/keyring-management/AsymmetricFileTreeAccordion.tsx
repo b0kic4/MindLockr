@@ -23,11 +23,6 @@ export function FileTreeAccordion() {
     setSelectedFile(file);
   };
 
-  // TODO:
-  // signature:
-  // 1. provide the signature file
-  // 2. provide senders public key to validate the authority
-
   return (
     <div className="w-1/3 space-y-2 pt-2">
       <h2 className="text-start text-xl font-bold">Asymmetric Keys</h2>
