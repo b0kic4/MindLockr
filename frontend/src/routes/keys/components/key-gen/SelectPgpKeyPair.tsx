@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Select,
   SelectContent,
@@ -7,27 +8,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
 import usePgpKeysStore from "@/lib/store/usePgpKeysStore";
 
-// TODO: come back to this
-
 export default function SelectPgpKeyPair() {
-  const { selectedPgpKeyPair, setSelectPgpKeyPair } = usePgpKeysStore();
-  const { pgpKeys } = usePgpKeysStore();
+  const selectedPgpKeyPair = usePgpKeysStore(
+    (state) => state.selectedPgpKeyPair,
+  );
+  const setSelectPgpKeyPair = usePgpKeysStore(
+    (state) => state.setSelectPgpKeyPair,
+  );
+  const { pgpKeys, fetchPgpKeys } = usePgpKeys();
+
+  React.useEffect(() => {
+    fetchPgpKeys();
+  }, [fetchPgpKeys]);
+
+  const handleChange = (value: string) => {
+    setSelectPgpKeyPair(value);
+  };
 
   return (
-    <Select>
+    <Select value={selectedPgpKeyPair} onValueChange={handleChange}>
       <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select a fruit" />
+        <SelectValue placeholder="Select a PGP Key Pair" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Fruits</SelectLabel>
-          <SelectItem value="apple">Apple</SelectItem>
-          <SelectItem value="banana">Banana</SelectItem>
-          <SelectItem value="blueberry">Blueberry</SelectItem>
-          <SelectItem value="grapes">Grapes</SelectItem>
-          <SelectItem value="pineapple">Pineapple</SelectItem>
+          <SelectLabel>PGP Keys</SelectLabel>
+          {pgpKeys.map((keyName) => (
+            <SelectItem key={keyName.name} value={keyName.name}>
+              {keyName.name}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
