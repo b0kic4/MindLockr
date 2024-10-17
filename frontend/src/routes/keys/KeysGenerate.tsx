@@ -8,13 +8,13 @@ import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption
 import { hybridencryption } from "@wailsjs/go/models";
 import { LogError } from "@wailsjs/runtime/runtime";
 import React from "react";
-import AlgorithmSelector from "./components/key-gen/AlgorithmSelector";
-import AsymmetricKeyEncryptionForm from "./components/key-gen/AsymmetricEncryptionForm";
+import AlgorithmSelector from "./components/key-gen/utils/AlgorithmSelector";
+import AsymmetricKeyEncryptionForm from "./components/key-gen/forms/AsymmetricEncryptionForm";
 import EncryptedDataDisplay from "./components/key-gen/EncryptedDataDisplay";
-import EncryptionForm from "./components/key-gen/EncryptionForm";
-import KeySaveForm from "./components/key-gen/KeySaveForm";
-import KeyTypeTabs from "./components/key-gen/KeyTypeTabs";
-import Questions from "./components/key-gen/Questions";
+import EncryptionForm from "./components/key-gen/forms/EncryptionForm";
+import KeySaveForm from "./components/key-gen/forms/KeySaveForm";
+import KeyTypeTabs from "./components/key-gen/utils/KeyTypeTabs";
+import Questions from "./components/key-gen/utils/Questions";
 
 export default function KeysGen() {
   // data for encryption (symmetric)

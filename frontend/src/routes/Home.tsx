@@ -4,7 +4,7 @@ import { useFolderPath } from "@/hooks/folder/useFolderPath.js";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption.js";
 import { useMsgPGP } from "@/hooks/keys/useMsgPGP.js";
 import { EyeOff } from "lucide-react";
-import { MsgPGPGenForm } from "./keys/components/key-gen/MessagingPgpKeysGenForm.js";
+import { MsgPGPGenForm } from "./keys/components/key-gen/forms/MessagingPgpKeysGenForm.js";
 
 export default function Home() {
   // hooks
