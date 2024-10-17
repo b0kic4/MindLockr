@@ -10,7 +10,7 @@ import {
 } from "@wailsjs/go/keys/KeyRetrieve";
 import { EyeOff, Eye } from "lucide-react";
 import React from "react";
-import SelectPgpKeyPair from "./SelectPgpKeyPair";
+import SelectPgpKeyPair from "../SelectPgpKeyPair";
 
 export default function AsymmetricKeyEncryptionForm() {
   const { selectedPgpKeyPair } = usePgpKeysStore();
