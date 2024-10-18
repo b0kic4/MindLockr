@@ -34,7 +34,7 @@ type ReturnType struct {
 // 5. Save the public PEM format key
 // 6. return the values
 
-func (pubpriv *PgpKeysGen) GeneratePGPKeys(req RequestData) (ReturnType, error) {
+func (pgpGen *PgpKeysGen) GeneratePGPKeys(req RequestData) (ReturnType, error) {
 	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return ReturnType{}, err
@@ -86,7 +86,7 @@ func (pubpriv *PgpKeysGen) GeneratePGPKeys(req RequestData) (ReturnType, error) 
 	}, nil
 }
 
-func (pubpriv *PgpKeysGen) DecryptPgpPrivKey(passphrase string, keyName string) (string, error) {
+func (pgpGen *PgpKeysGen) DecryptPgpPrivKey(passphrase string, keyName string) (string, error) {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
 	keysDir := filepath.Join(folderPath, "pgp", keyName)

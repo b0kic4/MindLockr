@@ -10,6 +10,7 @@ type PgpKeysActions = {
   addPgpKey: (folder: string) => void;
   setSelectPgpKeyPair: (folder: string) => void;
   removePgpKey: (folder: string) => void;
+  clearPair: () => void;
   clearKeys: () => void;
 };
 
@@ -32,7 +33,8 @@ const usePgpKeysStore = create<PgpKeysState & PgpKeysActions>((set) => ({
       pgpKeys: state.pgpKeys.filter((key) => key !== folder),
     })),
 
-  // Clear all PGP keys
+  clearPair: () => set({ selectedPgpKeyPair: "" }),
+
   clearKeys: () => set({ pgpKeys: [] }),
 }));
 

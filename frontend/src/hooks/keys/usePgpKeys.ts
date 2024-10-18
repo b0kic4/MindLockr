@@ -11,7 +11,6 @@ export function usePgpKeys() {
   const fetchPgpKeys = React.useCallback(async () => {
     try {
       const keys = await RetrievePgpKeys();
-      LogInfo(JSON.stringify(keys));
 
       setPgpKeys(keys);
     } catch (error) {

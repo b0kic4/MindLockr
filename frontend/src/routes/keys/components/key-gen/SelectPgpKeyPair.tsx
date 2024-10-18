@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
 import usePgpKeysStore from "@/lib/store/usePgpKeysStore";
+import { LogInfo } from "@wailsjs/runtime/runtime";
 
 export default function SelectPgpKeyPair() {
   const selectedPgpKeyPair = usePgpKeysStore(
@@ -25,8 +26,13 @@ export default function SelectPgpKeyPair() {
   }, [fetchPgpKeys]);
 
   const handleChange = (value: string) => {
+    LogInfo(value);
     setSelectPgpKeyPair(value);
   };
+
+  React.useEffect(() => {
+    LogInfo(selectedPgpKeyPair);
+  }, []);
 
   return (
     <Select value={selectedPgpKeyPair} onValueChange={handleChange}>

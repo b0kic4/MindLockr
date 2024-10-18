@@ -1,18 +1,18 @@
 import { create } from "zustand";
 
-type PrivPubInputState = {
+type PgpInputState = {
   providedPrivKey: string;
   providedPubKey: string;
 };
 
-type PrivPubInputActions = {
+type PgpInputActions = {
   setProvidedPrivKey: (providedPrivKey: string) => void;
   setProvidedPubKey: (providedPubKey: string) => void;
   clearInputs: () => void;
 };
 
-const usePubPrivAsymmetricEncryptionInputsStore = create<
-  PrivPubInputState & PrivPubInputActions
+const usePgpAsymmetricEncryptionInputsStore = create<
+  PgpInputState & PgpInputActions
 >((set) => ({
   providedPrivKey: "",
   providedPubKey: "",
@@ -22,4 +22,4 @@ const usePubPrivAsymmetricEncryptionInputsStore = create<
   clearInputs: () => set({ providedPrivKey: "", providedPubKey: "" }),
 }));
 
-export default usePubPrivAsymmetricEncryptionInputsStore;
+export default usePgpAsymmetricEncryptionInputsStore;

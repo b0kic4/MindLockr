@@ -2,12 +2,13 @@ import { DecryptButton } from "@/components/shared/decryption/DecryptButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
-import usePubPrivAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
+import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import usePgpKeysStore from "@/lib/store/usePgpKeysStore";
 import {
   RetrievePgpPubKey,
   RetrievePgpPrivKey,
 } from "@wailsjs/go/keys/KeyRetrieve";
+import { LogInfo } from "@wailsjs/runtime/runtime";
 import { EyeOff, Eye } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";
@@ -15,7 +16,7 @@ import SelectPgpKeyPair from "../SelectPgpKeyPair";
 export default function AsymmetricKeyEncryptionForm() {
   const { selectedPgpKeyPair } = usePgpKeysStore();
   const { setProvidedPrivKey, setProvidedPubKey } =
-    usePubPrivAsymmetricEncryptionInputsStore();
+    usePgpAsymmetricEncryptionInputsStore();
 
   const [publicKeyInput, setPublicKeyInput] = React.useState("");
   const [encryptedPrivateKey, setEncryptedPrivateKey] = React.useState("");
