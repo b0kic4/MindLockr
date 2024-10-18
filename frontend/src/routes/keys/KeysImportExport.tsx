@@ -1,16 +1,3 @@
-// TODO:
-// we need import export functionality
-// also we need to implement RSA Enc and Dec
-//
-// Probably importing the pgp pub priv keys
-// also maybe importing the symmetric data
-// also we need to have importing the whole
-// asymmetric data with:
-// 1. encrypted passphrase
-// 2. encrypted data
-// 3. signature
-//
-
 // maybe create the documented steps
 // or the visual look of the importing and exporting
 // on the website of the MindLockr
@@ -43,6 +30,12 @@
 //     Trigger the import process.
 //
 //
+
+// so we need to have an encryption where the file is not
+// being stored what does that mean?
+// so the encrypted data is generated asymmetrically
+// we are sending that data to the reciptient and
+// the reciptient is decrypting with the private key
 
 //  Export Keys UI
 //

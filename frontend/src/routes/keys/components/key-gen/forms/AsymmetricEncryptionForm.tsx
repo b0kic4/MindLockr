@@ -70,6 +70,13 @@ export default function AsymmetricKeyEncryptionForm() {
     }
   }, [decryptedPrivKey, setProvidedPrivKey]);
 
+  // custom inputs for entering the public and private keys
+  // public the reciever and the private is the the senders
+  // key that will be used for creating the signature
+  //
+  // than for sharing with are taking the folder and sharing
+  // that data across other users
+
   return (
     <div className="space-y-4 p-4 bg-muted dark:bg-muted-dark mt-4 rounded-lg">
       <h3 className="text-lg font-semibold">Asymmetric Key Encryption</h3>

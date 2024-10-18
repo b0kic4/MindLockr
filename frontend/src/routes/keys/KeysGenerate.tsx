@@ -15,6 +15,7 @@ import EncryptionForm from "./components/key-gen/forms/EncryptionForm";
 import KeySaveForm from "./components/key-gen/forms/KeySaveForm";
 import KeyTypeTabs from "./components/key-gen/utils/KeyTypeTabs";
 import Questions from "./components/key-gen/utils/Questions";
+import usePgpKeysStore from "@/lib/store/usePgpKeysStore";
 
 export default function KeysGen() {
   // data for encryption (symmetric)
@@ -39,8 +40,15 @@ export default function KeysGen() {
   const { toast } = useToast();
 
   // zustand
-  const { providedPubKey, providedPrivKey } =
-    usePgpAsymmetricEncryptionInputsStore();
+  const {
+    providedPubKey,
+    providedPrivKey,
+    setProvidedPrivKey,
+    setProvidedPubKey,
+    clearInputs,
+  } = usePgpAsymmetricEncryptionInputsStore();
+
+  const { selectedPgpKeyPair, clearKeys, clearPair } = usePgpKeysStore();
 
   // effect to update encrypted data asap
   React.useEffect(() => {
@@ -144,6 +152,9 @@ export default function KeysGen() {
       setFolderName("");
       setData("");
       setPassphrase("");
+      setProvidedPrivKey("");
+      setProvidedPubKey("");
+      clearInputs(), clearKeys(), clearPair();
     }
   };
 
