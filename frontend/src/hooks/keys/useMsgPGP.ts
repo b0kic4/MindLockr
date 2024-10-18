@@ -22,7 +22,7 @@ export function useMsgPGP({ folderPath }: Props) {
       return;
     }
 
-    async function getPubPrivKeys() {
+    async function getPgpKeys() {
       try {
         const publicKey = await RetrievePgpPubKey("msg");
         setPubKey(publicKey);
@@ -55,7 +55,7 @@ export function useMsgPGP({ folderPath }: Props) {
       }
     }
 
-    getPubPrivKeys();
+    getPgpKeys();
   }, [folderPath, setPrivKey, setPubKey, clearKeys]);
 
   return { privKey, pubKey, setPrivKey, setPubKey };

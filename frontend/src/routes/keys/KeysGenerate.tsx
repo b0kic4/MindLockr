@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { useGenKey } from "@/hooks/keys/useGenKey";
 import { useSaveKey } from "@/hooks/keys/useSaveKey";
 import { useToast } from "@/hooks/use-toast";
-import usePubPrivAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
+import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption";
 import { hybridencryption } from "@wailsjs/go/models";
 import { LogError } from "@wailsjs/runtime/runtime";
@@ -40,13 +40,14 @@ export default function KeysGen() {
 
   // zustand
   const { providedPubKey, providedPrivKey } =
-    usePubPrivAsymmetricEncryptionInputsStore();
+    usePgpAsymmetricEncryptionInputsStore();
 
   // effect to update encrypted data asap
   React.useEffect(() => {
     if (result) setEncryptedData(result);
   }, [result]);
 
+  // symmetric encryption
   const handleGenerateKey = async () => {
     const requestData = {
       data,
@@ -75,7 +76,7 @@ export default function KeysGen() {
     }
   };
 
-  // adding now RSA
+  // hybrid encryption
   const handleGenerateSharableData = async () => {
     const missingFields = [];
 
