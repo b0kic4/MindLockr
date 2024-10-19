@@ -3,79 +3,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import usePgpKeysStore from "@/lib/store/usePgpKeysStore";
-import {
-  RetrievePgpPubKey,
-  RetrievePgpPrivKey,
-} from "@wailsjs/go/keys/KeyRetrieve";
-import { LogInfo } from "@wailsjs/runtime/runtime";
-import { EyeOff, Eye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";
 
 export default function AsymmetricKeyEncryptionForm() {
-  const { selectedPgpKeyPair } = usePgpKeysStore();
-  const { setProvidedPrivKey, setProvidedPubKey } =
-    usePgpAsymmetricEncryptionInputsStore();
+  // hooks
+  const {
+    selectedPgpKeyPair,
+    providedPubKey,
+    providedPrivKey,
+    setProvidedPrivKey,
+  } = usePgpAsymmetricEncryptionInputsStore();
 
-  const [publicKeyInput, setPublicKeyInput] = React.useState("");
-  const [encryptedPrivateKey, setEncryptedPrivateKey] = React.useState("");
-  const [providedPrivateKey, setProvidedPrivateKey] = React.useState("");
+  const { decryptedPrivKey, handleDecryptPrivKey, handleHidePrivKey } =
+    usePrivateKeyDecryption({
+      keyName: selectedPgpKeyPair,
+    });
+
   const [isPrivateKeyVisible, setIsPrivateKeyVisible] = React.useState(false);
 
-  // Hook to handle private key decryption
-  const { decryptedPrivKey, handleDecryptPrivKey } = usePrivateKeyDecryption({
-    keyName: selectedPgpKeyPair,
-  });
-
   React.useEffect(() => {
-    if (selectedPgpKeyPair) {
-      const fetchKeys = async () => {
-        try {
-          const pubKey = await RetrievePgpPubKey(selectedPgpKeyPair);
-          const privKey = await RetrievePgpPrivKey(selectedPgpKeyPair);
-
-          const cleanedPubKey = pubKey
-            .replace(/-----BEGIN PGP PUBLIC KEY-----/g, "")
-            .replace(/-----END PGP PUBLIC KEY-----/g, "")
-            .replace(/\s+/g, "")
-            .trim();
-
-          setPublicKeyInput(cleanedPubKey);
-
-          setProvidedPubKey(cleanedPubKey);
-
-          setEncryptedPrivateKey(privKey);
-        } catch (error) {
-          console.error("Error fetching keys for", selectedPgpKeyPair, error);
-        }
-      };
-
-      fetchKeys();
+    if (!providedPrivKey && decryptedPrivKey) {
+      handleHidePrivKey();
     }
-  }, [selectedPgpKeyPair, setProvidedPubKey]);
 
-  React.useEffect(() => {
-    if (decryptedPrivKey && decryptedPrivKey.length > 0) {
+    if (providedPrivKey && decryptedPrivKey && decryptedPrivKey.length > 0) {
       const cleanedPrivKey = decryptedPrivKey
         .replace(/-----BEGIN PGP PRIVATE KEY-----/g, "")
         .replace(/-----END PGP PRIVATE KEY-----/g, "")
         .replace(/\s+/g, "")
         .trim();
 
-      setProvidedPrivateKey(cleanedPrivKey);
-
-      // Also set it into providedPrivKey for further use
       setProvidedPrivKey(cleanedPrivKey);
     }
-  }, [decryptedPrivKey, setProvidedPrivKey]);
-
-  // custom inputs for entering the public and private keys
-  // public the reciever and the private is the the senders
-  // key that will be used for creating the signature
-  //
-  // than for sharing with are taking the folder and sharing
-  // that data across other users
+  }, [decryptedPrivKey, setProvidedPrivKey, providedPrivKey]);
 
   return (
     <div className="space-y-4 p-4 bg-muted dark:bg-muted-dark mt-4 rounded-lg">
@@ -110,7 +72,7 @@ export default function AsymmetricKeyEncryptionForm() {
             <Input
               id="publicKey"
               placeholder="Public Key"
-              value={publicKeyInput}
+              value={providedPubKey}
               readOnly
             />
           </div>
@@ -123,32 +85,64 @@ export default function AsymmetricKeyEncryptionForm() {
               >
                 Private Key
               </label>
-              {providedPrivateKey ? (
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsPrivateKeyVisible(!isPrivateKeyVisible)}
-                  className="ml-2"
-                >
-                  {isPrivateKeyVisible ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </Button>
+              {decryptedPrivKey ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsPrivateKeyVisible(!isPrivateKeyVisible)}
+                    className="ml-2"
+                  >
+                    {isPrivateKeyVisible ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </Button>
+                  <em className="text-sm text-green-500 ml-2">
+                    Private key is provided and decrypted.
+                  </em>
+                </>
               ) : (
-                <DecryptButton
-                  onSubmit={handleDecryptPrivKey}
-                  keyName={encryptedPrivateKey}
-                />
+                !decryptedPrivKey &&
+                providedPrivKey && (
+                  <>
+                    <em className="text-sm text-red-500">
+                      Please decrypt your private key.
+                    </em>
+                    <DecryptButton
+                      onSubmit={handleDecryptPrivKey}
+                      keyName={providedPrivKey}
+                    />
+                  </>
+                )
               )}
             </div>
-            <Input
-              id="privateKey"
-              placeholder="Private Key"
-              type={isPrivateKeyVisible ? "text" : "password"}
-              value={providedPrivateKey || "Private key is encrypted"}
-              readOnly
-            />
+
+            {providedPrivKey ? (
+              <Input
+                id="privateKey"
+                placeholder="Private Key"
+                type={isPrivateKeyVisible ? "text" : "password"}
+                value={providedPrivKey}
+                readOnly
+              />
+            ) : !providedPrivKey ? (
+              <Input
+                id="privateKeyInput"
+                placeholder="Enter custom private key"
+                type="text"
+                value={providedPrivKey}
+                onChange={(e) => setProvidedPrivKey(e.target.value)}
+              />
+            ) : (
+              <Input
+                id="privateKey"
+                placeholder="Private Key"
+                type="text"
+                value={providedPrivKey}
+                readOnly
+              />
+            )}
           </div>
         </>
       )}

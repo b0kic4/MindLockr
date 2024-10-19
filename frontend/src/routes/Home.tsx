@@ -20,6 +20,13 @@ export default function Home() {
     handleHidePrivKey,
   } = usePrivateKeyDecryption({ keyName: "msg" });
 
+  // for the generated messaging keys
+  // we should prompt the user if the is going
+  // to use the chatting functionality
+  // and if it does we wiil explain to the user
+  // that we need to store only the public key
+  // in the database for successfull chatting
+
   return (
     <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen max-w-4xl mx-auto mt-6 space-y-8">
       <div className="text-center">
