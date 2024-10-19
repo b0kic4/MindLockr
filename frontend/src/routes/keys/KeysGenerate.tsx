@@ -8,11 +8,11 @@ import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption
 import { hybridencryption } from "@wailsjs/go/models";
 import { LogError } from "@wailsjs/runtime/runtime";
 import React from "react";
-import AlgorithmSelector from "./components/key-gen/utils/AlgorithmSelector";
-import AsymmetricKeyEncryptionForm from "./components/key-gen/forms/AsymmetricEncryptionForm";
 import EncryptedDataDisplay from "./components/key-gen/EncryptedDataDisplay";
+import AsymmetricKeyEncryptionForm from "./components/key-gen/forms/AsymmetricEncryptionForm";
 import EncryptionForm from "./components/key-gen/forms/EncryptionForm";
 import KeySaveForm from "./components/key-gen/forms/KeySaveForm";
+import AlgorithmSelector from "./components/key-gen/utils/AlgorithmSelector";
 import KeyTypeTabs from "./components/key-gen/utils/KeyTypeTabs";
 import Questions from "./components/key-gen/utils/Questions";
 
@@ -39,8 +39,15 @@ export default function KeysGen() {
   const { toast } = useToast();
 
   // zustand
-  const { providedPubKey, providedPrivKey } =
-    usePgpAsymmetricEncryptionInputsStore();
+  const {
+    providedPubKey,
+    providedPrivKey,
+    setProvidedPrivKey,
+    setProvidedPubKey,
+    clearPriv,
+    clearPub,
+    clearPair,
+  } = usePgpAsymmetricEncryptionInputsStore();
 
   // effect to update encrypted data asap
   React.useEffect(() => {
@@ -121,8 +128,6 @@ export default function KeysGen() {
         description: "Your data and passphrase have been encrypted.",
       });
     } catch (error) {
-      // Log the entire error object for debugging
-      console.error("Raw error object:", error);
       LogError("Hybrid Encryption failed: " + JSON.stringify(error));
 
       // Handle known error structures
@@ -144,6 +149,9 @@ export default function KeysGen() {
       setFolderName("");
       setData("");
       setPassphrase("");
+      setProvidedPrivKey("");
+      setProvidedPubKey("");
+      clearPub(), clearPriv(), clearPair();
     }
   };
 
