@@ -3,3 +3,5 @@
 import {hybridencryption} from '../models';
 
 export function EncryptSharedData(arg1:hybridencryption.RequestData):Promise<hybridencryption.ResponseData>;
+
+export function PerformHybridEnOnExistingData(arg1:hybridencryption.RequestData):Promise<hybridencryption.ResponseData>;

@@ -3,8 +3,8 @@ export namespace hybridencryption {
 	export class RequestData {
 	    data: string;
 	    passphrase: string;
-	    algorithm: string;
-	    algorithmType: string;
+	    algorithm?: string;
+	    algorithmType?: string;
 	    folderName: string;
 	    pubKey: string;
 	    privKey: string;
