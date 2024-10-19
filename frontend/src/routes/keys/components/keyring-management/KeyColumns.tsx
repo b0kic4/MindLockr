@@ -1,3 +1,4 @@
+import ShareSymEnc from "@/components/shared/encryption/ShareSymEnc";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Portal } from "@radix-ui/react-portal";
 import { createColumnHelper } from "@tanstack/react-table";
-import { KeyRound, Trash } from "lucide-react";
+import { KeyRound, Share, Trash } from "lucide-react";
 
 interface KeyInfo {
   name: string;
@@ -59,7 +60,7 @@ export const getKeyColumns = (
                   onClick={() => handleDecrypt(row.original)}
                   aria-label={`Decrypt key ${row.original.name}`}
                 >
-                  <KeyRound className="w-5 h-5 text-primary hover:text-primary-dark" />
+                  <KeyRound className="w-5 h-5 text-green-500 hover:text-green-500" />
                 </button>
               </TooltipTrigger>
               <Portal>
@@ -97,6 +98,10 @@ export const getKeyColumns = (
               </AlertDialogContent>
             </AlertDialog>
           </TooltipProvider>
+          <button>
+            <Share className="w-5 h-5 text-primary hover:text-primary-dark" />
+          </button>
+          {/* <ShareSymEnc data={row.original} /> */}
         </div>
       ),
       meta: { align: "right" },

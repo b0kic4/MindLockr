@@ -5,3 +5,7 @@
 export function EncryptSharedData(arg1) {
   return window['go']['hybridencryption']['HybridEncryption']['EncryptSharedData'](arg1);
 }
+
+export function PerformHybridEnOnExistingData(arg1) {
+  return window['go']['hybridencryption']['HybridEncryption']['PerformHybridEnOnExistingData'](arg1);
+}

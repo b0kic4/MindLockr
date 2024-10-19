@@ -23,8 +23,8 @@ type HybridEncryption struct{}
 type RequestData struct {
 	Data          string `json:"data"`
 	Passphrase    string `json:"passphrase"`
-	Algorithm     string `json:"algorithm"`
-	AlgorithmType string `json:"algorithmType"`
+	Algorithm     string `json:"algorithm,omitempty"`
+	AlgorithmType string `json:"algorithmType,omitempty"`
 	FolderName    string `json:"folderName"`
 	PubKey        string `json:"pubKey"`
 	PrivKey       string `json:"privKey"`
@@ -103,6 +103,58 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 
 	return ResponseData{
 		SymmetricData:       aesRes,
+		EncryptedPassphrase: encPassphraseB64,
+		Signature:           signatureB64,
+	}, nil
+}
+
+func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (ResponseData, error) {
+	pubKey, err := ParsePublicKey(req.PubKey)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to parse public key: %v", err)
+	}
+	privKey, err := ParsePrivateKey(req.PrivKey)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to parse private key: %v", err)
+	}
+
+	// Encrypt the AES passphrase with the recipient's public key
+	encPassphrase, err := encryptWithPublicKey([]byte(req.Passphrase), pubKey)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to encrypt passphrase: %v", err)
+	}
+	encPassphraseB64 := base64.StdEncoding.EncodeToString(encPassphrase)
+
+	// Sign the encrypted data
+	signature, err := signData([]byte(req.Data), privKey)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to sign data: %v", err)
+	}
+	signatureB64 := base64.StdEncoding.EncodeToString(signature)
+
+	keyStore := &keys.KeyStore{}
+
+	saveData := SaveAsymmetricDataRequest{
+		SymmetricData:       req.Data,
+		AlgSymEnc:           req.AlgorithmType,
+		EncryptedPassphrase: encPassphraseB64,
+		Signature:           signatureB64,
+		FolderName:          req.FolderName,
+	}
+
+	err = keyStore.SaveAsymmetricData(keys.HybridRequestData{
+		SymmetricData:       saveData.SymmetricData,
+		AlgSymEnc:           saveData.AlgSymEnc,
+		EncyrptedPassphrase: saveData.EncryptedPassphrase,
+		Signature:           saveData.Signature,
+		FolderName:          saveData.FolderName,
+	})
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to save asymmetric data: %v", err)
+	}
+
+	return ResponseData{
+		SymmetricData:       req.Data,
 		EncryptedPassphrase: encPassphraseB64,
 		Signature:           signatureB64,
 	}, nil
