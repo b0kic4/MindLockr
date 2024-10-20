@@ -20,7 +20,6 @@ import { Eye, EyeOff, Share } from "lucide-react";
 import React from "react";
 import { hybridencryption } from "@wailsjs/go/models";
 import { PerformHybridEnOnExistingData } from "@wailsjs/go/hybridencryption/HybridEncryption";
-import { LogInfo } from "@wailsjs/runtime/runtime";
 import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
 
 interface Props {
@@ -141,14 +140,12 @@ export default function ShareSymEnc({ data }: Props) {
     };
 
     try {
-      const response: hybridencryption.ResponseData =
-        await PerformHybridEnOnExistingData(reqData);
+      await PerformHybridEnOnExistingData(reqData);
       toast({
         variant: "default",
         title: "Encryption Successful",
         description: "Your data and passphrase have been encrypted.",
       });
-      LogInfo(JSON.stringify(response));
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -165,7 +162,7 @@ export default function ShareSymEnc({ data }: Props) {
           errorMessage || "An unknown error occurred during encryption.",
       });
     } finally {
-      resetState(); // Reset state after form submission
+      resetState();
     }
   };
 
