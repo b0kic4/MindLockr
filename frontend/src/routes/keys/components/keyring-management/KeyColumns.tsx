@@ -98,10 +98,7 @@ export const getKeyColumns = (
               </AlertDialogContent>
             </AlertDialog>
           </TooltipProvider>
-          <button>
-            <Share className="w-5 h-5 text-primary hover:text-primary-dark" />
-          </button>
-          {/* <ShareSymEnc data={row.original} /> */}
+          <ShareSymEnc data={row.original} />
         </div>
       ),
       meta: { align: "right" },

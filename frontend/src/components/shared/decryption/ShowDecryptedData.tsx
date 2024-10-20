@@ -3,8 +3,8 @@ import { useToast } from "@/hooks/use-toast";
 import { KeyInfo } from "@/lib/types/keys";
 import React from "react";
 import { PacmanLoader } from "react-spinners";
-import { LoadEncryptedKeyContent } from "../../../../wailsjs/go/keys/KeyRetrieve";
-import { DecryptAES } from "../../../../wailsjs/go/symmetricdecryption/Cryptography";
+import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
+import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
 
 interface DecryptedDataProps {
   keyInfo: KeyInfo;
@@ -23,6 +23,8 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
   const [decryptedData, setDecryptedData] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const { toast } = useToast();
+
+  // need to handle the onClose state
 
   const handleDecryptPassphraseSubmit = async (passphrase: string) => {
     setIsLoading(true);
