@@ -26,8 +26,8 @@ type FileInfo struct {
 
 type FolderInfo struct {
 	Name  string     `json:"name"`
-	Files []FileInfo `json:"files"`
 	Path  string     `json:"path"`
+	Files []FileInfo `json:"files"`
 }
 
 type KeyInfo struct {

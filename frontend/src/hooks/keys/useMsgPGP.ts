@@ -1,11 +1,11 @@
-import React from "react";
+import useMsgKeysStore from "@/lib/store/useMsgKeysStore";
 import {
   RetrievePgpPrivKey,
   RetrievePgpPubKey,
 } from "@wailsjs/go/keys/KeyRetrieve";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
+import { LogError } from "@wailsjs/runtime/runtime.js";
+import React from "react";
 import { useToast } from "../use-toast";
-import useMsgKeysStore from "@/lib/store/useMsgKeysStore";
 
 interface Props {
   folderPath: string;

@@ -63,8 +63,8 @@ export namespace keys {
 	}
 	export class FolderInfo {
 	    name: string;
-	    files: FileInfo[];
 	    path: string;
+	    files: FileInfo[];
 	
 	    static createFrom(source: any = {}) {
 	        return new FolderInfo(source);
@@ -73,8 +73,8 @@ export namespace keys {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
-	        this.files = this.convertValues(source["files"], FileInfo);
 	        this.path = source["path"];
+	        this.files = this.convertValues(source["files"], FileInfo);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

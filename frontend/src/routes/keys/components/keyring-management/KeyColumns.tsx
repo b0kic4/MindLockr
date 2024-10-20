@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Portal } from "@radix-ui/react-portal";
 import { createColumnHelper } from "@tanstack/react-table";
-import { KeyRound, Share, Trash } from "lucide-react";
+import { KeyRound, Trash } from "lucide-react";
 
 interface KeyInfo {
   name: string;
