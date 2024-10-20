@@ -20,14 +20,12 @@ import { Eye, EyeOff, Share } from "lucide-react";
 import React from "react";
 import { hybridencryption } from "@wailsjs/go/models";
 import { PerformHybridEnOnExistingData } from "@wailsjs/go/hybridencryption/HybridEncryption";
+import { LogInfo } from "@wailsjs/runtime/runtime";
+import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
 
 interface Props {
   data: keys.KeyInfo;
 }
-
-// FIXME:  we need to properly implement this functionality
-// How should we properly perform the hybrind enc on existing
-// Symmetric data
 
 export default function ShareSymEnc({ data }: Props) {
   const { toast } = useToast();
@@ -84,11 +82,21 @@ export default function ShareSymEnc({ data }: Props) {
     setProvidedPrivKey(cleanedPrivKey);
   };
 
-  const onClose = () => {
-    clearPair();
-    clearPriv();
+  const resetState = () => {
+    // Clear all form inputs and state variables
+    setFolderName("");
+    setPassphrase("");
+    setProvidedPrivKey("");
+    setProvidedPubKey("");
     clearPub();
+    clearPriv();
+    clearPair();
     handleHidePrivKey();
+    setIsPrivateKeyVisible(false);
+  };
+
+  const onClose = () => {
+    resetState();
   };
 
   const handlePerformHybridEnc = async () => {
@@ -112,8 +120,20 @@ export default function ShareSymEnc({ data }: Props) {
       return;
     }
 
+    const loadedData = await LoadEncryptedKeyContent(data.name, data.algorithm);
+
+    if (!loadedData) {
+      return toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Transforming failed",
+        description: "Encrypted data not found in the filesystem",
+      });
+    }
+
     const reqData: hybridencryption.RequestData = {
-      data: data.name,
+      data: loadedData,
+      algorithmType: data.algorithm,
       passphrase,
       folderName,
       pubKey: providedPubKey,
@@ -128,6 +148,7 @@ export default function ShareSymEnc({ data }: Props) {
         title: "Encryption Successful",
         description: "Your data and passphrase have been encrypted.",
       });
+      LogInfo(JSON.stringify(response));
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -144,18 +165,12 @@ export default function ShareSymEnc({ data }: Props) {
           errorMessage || "An unknown error occurred during encryption.",
       });
     } finally {
-      setFolderName("");
-      setPassphrase("");
-      setProvidedPrivKey("");
-      setProvidedPubKey("");
-      clearPub();
-      clearPriv();
-      clearPair();
+      resetState(); // Reset state after form submission
     }
   };
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogTrigger asChild>
         <button>
           <Share className="w-5 h-5 text-primary hover:text-primary-dark" />
@@ -172,7 +187,6 @@ export default function ShareSymEnc({ data }: Props) {
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
-          {/* Folder Name Input */}
           <div className="space-y-2">
             <Label htmlFor="folderName" className="text-sm font-medium">
               Folder Name
@@ -185,10 +199,9 @@ export default function ShareSymEnc({ data }: Props) {
             />
           </div>
 
-          {/* Passphrase Input */}
           <div className="space-y-2">
             <Label htmlFor="passphrase" className="text-sm font-medium">
-              Passphrase
+              Passphrase for decrypting the data
             </Label>
             <Input
               id="passphrase"
@@ -199,7 +212,6 @@ export default function ShareSymEnc({ data }: Props) {
             />
           </div>
 
-          {/* PGP Key Pair Selection */}
           <div className="space-y-2">
             <Label htmlFor="pgpKeyPair" className="block text-sm font-medium">
               PGP Key Pair
@@ -207,7 +219,6 @@ export default function ShareSymEnc({ data }: Props) {
             <SelectPgpKeyPair />
           </div>
 
-          {/* Public Key Field */}
           <div className="space-y-2 mt-4">
             <Label
               htmlFor="publicKey"
@@ -223,7 +234,6 @@ export default function ShareSymEnc({ data }: Props) {
             />
           </div>
 
-          {/* Private Key Field */}
           <div className="space-y-2 mt-4">
             <Label
               htmlFor="privateKey"
@@ -248,25 +258,26 @@ export default function ShareSymEnc({ data }: Props) {
                   Private key is decrypted.
                 </em>
               </>
-            ) : providedPrivKey ? (
-              <>
-                <em className="text-sm text-red-500">
-                  Please decrypt your private key.
-                </em>
-                <DecryptButton
-                  onSubmit={handleDecryptPrivKey}
-                  keyName={providedPrivKey}
-                />
-              </>
             ) : (
-              <Input
-                id="privateKey"
-                placeholder="Private Key"
-                type={isPrivateKeyVisible ? "text" : "password"}
-                value={providedPrivKey || ""}
-                onChange={handlePrivateKeyChange}
-              />
+              providedPrivKey && (
+                <>
+                  <em className="text-sm text-red-500">
+                    Please decrypt your private key.
+                  </em>
+                  <DecryptButton
+                    onSubmit={handleDecryptPrivKey}
+                    keyName={providedPrivKey}
+                  />
+                </>
+              )
             )}
+            <Input
+              id="privateKey"
+              placeholder="Private Key"
+              type={isPrivateKeyVisible ? "text" : "password"}
+              value={providedPrivKey || ""}
+              onChange={handlePrivateKeyChange}
+            />
           </div>
         </div>
 

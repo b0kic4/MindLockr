@@ -109,6 +109,8 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 }
 
 func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (ResponseData, error) {
+	fmt.Println("recieved data: ", req)
+
 	pubKey, err := ParsePublicKey(req.PubKey)
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to parse public key: %v", err)
