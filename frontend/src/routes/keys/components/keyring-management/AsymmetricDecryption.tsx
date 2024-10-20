@@ -1,19 +1,19 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
-import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
+import { useToast } from "@/hooks/use-toast";
 import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
-import { VerifyData } from "@wailsjs/go/validation/Validator";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
+import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
 import {
   GetEncryptionFromSignature,
   LoadAsymmetricEnData,
 } from "@wailsjs/go/keys/KeyRetrieve";
-import { PacmanLoader } from "react-spinners";
-import { EyeOffIcon, EyeIcon, XSquareIcon } from "lucide-react";
 import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
+import { VerifyData } from "@wailsjs/go/validation/Validator";
+import { LogError } from "@wailsjs/runtime/runtime";
+import { EyeIcon, EyeOffIcon, XSquareIcon } from "lucide-react";
+import React from "react";
+import { PacmanLoader } from "react-spinners";
 
 const PassphraseFormDecryption = () => {
   // form inputs
