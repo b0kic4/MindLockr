@@ -194,6 +194,7 @@ func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (Resp
 		EncyrptedPassphrase: encPassphraseB64,
 		Signature:           signatureB64,
 		FolderName:          req.FolderName,
+		AsymAlgType:         req.PgpType,
 	})
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to save asymmetric data: %v", err)
