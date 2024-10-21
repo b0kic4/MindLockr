@@ -27,6 +27,7 @@ type FileInfo struct {
 type FolderInfo struct {
 	Name  string     `json:"name"`
 	Path  string     `json:"path"`
+	Type  string     `json:"type"`
 	Files []FileInfo `json:"files"`
 }
 
@@ -40,6 +41,7 @@ type PgpKeyInfo struct {
 	PublicKey  string `json:"publicKey"`
 	PrivateKey string `json:"privateKey"`
 	FolderPath string `json:"folderPath"`
+	Type       string `json:"type"`
 }
 
 func (kr *KeyRetrieve) LoadEncryptedKeyContent(keyName string, algorithmType string) (string, error) {
@@ -168,12 +170,14 @@ func (kr *KeyRetrieve) RetrievePgpKeys() ([]PgpKeyInfo, error) {
 	rsaKeys := []PgpKeyInfo{}
 	var err error
 
-	eccKeys, err = kr.getPgpKeysFromDirectory(eccBaseFolderPath)
+	// Pass the key type "ECC" when retrieving ECC keys
+	eccKeys, err = kr.getPgpKeysFromDirectory(eccBaseFolderPath, "ECC")
 	if err != nil {
 		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving ECC PGP keys: %v", err)
 	}
 
-	rsaKeys, err = kr.getPgpKeysFromDirectory(rsaBaseFolderPath)
+	// Pass the key type "RSA" when retrieving RSA keys
+	rsaKeys, err = kr.getPgpKeysFromDirectory(rsaBaseFolderPath, "RSA")
 	if err != nil {
 		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving RSA PGP keys: %v", err)
 	}
@@ -181,7 +185,7 @@ func (kr *KeyRetrieve) RetrievePgpKeys() ([]PgpKeyInfo, error) {
 	return append(eccKeys, rsaKeys...), nil
 }
 
-func (kr *KeyRetrieve) getPgpKeysFromDirectory(basePath string) ([]PgpKeyInfo, error) {
+func (kr *KeyRetrieve) getPgpKeysFromDirectory(basePath string, keyType string) ([]PgpKeyInfo, error) {
 	pgpKeys := []PgpKeyInfo{}
 
 	if _, err := os.Stat(basePath); os.IsNotExist(err) {
@@ -201,6 +205,7 @@ func (kr *KeyRetrieve) getPgpKeysFromDirectory(basePath string) ([]PgpKeyInfo, e
 			pgpKeys = append(pgpKeys, PgpKeyInfo{
 				Name:       keyName,
 				FolderPath: keyFolderPath,
+				Type:       keyType, // Add the type (ECC or RSA)
 			})
 		}
 	}
@@ -244,62 +249,84 @@ func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]FolderInfo, error) {
 		return nil, fmt.Errorf("Error reading keys folder: %v", err)
 	}
 
+	// Iterate over key-type directories (e.g., "ECC", "RSA")
 	for _, folderDir := range folderDirs {
 		if !folderDir.IsDir() {
 			continue
 		}
 
-		folderName := folderDir.Name()
-		mainFolderPath := filepath.Join(keysBaseFolderPath, folderName)
-		files := []FileInfo{}
+		// Retrieve key type folder (ECC, RSA)
+		keyType := folderDir.Name() // "ECC" or "RSA"
+		keyTypeFolderPath := filepath.Join(keysBaseFolderPath, keyType)
 
-		algoDirs, err := os.ReadDir(mainFolderPath)
+		// Iterate over key instances within the key type folder
+		instanceDirs, err := os.ReadDir(keyTypeFolderPath)
 		if err != nil {
-			return nil, fmt.Errorf("Error reading algorithm folders in %s: %v", folderName, err)
+			return nil, fmt.Errorf("Error reading key type folders in %s: %v", keyType, err)
 		}
 
-		for _, algoDir := range algoDirs {
-			if !algoDir.IsDir() {
+		for _, instanceDir := range instanceDirs {
+			if !instanceDir.IsDir() {
 				continue
 			}
 
-			algoName := algoDir.Name()
-			algoFolderPath := filepath.Join(mainFolderPath, algoName)
-			algoFiles, err := os.ReadDir(algoFolderPath)
+			folderName := instanceDir.Name() // Name of the key instance folder
+			mainFolderPath := filepath.Join(keyTypeFolderPath, folderName)
+			files := []FileInfo{}
+
+			// Retrieve algorithm directories (e.g., AES-256) within the key instance folder
+			algoDirs, err := os.ReadDir(mainFolderPath)
 			if err != nil {
-				return nil, fmt.Errorf("Error reading files in algorithm folder %s: %v", algoName, err)
+				return nil, fmt.Errorf("Error reading algorithm folders in %s: %v", folderName, err)
 			}
 
-			for _, file := range algoFiles {
-				files = append(files, FileInfo{
-					Name: fmt.Sprintf("%s/%s", algoName, file.Name()),
-					Type: "Encrypted Data",
-					Path: filepath.Join(algoFolderPath, file.Name()),
-				})
-			}
-		}
-
-		extraFiles := []string{"encrypted_passphrase.key", "signature.sig"}
-		for _, file := range extraFiles {
-			filePath := filepath.Join(mainFolderPath, file)
-			if _, err := os.Stat(filePath); err == nil {
-				fileType := "Key File"
-				if file == "signature.sig" {
-					fileType = "Signature File"
+			for _, algoDir := range algoDirs {
+				if !algoDir.IsDir() {
+					continue
 				}
-				files = append(files, FileInfo{
-					Name: file,
-					Type: fileType,
-					Path: filePath,
-				})
-			}
-		}
 
-		folders = append(folders, FolderInfo{
-			Name:  folderName,
-			Files: files,
-			Path:  mainFolderPath,
-		})
+				algoName := algoDir.Name() // E.g., "AES-256"
+				algoFolderPath := filepath.Join(mainFolderPath, algoName)
+				algoFiles, err := os.ReadDir(algoFolderPath)
+				if err != nil {
+					return nil, fmt.Errorf("Error reading files in algorithm folder %s: %v", algoName, err)
+				}
+
+				// Collect files within the algorithm folder
+				for _, file := range algoFiles {
+					files = append(files, FileInfo{
+						Name: fmt.Sprintf("%s/%s", algoName, file.Name()),
+						Type: "Encrypted Data",
+						Path: filepath.Join(algoFolderPath, file.Name()),
+					})
+				}
+			}
+
+			// Collect additional files like encrypted passphrase and signature from the key folder itself
+			extraFiles := []string{"encrypted_passphrase.key", "signature.sig"}
+			for _, file := range extraFiles {
+				filePath := filepath.Join(mainFolderPath, file)
+				if _, err := os.Stat(filePath); err == nil {
+					fileType := "Key File"
+					if file == "signature.sig" {
+						fileType = "Signature File"
+					}
+					files = append(files, FileInfo{
+						Name: file,
+						Type: fileType,
+						Path: filePath,
+					})
+				}
+			}
+
+			// Append the folder and associated files to the result list
+			folders = append(folders, FolderInfo{
+				Name:  folderName,
+				Files: files,
+				Path:  mainFolderPath,
+				Type:  keyType, // Set key type (ECC or RSA) here
+			})
+		}
 	}
 
 	return folders, nil

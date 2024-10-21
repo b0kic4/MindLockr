@@ -42,6 +42,7 @@ export default function KeysGen() {
   const {
     providedPubKey,
     providedPrivKey,
+    encType,
     setProvidedPrivKey,
     setProvidedPubKey,
     clearPriv,
@@ -113,6 +114,7 @@ export default function KeysGen() {
       algorithm,
       algorithmType,
       folderName,
+      pgpType: encType,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };

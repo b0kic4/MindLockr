@@ -43,14 +43,11 @@ func ParseRSAPublicKey(pubKey string) (*rsa.PublicKey, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error decoding public key: %v", err)
 	}
-	publicKeyInterface, err := x509.ParsePKIXPublicKey(pubKeyBytes)
+	rsaPubKey, err := x509.ParsePKCS1PublicKey(pubKeyBytes)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing public key: %v", err)
+		return nil, fmt.Errorf("error parsing rsa public key: %v", err)
 	}
-	rsaPubKey, ok := publicKeyInterface.(*rsa.PublicKey)
-	if !ok {
-		return nil, fmt.Errorf("not an RSA public key")
-	}
+
 	return rsaPubKey, nil
 }
 

@@ -41,6 +41,10 @@ const PassphraseFormDecryption = () => {
     setPrivKey(cleanedPrivKey);
   };
 
+  // FIXME:
+  // We can get the folder name where is saved (ECC, RSA)
+  // and from that to send that as pgp type
+
   // path to be displayed
   const displayPath = selectedFile
     ? selectedFile.path.split("/").slice(-3).join("/")
@@ -65,6 +69,7 @@ const PassphraseFormDecryption = () => {
       const decryptedPassphrase = await DecryptPassphrase(
         loadedPassphraseFromFS,
         privKey,
+        selectedFile.type,
       );
       setDecryptedPassphrase(decryptedPassphrase);
       setPassphrase(decryptedPassphrase);
@@ -175,6 +180,7 @@ const SignatureFormValidation = () => {
           .replace(/-----END PGP PUBLIC KEY-----/g, "")
           .replace(/\s+/g, "")
           .trim(),
+        selectedFile.type,
       );
 
       if (response) {

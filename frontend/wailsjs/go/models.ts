@@ -66,6 +66,7 @@ export namespace keys {
 	export class FolderInfo {
 	    name: string;
 	    path: string;
+	    type: string;
 	    files: FileInfo[];
 	
 	    static createFrom(source: any = {}) {
@@ -76,6 +77,7 @@ export namespace keys {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.path = source["path"];
+	        this.type = source["type"];
 	        this.files = this.convertValues(source["files"], FileInfo);
 	    }
 	
@@ -103,6 +105,7 @@ export namespace keys {
 	    EncyrptedPassphrase: string;
 	    Signature: string;
 	    FolderName: string;
+	    AsymAlgType: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new HybridRequestData(source);
@@ -115,6 +118,7 @@ export namespace keys {
 	        this.EncyrptedPassphrase = source["EncyrptedPassphrase"];
 	        this.Signature = source["Signature"];
 	        this.FolderName = source["FolderName"];
+	        this.AsymAlgType = source["AsymAlgType"];
 	    }
 	}
 	export class KeyInfo {
@@ -136,6 +140,7 @@ export namespace keys {
 	    publicKey: string;
 	    privateKey: string;
 	    folderPath: string;
+	    type: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new PgpKeyInfo(source);
@@ -147,6 +152,7 @@ export namespace keys {
 	        this.publicKey = source["publicKey"];
 	        this.privateKey = source["privateKey"];
 	        this.folderPath = source["folderPath"];
+	        this.type = source["type"];
 	    }
 	}
 	export class RequestData {

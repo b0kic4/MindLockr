@@ -40,6 +40,7 @@ export default function ShareSymEnc({ data }: Props) {
     selectedPgpKeyPair,
     providedPubKey,
     providedPrivKey,
+    encType,
     setProvidedPrivKey,
     setProvidedPubKey,
     clearPair,
@@ -143,6 +144,7 @@ export default function ShareSymEnc({ data }: Props) {
       algorithmType: data.algorithm,
       passphrase,
       folderName,
+      pgpType: encType,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };
@@ -182,22 +184,19 @@ export default function ShareSymEnc({ data }: Props) {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Share Symmetric Encrypted Data</DialogTitle>
-          <DialogDescription>
-            Provide the folder name and passphrase, select your PGP key pair or
-            manually enter keys to share the encrypted data.
-          </DialogDescription>
+      <DialogContent className="sm:max-w-[600px] max-w-full min-w-[350px] max-h-[75vh] sm:max-h-[500px] lg:max-h-[600px] xl:max-h-[650px] flex flex-col overflow-y-auto p-4 sm:p-6 md:p-8">
+        <DialogHeader className="flex-shrink-0">
+          <DialogTitle>Share your encrypted data with others</DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="flex-1 grid gap-4 py-4 overflow-y-auto">
           <div className="space-y-2">
             <Label htmlFor="folderName" className="text-sm font-medium">
               Folder Name
             </Label>
             <Input
               id="folderName"
+              className="w-full"
               placeholder="Enter folder name"
               value={folderName}
               onChange={(e) => setFolderName(e.target.value)}
@@ -211,6 +210,7 @@ export default function ShareSymEnc({ data }: Props) {
             <Input
               id="passphrase"
               type="password"
+              className="w-full"
               placeholder="Enter passphrase"
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
@@ -233,6 +233,7 @@ export default function ShareSymEnc({ data }: Props) {
             </Label>
             <Input
               id="publicKey"
+              className="w-full"
               placeholder="Public Key"
               value={providedPubKey || ""}
               onChange={handlePublicKeyChange}
@@ -278,6 +279,7 @@ export default function ShareSymEnc({ data }: Props) {
             )}
             <Input
               id="privateKey"
+              className="w-full"
               placeholder="Private Key"
               type={isPrivateKeyVisible ? "text" : "password"}
               value={providedPrivKey || ""}
@@ -286,7 +288,7 @@ export default function ShareSymEnc({ data }: Props) {
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0">
           <Button onClick={handlePerformHybridEnc}>Save Changes</Button>
         </DialogFooter>
       </DialogContent>
