@@ -6,6 +6,7 @@ export namespace hybridencryption {
 	    algorithm?: string;
 	    algorithmType?: string;
 	    folderName: string;
+	    pgpType?: string;
 	    pubKey: string;
 	    privKey: string;
 	
@@ -20,6 +21,7 @@ export namespace hybridencryption {
 	        this.algorithm = source["algorithm"];
 	        this.algorithmType = source["algorithmType"];
 	        this.folderName = source["folderName"];
+	        this.pgpType = source["pgpType"];
 	        this.pubKey = source["pubKey"];
 	        this.privKey = source["privKey"];
 	    }
@@ -148,8 +150,10 @@ export namespace keys {
 	    }
 	}
 	export class RequestData {
+	    EnType: string;
 	    Usage: string;
 	    Passphrase: string;
+	    Bits: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RequestData(source);
@@ -157,8 +161,10 @@ export namespace keys {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.EnType = source["EnType"];
 	        this.Usage = source["Usage"];
 	        this.Passphrase = source["Passphrase"];
+	        this.Bits = source["Bits"];
 	    }
 	}
 	export class ReturnType {

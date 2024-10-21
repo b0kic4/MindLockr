@@ -1,31 +1,9 @@
-import { DecryptButton } from "@/components/shared/decryption/DecryptButton.js";
 import { Button } from "@/components/ui/button.js";
 import { useFolderPath } from "@/hooks/folder/useFolderPath.js";
-import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption.js";
-import { useMsgPGP } from "@/hooks/keys/useMsgPGP.js";
-import { EyeOff } from "lucide-react";
-import { MsgPGPGenForm } from "./keys/components/key-gen/forms/MessagingPgpKeysGenForm.js";
 
 export default function Home() {
   // hooks
   const { folderPath, pickFolder, removeFolderPath } = useFolderPath();
-  const { privKey, setPrivKey, pubKey, setPubKey } = useMsgPGP({
-    folderPath: folderPath,
-  });
-
-  const {
-    decryptedPrivKey,
-    isPrivKeyVisible,
-    handleDecryptPrivKey,
-    handleHidePrivKey,
-  } = usePrivateKeyDecryption({ keyName: "msg" });
-
-  // for the generated messaging keys
-  // we should prompt the user if the is going
-  // to use the chatting functionality
-  // and if it does we wiil explain to the user
-  // that we need to store only the public key
-  // in the database for successfull chatting
 
   return (
     <div className="p-8 text-foreground dark:text-foreground-dark shadow-md rounded-lg flex flex-col items-center min-h-screen max-w-4xl mx-auto mt-6 space-y-8">
@@ -71,72 +49,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      {!pubKey && !privKey && (
-        <div className="w-full p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">
-            Messages Key Generation
-          </h2>
-          <div className="text-center">
-            <p className="text-md text-gray-700 dark:text-gray-300">
-              Generate your Public/Private Messaging keys
-            </p>
-            <p className="mt-4 text-red-500 font-bold">
-              Please generate Public/Private keys for this machine.
-              <br /> Those keys will be used for the Message exchanging
-            </p>
-            <MsgPGPGenForm setPrivKey={setPrivKey} setPubKey={setPubKey} />
-          </div>
-        </div>
-      )}
-
-      {pubKey && privKey && (
-        <div className="w-full p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">
-            Generated Messaging Keys
-          </h2>
-          <div className="mb-4">
-            <h3 className="text-start px-4 text-lg font-semibold">
-              PGP Public Key:
-            </h3>
-            <textarea
-              readOnly
-              value={pubKey}
-              className="w-full h-32 p-3 border border-gray-600 dark:border-gray-400 bg-gray-200 dark:bg-gray-900 rounded-md"
-            />
-          </div>
-          <div className="relative mb-4 p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-            <div className="flex flex-col gap-2 sm:flex-row items-start sm:items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold mb-2 sm:mb-0 text-nowrap">
-                PGP Private Key:
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                <em className="text-red-500 text-nowrap">
-                  Private key is initially encrypted. Use the decryption
-                  passphrase to retrieve the pgp key.
-                </em>
-              </p>
-            </div>
-            <textarea
-              readOnly
-              value={decryptedPrivKey ? decryptedPrivKey : privKey}
-              className="w-full h-32 p-3 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 rounded-md resize-none mb-4"
-              placeholder="Encrypted private key will be displayed here."
-            />
-            <div className="flex justify-end items-center space-x-4">
-              {isPrivKeyVisible && (
-                <Button onClick={handleHidePrivKey} variant="ghost">
-                  <EyeOff className="w-6 h-6" />
-                </Button>
-              )}
-              <DecryptButton
-                onSubmit={handleDecryptPrivKey}
-                keyName={decryptedPrivKey ? decryptedPrivKey : privKey}
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="w-full p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
         <p className="text-md text-gray-700 dark:text-gray-300 text-center">

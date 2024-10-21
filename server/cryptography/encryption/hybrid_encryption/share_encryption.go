@@ -1,16 +1,18 @@
 package hybridencryption
 
 import (
+	"MindLockr/server/cryptography/cryptohelper"
 	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
 	"MindLockr/server/filesystem/keys"
 	"bytes"
+	"crypto"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/sha256"
-	"crypto/x509"
 	"encoding/asn1"
 	"encoding/base64"
 	"fmt"
@@ -26,6 +28,7 @@ type RequestData struct {
 	Algorithm     string `json:"algorithm,omitempty"`
 	AlgorithmType string `json:"algorithmType,omitempty"`
 	FolderName    string `json:"folderName"`
+	PgpType       string `json:"pgpType,omitempty"`
 	PubKey        string `json:"pubKey"`
 	PrivKey       string `json:"privKey"`
 }
@@ -45,13 +48,33 @@ type SaveAsymmetricDataRequest struct {
 }
 
 func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, error) {
-	pubKey, err := ParsePublicKey(req.PubKey)
-	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to parse public key: %v", err)
-	}
-	privKey, err := ParsePrivateKey(req.PrivKey)
-	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to parse private key: %v", err)
+	var pubKey interface{}
+	var privKey interface{}
+	var err error
+
+	switch req.PgpType {
+	case "ECC":
+		pubKey, err = cryptohelper.ParseECCPublicKey(req.PubKey)
+		if err != nil {
+			return ResponseData{}, fmt.Errorf("failed to parse ECC public key: %v", err)
+		}
+		privKey, err = cryptohelper.ParseECCPrivateKey(req.PrivKey)
+		if err != nil {
+			return ResponseData{}, fmt.Errorf("failed to parse ECC private key: %v", err)
+		}
+
+	case "RSA":
+		pubKey, err = cryptohelper.ParseRSAPublicKey(req.PubKey)
+		if err != nil {
+			return ResponseData{}, fmt.Errorf("failed to parse RSA public key: %v", err)
+		}
+		privKey, err = cryptohelper.ParseRSAPrivateKey(req.PrivKey)
+		if err != nil {
+			return ResponseData{}, fmt.Errorf("failed to parse RSA private key: %v", err)
+		}
+
+	default:
+		return ResponseData{}, fmt.Errorf("unsupported key type: %s", req.PgpType)
 	}
 
 	aes := &symmetricencryption.Cryptography{}
@@ -63,39 +86,40 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 	}
 	aesRes, err := aes.EncryptAES(aesEncryptData)
 	if err != nil {
-		return ResponseData{}, fmt.Errorf("Encryption Failed: %v", err)
+		return ResponseData{}, fmt.Errorf("AES encryption failed: %v", err)
 	}
 
-	// Encrypt the AES passphrase with the recipient's public key
-	encPassphrase, err := encryptWithPublicKey([]byte(req.Passphrase), pubKey)
+	var encPassphrase []byte
+	switch req.PgpType {
+	case "ECC":
+		encPassphrase, err = encryptWithECC([]byte(req.Passphrase), pubKey.(*ecdsa.PublicKey))
+	case "RSA":
+		encPassphrase, err = encryptWithRSA([]byte(req.Passphrase), pubKey.(*rsa.PublicKey))
+	}
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to encrypt passphrase: %v", err)
 	}
 	encPassphraseB64 := base64.StdEncoding.EncodeToString(encPassphrase)
 
-	// Sign the encrypted data
-	signature, err := signData([]byte(aesRes), privKey)
+	var signature []byte
+	switch req.PgpType {
+	case "ECC":
+		signature, err = signWithECC([]byte(aesRes), privKey.(*ecdsa.PrivateKey))
+	case "RSA":
+		signature, err = signWithRSA([]byte(aesRes), privKey.(*rsa.PrivateKey))
+	}
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to sign data: %v", err)
 	}
 	signatureB64 := base64.StdEncoding.EncodeToString(signature)
 
 	keyStore := &keys.KeyStore{}
-
-	saveData := SaveAsymmetricDataRequest{
+	err = keyStore.SaveAsymmetricData(keys.HybridRequestData{
 		SymmetricData:       aesRes,
 		AlgSymEnc:           req.AlgorithmType,
-		EncryptedPassphrase: encPassphraseB64,
+		EncyrptedPassphrase: encPassphraseB64,
 		Signature:           signatureB64,
 		FolderName:          req.FolderName,
-	}
-
-	err = keyStore.SaveAsymmetricData(keys.HybridRequestData{
-		SymmetricData:       saveData.SymmetricData,
-		AlgSymEnc:           saveData.AlgSymEnc,
-		EncyrptedPassphrase: saveData.EncryptedPassphrase,
-		Signature:           saveData.Signature,
-		FolderName:          saveData.FolderName,
 	})
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to save asymmetric data: %v", err)
@@ -109,45 +133,66 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 }
 
 func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (ResponseData, error) {
-	pubKey, err := ParsePublicKey(req.PubKey)
-	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to parse public key: %v", err)
-	}
-	privKey, err := ParsePrivateKey(req.PrivKey)
-	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to parse private key: %v", err)
+	var pubKey interface{}
+	var privKey interface{}
+	var err error
+
+	switch req.PgpType {
+	case "ECC":
+		pubKey, err = cryptohelper.ParseECCPublicKey(req.PubKey)
+		if err != nil {
+			return ResponseData{}, fmt.Errorf("failed to parse ECC public key: %v", err)
+		}
+		privKey, err = cryptohelper.ParseECCPrivateKey(req.PrivKey)
+		if err != nil {
+			return ResponseData{}, fmt.Errorf("failed to parse ECC private key: %v", err)
+		}
+
+	case "RSA":
+		pubKey, err = cryptohelper.ParseRSAPublicKey(req.PubKey)
+		if err != nil {
+			return ResponseData{}, fmt.Errorf("failed to parse RSA public key: %v", err)
+		}
+		privKey, err = cryptohelper.ParseRSAPrivateKey(req.PrivKey)
+		if err != nil {
+			return ResponseData{}, fmt.Errorf("failed to parse RSA private key: %v", err)
+		}
+
+	default:
+		return ResponseData{}, fmt.Errorf("unsupported key type: %s", req.PgpType)
 	}
 
-	// Encrypt the AES passphrase with the recipient's public key
-	encPassphrase, err := encryptWithPublicKey([]byte(req.Passphrase), pubKey)
+	var encPassphrase []byte
+	switch req.PgpType {
+	case "ECC":
+		encPassphrase, err = encryptWithECC([]byte(req.Passphrase), pubKey.(*ecdsa.PublicKey))
+	case "RSA":
+		encPassphrase, err = encryptWithRSA([]byte(req.Passphrase), pubKey.(*rsa.PublicKey))
+	}
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to encrypt passphrase: %v", err)
 	}
 	encPassphraseB64 := base64.StdEncoding.EncodeToString(encPassphrase)
 
-	// Sign the encrypted data
-	signature, err := signData([]byte(req.Data), privKey)
+	var signature []byte
+	switch req.PgpType {
+	case "ECC":
+		signature, err = signWithECC([]byte(req.Data), privKey.(*ecdsa.PrivateKey))
+	case "RSA":
+		signature, err = signWithRSA([]byte(req.Data), privKey.(*rsa.PrivateKey))
+	}
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to sign data: %v", err)
 	}
 	signatureB64 := base64.StdEncoding.EncodeToString(signature)
 
 	keyStore := &keys.KeyStore{}
-
-	saveData := SaveAsymmetricDataRequest{
+	err = keyStore.SaveAsymmetricData(keys.HybridRequestData{
 		SymmetricData:       req.Data,
 		AlgSymEnc:           req.AlgorithmType,
-		EncryptedPassphrase: encPassphraseB64,
+		EncyrptedPassphrase: encPassphraseB64,
 		Signature:           signatureB64,
 		FolderName:          req.FolderName,
-	}
-
-	err = keyStore.SaveAsymmetricData(keys.HybridRequestData{
-		SymmetricData:       saveData.SymmetricData,
-		AlgSymEnc:           saveData.AlgSymEnc,
-		EncyrptedPassphrase: saveData.EncryptedPassphrase,
-		Signature:           saveData.Signature,
-		FolderName:          saveData.FolderName,
 	})
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to save asymmetric data: %v", err)
@@ -160,39 +205,7 @@ func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (Resp
 	}, nil
 }
 
-func ParsePublicKey(pubKey string) (*ecdsa.PublicKey, error) {
-	pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKey)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding public key: %v", err)
-	}
-	publicKeyInterface, err := x509.ParsePKIXPublicKey(pubKeyBytes)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing public key: %v", err)
-	}
-	ecdsaPubKey, ok := publicKeyInterface.(*ecdsa.PublicKey)
-	if !ok {
-		return nil, fmt.Errorf("not an ECDSA public key")
-	}
-	return ecdsaPubKey, nil
-}
-
-func ParsePrivateKey(privKey string) (*ecdsa.PrivateKey, error) {
-	privKeyBytes, err := base64.StdEncoding.DecodeString(privKey)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding private key: %v", err)
-	}
-	ecdsaPrivKey, err := x509.ParseECPrivateKey(privKeyBytes)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing private key: %v", err)
-	}
-	return ecdsaPrivKey, nil
-}
-
-// link for explanation:
-// https://crypto.stackexchange.com/questions/30282/public-key-encryption-using-ecdhe-and-aes-gcm
-//
-// Encrypts data using the recipient's public key (ECDH + AES-GCM hybrid encryption)
-func encryptWithPublicKey(data []byte, pubKey *ecdsa.PublicKey) ([]byte, error) {
+func encryptWithECC(data []byte, pubKey *ecdsa.PublicKey) ([]byte, error) {
 	ephemeralPrivKey, err := ecdsa.GenerateKey(pubKey.Curve, rand.Reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate ephemeral key pair: %v", err)
@@ -222,21 +235,36 @@ func encryptWithPublicKey(data []byte, pubKey *ecdsa.PublicKey) ([]byte, error) 
 	return buf.Bytes(), nil
 }
 
+func encryptWithRSA(data []byte, pubKey *rsa.PublicKey) ([]byte, error) {
+	encryptedData, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, pubKey, data, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encrypt with RSA: %v", err)
+	}
+	return encryptedData, nil
+}
+
 type ECDSASignature struct {
 	R, S *big.Int
 }
 
-func signData(data []byte, privKey *ecdsa.PrivateKey) ([]byte, error) {
+func signWithECC(data []byte, privKey *ecdsa.PrivateKey) ([]byte, error) {
 	hash := sha256.Sum256(data)
 	r, s, err := ecdsa.Sign(rand.Reader, privKey, hash[:])
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign data: %v", err)
+		return nil, fmt.Errorf("failed to sign with ECC: %v", err)
 	}
-
-	// Encode r and s as ASN.1 DER
 	sig, err := asn1.Marshal(ECDSASignature{R: r, S: s})
 	if err != nil {
-		return nil, fmt.Errorf("failed to encode signature: %v", err)
+		return nil, fmt.Errorf("failed to marshal signature: %v", err)
 	}
 	return sig, nil
+}
+
+func signWithRSA(data []byte, privKey *rsa.PrivateKey) ([]byte, error) {
+	hash := sha256.Sum256(data)
+	signature, err := rsa.SignPKCS1v15(rand.Reader, privKey, crypto.SHA256, hash[:])
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign with RSA: %v", err)
+	}
+	return signature, nil
 }

@@ -36,14 +36,14 @@ const PgpKeyAccordionItem: React.FC<PgpKeyAccordionItemProps> = ({
     isPrivKeyVisible,
     handleDecryptPrivKey,
     handleHidePrivKey,
-  } = usePrivateKeyDecryption({ keyName: keyName.name });
+  } = usePrivateKeyDecryption({ keyPath: keyName.folderPath });
 
   React.useEffect(() => {
     if (isExpanded && !publicKey && !privateKey) {
       const fetchKeys = async () => {
         try {
-          const pubKey = await RetrievePgpPubKey(keyName.name);
-          const privKey = await RetrievePgpPrivKey(keyName.name);
+          const pubKey = await RetrievePgpPubKey(keyName.folderPath);
+          const privKey = await RetrievePgpPrivKey(keyName.folderPath);
           setPublicKey(pubKey);
           setPrivateKey(privKey);
         } catch (error) {

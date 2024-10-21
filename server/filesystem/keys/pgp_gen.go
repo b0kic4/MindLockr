@@ -3,10 +3,10 @@ package keys
 import (
 	symmetricdecryption "MindLockr/server/cryptography/decryption/symmetric_decryption"
 	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
-	"MindLockr/server/filesystem"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -15,26 +15,38 @@ import (
 )
 
 type (
-	PgpKeysGen  struct{}
+	PgpKeysGen struct{}
+
 	RequestData struct {
+		EnType     string
 		Usage      string
 		Passphrase string
+		Bits       int
+	}
+
+	ReturnType struct {
+		PrivKey string
+		PubKey  string
 	}
 )
 
-type ReturnType struct {
-	PrivKey string
-	PubKey  string
+func (pgpKeysGen *PgpKeysGen) GeneratePGPKeys(req RequestData) (ReturnType, error) {
+	switch req.EnType {
+	case "ECC":
+		return pgpKeysGen.GenerateEcPgpKeys(req)
+
+	case "RSA":
+		if req.Bits < 1024 || req.Bits > 7680 {
+			return ReturnType{}, fmt.Errorf("RSA key generation requires a valid bit size (1024 <= x <= 7680)")
+		}
+		return pgpKeysGen.GenerateRsaPgpKeys(req)
+
+	default:
+		return ReturnType{}, fmt.Errorf("unsupported encryption type: %v", req.EnType)
+	}
 }
 
-// 1. Encode the private key to PEM format
-// 2. Encrypt the private key PEM
-// 3. Save the encrypted private key
-// 4. Encode the public key to PEM format
-// 5. Save the public PEM format key
-// 6. return the values
-
-func (pgpGen *PgpKeysGen) GeneratePGPKeys(req RequestData) (ReturnType, error) {
+func (pgpKeysGen *PgpKeysGen) GenerateEcPgpKeys(req RequestData) (ReturnType, error) {
 	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return ReturnType{}, err
@@ -60,7 +72,8 @@ func (pgpGen *PgpKeysGen) GeneratePGPKeys(req RequestData) (ReturnType, error) {
 		return ReturnType{}, fmt.Errorf("encryption failed: %v", err)
 	}
 
-	err = SavePgpPrivKey(encryptedPrivKey, req.Usage)
+	path := filepath.Join("ECC", req.Usage)
+	err = SavePgpPrivKey(encryptedPrivKey, path)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
 	}
@@ -75,7 +88,7 @@ func (pgpGen *PgpKeysGen) GeneratePGPKeys(req RequestData) (ReturnType, error) {
 		Bytes: pubKeyBytes,
 	})
 
-	err = SavePgpPublicKey(pubKeyPEM, req.Usage)
+	err = SavePgpPublicKey(pubKeyPEM, path)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
 	}
@@ -86,19 +99,60 @@ func (pgpGen *PgpKeysGen) GeneratePGPKeys(req RequestData) (ReturnType, error) {
 	}, nil
 }
 
-func (pgpGen *PgpKeysGen) DecryptPgpPrivKey(passphrase string, keyName string) (string, error) {
-	folderInstance := filesystem.GetFolderInstance()
-	folderPath := folderInstance.GetFolderPath()
-	keysDir := filepath.Join(folderPath, "pgp", keyName)
-	privKeyPath := filepath.Join(keysDir, "private.pem")
+func (pgpKeysGen *PgpKeysGen) GenerateRsaPgpKeys(req RequestData) (ReturnType, error) {
+	privKey, err := rsa.GenerateKey(rand.Reader, req.Bits)
+	if err != nil {
+		return ReturnType{}, fmt.Errorf("error generating RSA private key: %v", err)
+	}
 
-	// Read the encrypted private key file
+	privKeyBytes := x509.MarshalPKCS1PrivateKey(privKey)
+
+	privKeyPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "PGP PRIVATE KEY",
+		Bytes: privKeyBytes,
+	})
+
+	data := symmetricencryption.DataToEncrypt{
+		Data:       string(privKeyPEM),
+		Passphrase: req.Passphrase,
+	}
+
+	encryptedPrivKey, err := symmetricencryption.AES256Encryption(data)
+	if err != nil {
+		return ReturnType{}, fmt.Errorf("encryption of private key failed: %v", err)
+	}
+
+	path := filepath.Join("RSA", req.Usage)
+	err = SavePgpPrivKey(encryptedPrivKey, path)
+	if err != nil {
+		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
+	}
+
+	pubKeyBytes := x509.MarshalPKCS1PublicKey(&privKey.PublicKey)
+	pubKeyPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "PGP PUBLIC KEY",
+		Bytes: pubKeyBytes,
+	})
+
+	err = SavePgpPublicKey(pubKeyPEM, path)
+	if err != nil {
+		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
+	}
+
+	return ReturnType{
+		PrivKey: encryptedPrivKey,
+		PubKey:  string(pubKeyPEM),
+	}, nil
+}
+
+func (pgpKeysGen *PgpKeysGen) DecryptPgpPrivKey(passphrase string, keyFolderPath string) (string, error) {
+	privKeyPath := filepath.Join(keyFolderPath, "private.pem")
+
 	encryptedPrivKeyHex, err := os.ReadFile(privKeyPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read private key file: %v", err)
 	}
 
-	// Decrypt the private key using the passphrase
 	decryptedPrivKeyPEM, err := symmetricdecryption.AES256Decryption(symmetricdecryption.DataToDecrypt{
 		EncryptedData: string(encryptedPrivKeyHex),
 		Passphrase:    passphrase,

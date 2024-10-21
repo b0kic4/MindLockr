@@ -26,6 +26,14 @@ interface Props {
   data: keys.KeyInfo;
 }
 
+// FIXME:
+// I need to fix when the user
+// provides private key manually
+// to not show the decrypt button
+// (or maybe to have funcionality
+// for user to specify if the key
+// is decrypted or not)
+
 export default function ShareSymEnc({ data }: Props) {
   const { toast } = useToast();
   const {
@@ -47,7 +55,7 @@ export default function ShareSymEnc({ data }: Props) {
 
   const { decryptedPrivKey, handleDecryptPrivKey, handleHidePrivKey } =
     usePrivateKeyDecryption({
-      keyName: selectedPgpKeyPair,
+      keyPath: selectedPgpKeyPair,
     });
 
   React.useEffect(() => {

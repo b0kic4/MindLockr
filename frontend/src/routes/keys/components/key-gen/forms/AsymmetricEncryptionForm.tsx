@@ -19,7 +19,7 @@ export default function AsymmetricKeyEncryptionForm() {
 
   const { decryptedPrivKey, handleDecryptPrivKey, handleHidePrivKey } =
     usePrivateKeyDecryption({
-      keyName: selectedPgpKeyPair,
+      keyPath: selectedPgpKeyPair,
     });
 
   const [isPrivateKeyVisible, setIsPrivateKeyVisible] = React.useState(false);

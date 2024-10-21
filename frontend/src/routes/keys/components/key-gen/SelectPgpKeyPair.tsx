@@ -102,7 +102,7 @@ export default function SelectPgpKeyPair() {
           <SelectGroup>
             <SelectLabel>PGP Keys</SelectLabel>
             {pgpKeys.map((key) => (
-              <SelectItem key={key.name} value={key.name}>
+              <SelectItem key={key.name} value={key.folderPath}>
                 {key.name}
               </SelectItem>
             ))}

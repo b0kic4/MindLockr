@@ -158,39 +158,46 @@ func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 	return keyFiles, nil
 }
 
-// functions to implement:
-// 1. RetrievePgpKeys
-// 2. RetrievePgpPrivKey
-// 3. RetrievePgpPubKey
-
-// ufff treba mi type za ovo
-
 func (kr *KeyRetrieve) RetrievePgpKeys() ([]PgpKeyInfo, error) {
 	folderPath := kr.folderInstance.GetFolderPath()
 
-	keysBaseFolderPath := filepath.Join(folderPath, "pgp")
+	eccBaseFolderPath := filepath.Join(folderPath, "pgp", "ECC")
+	rsaBaseFolderPath := filepath.Join(folderPath, "pgp", "RSA")
 
-	// Check if the base keys folder exists
-	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("PGP keys folder does not exist at: %s", keysBaseFolderPath)
-	}
+	eccKeys := []PgpKeyInfo{}
+	rsaKeys := []PgpKeyInfo{}
+	var err error
 
-	// Create a slice to store key folder info
-	var pgpKeys []PgpKeyInfo
-
-	// Read the contents of the PGP keys directory
-	keyFolders, err := os.ReadDir(keysBaseFolderPath)
+	eccKeys, err = kr.getPgpKeysFromDirectory(eccBaseFolderPath)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading PGP keys folder: %v", err)
+		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving ECC PGP keys: %v", err)
 	}
 
-	// Iterate over each key folder
+	rsaKeys, err = kr.getPgpKeysFromDirectory(rsaBaseFolderPath)
+	if err != nil {
+		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving RSA PGP keys: %v", err)
+	}
+
+	return append(eccKeys, rsaKeys...), nil
+}
+
+func (kr *KeyRetrieve) getPgpKeysFromDirectory(basePath string) ([]PgpKeyInfo, error) {
+	pgpKeys := []PgpKeyInfo{}
+
+	if _, err := os.Stat(basePath); os.IsNotExist(err) {
+		return pgpKeys, nil
+	}
+
+	keyFolders, err := os.ReadDir(basePath)
+	if err != nil {
+		return []PgpKeyInfo{}, fmt.Errorf("Error reading PGP keys folder: %v", err)
+	}
+
 	for _, keyFolder := range keyFolders {
 		if keyFolder.IsDir() {
 			keyName := keyFolder.Name()
-			keyFolderPath := filepath.Join(keysBaseFolderPath, keyName)
+			keyFolderPath := filepath.Join(basePath, keyName)
 
-			// You might choose to retrieve keys here or later
 			pgpKeys = append(pgpKeys, PgpKeyInfo{
 				Name:       keyName,
 				FolderPath: keyFolderPath,
@@ -201,12 +208,9 @@ func (kr *KeyRetrieve) RetrievePgpKeys() ([]PgpKeyInfo, error) {
 	return pgpKeys, nil
 }
 
-func (kr *KeyRetrieve) RetrievePgpPubKey(keyName string) (string, error) {
-	folderPath := kr.folderInstance.GetFolderPath()
-	keysDir := filepath.Join(folderPath, "pgp", keyName)
-	pubKeyPath := filepath.Join(keysDir, "public.pem")
+func (kr *KeyRetrieve) RetrievePgpPubKey(keyFolderPath string) (string, error) {
+	pubKeyPath := filepath.Join(keyFolderPath, "public.pem")
 
-	// Read the public key file
 	pubKeyPEM, err := os.ReadFile(pubKeyPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read public key file: %v", err)
@@ -215,12 +219,9 @@ func (kr *KeyRetrieve) RetrievePgpPubKey(keyName string) (string, error) {
 	return string(pubKeyPEM), nil
 }
 
-func (kr *KeyRetrieve) RetrievePgpPrivKey(keyName string) (string, error) {
-	folderInstance := filesystem.GetFolderInstance()
-	keysDir := filepath.Join(folderInstance.GetFolderPath(), "pgp", keyName)
-	privKeyPath := filepath.Join(keysDir, "private.pem")
+func (kr *KeyRetrieve) RetrievePgpPrivKey(keyFolderPath string) (string, error) {
+	privKeyPath := filepath.Join(keyFolderPath, "private.pem")
 
-	// Read the encrypted private key file
 	encryptedPrivKeyHex, err := os.ReadFile(privKeyPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read private key file: %v", err)

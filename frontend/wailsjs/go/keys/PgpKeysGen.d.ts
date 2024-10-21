@@ -4,4 +4,8 @@ import {keys} from '../models';
 
 export function DecryptPgpPrivKey(arg1:string,arg2:string):Promise<string>;
 
+export function GenerateEcPgpKeys(arg1:keys.RequestData):Promise<keys.ReturnType>;
+
 export function GeneratePGPKeys(arg1:keys.RequestData):Promise<keys.ReturnType>;
+
+export function GenerateRsaPgpKeys(arg1:keys.RequestData):Promise<keys.ReturnType>;
