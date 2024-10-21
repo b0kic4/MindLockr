@@ -4,10 +4,10 @@ import React from "react";
 import { useToast } from "../use-toast";
 
 interface Props {
-  keyName: string;
+  keyPath: string;
 }
 
-export function usePrivateKeyDecryption({ keyName }: Props) {
+export function usePrivateKeyDecryption({ keyPath }: Props) {
   const [decryptedPrivKey, setDecryptedPrivKey] = React.useState<string>("");
   const [isPrivKeyVisible, setIsPrivKeyVisible] =
     React.useState<boolean>(false);
@@ -15,7 +15,7 @@ export function usePrivateKeyDecryption({ keyName }: Props) {
 
   const handleDecryptPrivKey = async (passphrase: string) => {
     try {
-      const decrypted = await DecryptPgpPrivKey(passphrase, keyName);
+      const decrypted = await DecryptPgpPrivKey(passphrase, keyPath);
       setDecryptedPrivKey(decrypted);
       setIsPrivKeyVisible(true);
 

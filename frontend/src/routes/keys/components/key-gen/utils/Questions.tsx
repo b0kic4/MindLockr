@@ -92,12 +92,13 @@ export default function Questions() {
 
           <AccordionItem value="item-4">
             <AccordionTrigger className="text-lg font-medium text-gray-800 dark:text-gray-200">
-              How do I generate a public/private key pair?
+              How do I generate a PGP Public/Private key pair?
             </AccordionTrigger>
             <AccordionContent className="pl-4">
               <p className="mb-4 text-foreground dark:text-foreground-dark">
                 You can generate a key pair by selecting the encryption
-                algorithm (like RSA or ECC) and clicking "Generate".
+                algorithm (like RSA or ECC) and clicking "Generate" on PGP Keys
+                section.
               </p>
               <ul className="list-disc list-inside space-y-1 text-sm text-foreground dark:text-foreground-dark">
                 <li>Select the encryption type (RSA or ECC).</li>

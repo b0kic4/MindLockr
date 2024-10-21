@@ -49,9 +49,17 @@ export default function KeyringManagement() {
       return <DataTable data={symmetricFilteredKeys} columns={columns} />;
     } else if (filterKeyType === "Asymmetric") {
       return (
-        <div className="flex justify-center max-w-6xl">
-          <FileTreeAccordion />
-          {selectedFile && <AsymmetricDecryption />}
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-4">
+            <FileTreeAccordion />
+          </div>
+          <div className="col-span-8">
+            {selectedFile ? (
+              <AsymmetricDecryption />
+            ) : (
+              <p className="text-center text-muted">Select a key to decrypt</p>
+            )}
+          </div>
         </div>
       );
     } else {

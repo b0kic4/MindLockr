@@ -106,6 +106,7 @@ type HybridRequestData struct {
 	EncyrptedPassphrase string
 	Signature           string
 	FolderName          string
+	AsymAlgType         string
 }
 
 func (ks *KeyStore) SaveAsymmetricData(req HybridRequestData) error {
@@ -116,7 +117,7 @@ func (ks *KeyStore) SaveAsymmetricData(req HybridRequestData) error {
 		return fmt.Errorf("Please initialize the folder where you want to store data")
 	}
 
-	keysDir := filepath.Join(folderPath, "keys/asymmetric", req.FolderName)
+	keysDir := filepath.Join(folderPath, "keys/asymmetric", req.AsymAlgType, req.FolderName)
 
 	// Check if the specified FolderName already exists
 	if _, err := os.Stat(keysDir); !os.IsNotExist(err) {

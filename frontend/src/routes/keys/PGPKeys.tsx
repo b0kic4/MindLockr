@@ -1,4 +1,12 @@
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
 import { Accordion } from "@radix-ui/react-accordion";
 import { TextSearchIcon } from "lucide-react";
@@ -11,11 +19,15 @@ export default function PGPKeys() {
   const { pgpKeys, fetchPgpKeys } = usePgpKeys();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+  const [selectedType, setSelectedType] = React.useState<string>("all");
 
-  // Filtered PGP keys based on the search term
-  const filteredKeys = pgpKeys.filter((keyName) =>
-    keyName.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
-  );
+  const filteredKeys = pgpKeys
+    .filter((keyName) =>
+      keyName.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
+    )
+    .filter((key) =>
+      selectedType === "all" ? true : key.type === selectedType,
+    );
 
   return (
     <div className="p-6 rounded shadow-md">
@@ -26,7 +38,20 @@ export default function PGPKeys() {
         <PgpKeysGenForm fetchPgpKeys={fetchPgpKeys} />
       </div>
 
-      <div className="relative flex items-center text-foreground dark:text-foreground-dark max-w-xs">
+      <Select value={selectedType} onValueChange={setSelectedType}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by Key Type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="ECC">ECC</SelectItem>
+            <SelectItem value="RSA">RSA</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+
+      <div className="relative flex items-center text-foreground dark:text-foreground-dark max-w-xs mt-4">
         <Input
           type="text"
           placeholder="Search PGP Keys"

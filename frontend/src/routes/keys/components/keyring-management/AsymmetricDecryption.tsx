@@ -41,13 +41,27 @@ const PassphraseFormDecryption = () => {
     setPrivKey(cleanedPrivKey);
   };
 
+  // FIXME:
+  // We can get the folder name where is saved (ECC, RSA)
+  // and from that to send that as pgp type
+
   // path to be displayed
   const displayPath = selectedFile
     ? selectedFile.path.split("/").slice(-3).join("/")
     : "";
 
+  const extractPgpTypeFromDisplayPath = (displayPath: string): string => {
+    const parts = displayPath.split("/");
+    const baseFolder = parts[0];
+    return baseFolder === "ECC" || baseFolder === "RSA"
+      ? baseFolder
+      : "Unknown";
+  };
+
   const handleDecrypt = async () => {
     if (!selectedFile) return;
+
+    const pgpType = extractPgpTypeFromDisplayPath(displayPath);
 
     try {
       setIsLoading(true);
@@ -65,6 +79,7 @@ const PassphraseFormDecryption = () => {
       const decryptedPassphrase = await DecryptPassphrase(
         loadedPassphraseFromFS,
         privKey,
+        pgpType,
       );
       setDecryptedPassphrase(decryptedPassphrase);
       setPassphrase(decryptedPassphrase);
@@ -155,9 +170,18 @@ const SignatureFormValidation = () => {
     ? selectedFile.path.split("/").slice(-3).join("/")
     : "";
 
+  const extractPgpTypeFromDisplayPath = (displayPath: string): string => {
+    const parts = displayPath.split("/");
+    const baseFolder = parts[0];
+    return baseFolder === "ECC" || baseFolder === "RSA"
+      ? baseFolder
+      : "Unknown";
+  };
+
   const handleValidate = async () => {
     try {
       if (!selectedFile) return;
+      const pgpType = extractPgpTypeFromDisplayPath(displayPath);
       setIsLoading(true);
 
       const foundSymmetricData = await GetEncryptionFromSignature(
@@ -175,6 +199,7 @@ const SignatureFormValidation = () => {
           .replace(/-----END PGP PUBLIC KEY-----/g, "")
           .replace(/\s+/g, "")
           .trim(),
+        pgpType,
       );
 
       if (response) {

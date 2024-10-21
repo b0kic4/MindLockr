@@ -11,9 +11,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import useSelectAlgPgpGen from "@/lib/store/useSelectAlgPgpGen";
+import useSelectNumOfBits from "@/lib/store/useSelectNumberOfBits";
 import { GeneratePGPKeys } from "@wailsjs/go/keys/PgpKeysGen";
 import { LogError } from "@wailsjs/runtime/runtime";
 import React from "react";
+import SelectAlg from "./SelectAlgorithm";
+import NumberOfBitsRSA from "./SelectNumberOfBitsForRSA";
+import { PacmanLoader } from "react-spinners";
 
 type Props = {
   fetchPgpKeys: () => void;
@@ -22,15 +27,21 @@ type Props = {
 export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
   const [keyName, setKeyName] = React.useState<string>("");
   const [passphrase, setPassphrase] = React.useState<string>("");
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { toast } = useToast();
+
+  const { selectedAlg, clearSelectedAlg } = useSelectAlgPgpGen();
+  const { selectedBits, clearSelectedBits } = useSelectNumOfBits();
 
   const genKeys = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setIsLoading(true);
     try {
       const response = await GeneratePGPKeys({
+        EnType: selectedAlg,
         Usage: keyName,
         Passphrase: passphrase,
+        Bits: selectedBits,
       });
 
       if (response.PubKey && response.PrivKey) {
@@ -59,8 +70,11 @@ export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
           "Failed to generate keys. Please check if you initialized folder path.",
       });
     } finally {
+      setIsLoading(false);
       setKeyName("");
       setPassphrase("");
+      clearSelectedBits();
+      clearSelectedAlg();
     }
   };
 
@@ -107,11 +121,31 @@ export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
                 className="col-span-3"
                 placeholder="Enter passphrase"
               />
+              <Label htmlFor="algorithm" className="text-right">
+                Algorithm
+              </Label>
+              <div className="col-span-3">
+                <SelectAlg />
+              </div>
+              {selectedAlg === "RSA" && (
+                <>
+                  <Label htmlFor="bits" className="text-right">
+                    Number of Bits
+                  </Label>
+                  <div className="col-span-3">
+                    <NumberOfBitsRSA />
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={!passphrase || !keyName}>
-              Generate
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={!passphrase || !keyName || !selectedAlg || isLoading} // Disable when loading
+            >
+              {isLoading ? <PacmanLoader size={8} color="#fff" /> : "Generate"}{" "}
             </Button>
           </DialogFooter>
         </form>
