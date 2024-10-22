@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Accordion,
   AccordionContent,
@@ -25,12 +24,12 @@ export function FileTreeAccordion() {
 
   return (
     <div className="w-full space-y-2 pt-2">
-      <h2 className="text-start text-xl font-bold mb-4">Asymmetric Keys</h2>
+      <h2 className="text-start text-lg font-bold mb-4">Asymmetric Keys</h2>
       {keys.asymmetric.length > 0 ? (
         <Accordion type="multiple">
           {keys.asymmetric.map((folder) => (
             <AccordionItem key={folder.name} value={folder.name}>
-              <AccordionTrigger className="flex justify-start items-center space-x-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
+              <AccordionTrigger className="flex justify-start items-center space-x-4 font-semibold text-gray-800 dark:text-gray-200">
                 <FolderIcon className="w-5 h-5 text-blue-600" />
                 <span>{folder.name}</span>
               </AccordionTrigger>
@@ -41,8 +40,8 @@ export function FileTreeAccordion() {
                     const [algoFolder, fileName] = file.name.split("/");
 
                     return isAlgorithmFolder ? (
-                      <li key={fileName} className="ml-4 text-lg">
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <li key={fileName} className="ml-4">
+                        <div className="flex items-center gap-2 font-semibold text-gray-600 dark:text-gray-300">
                           <FolderIcon className="w-4 h-4" />
                           {algoFolder}
                         </div>
@@ -58,7 +57,10 @@ export function FileTreeAccordion() {
                             }
                           >
                             <FileTextIcon className="w-4 h-4 text-gray-400" />
-                            <span className="truncate">{fileName}</span>
+                            {/* This is the encrypted data */}
+                            <span className="truncate font-semibold">
+                              {fileName}
+                            </span>
                           </li>
                         </ul>
                       </li>
@@ -75,7 +77,10 @@ export function FileTreeAccordion() {
                         }
                       >
                         <FileTextIcon className="w-4 h-4 text-gray-400" />
-                        <span className="truncate">{file.name}</span>
+                        {/* These are the encrypted pass and validation file */}
+                        <span className="truncate font-semibold">
+                          {file.name}
+                        </span>
                       </li>
                     );
                   })}
