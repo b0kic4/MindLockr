@@ -28,7 +28,6 @@ type RequestData struct {
 	Algorithm     string `json:"algorithm,omitempty"`
 	AlgorithmType string `json:"algorithmType,omitempty"`
 	FolderName    string `json:"folderName"`
-	PgpType       string `json:"pgpType,omitempty"`
 	PubKey        string `json:"pubKey"`
 	PrivKey       string `json:"privKey"`
 }
@@ -50,9 +49,25 @@ type SaveAsymmetricDataRequest struct {
 func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, error) {
 	var pubKey interface{}
 	var privKey interface{}
-	var err error
 
-	switch req.PgpType {
+	kd := keys.KeyTypeDetection{}
+	pubKeyType, err := kd.DetectKeyType(req.PubKey)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("Error ocurred while detecting pub key type: ", err)
+	}
+	fmt.Println("pub key type: ", pubKeyType)
+
+	privKeyType, err := kd.DetectKeyType(req.PrivKey)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("Error ocurred while detecting priv key type: ", err)
+	}
+	fmt.Println("priv key type: ", privKeyType)
+
+	if pubKeyType != privKeyType {
+		return ResponseData{}, fmt.Errorf("Key type mismatch: Both the public and private keys must be of the same type (either ECC or RSA), but got pub key type: %s and priv key type: %s", pubKeyType, privKeyType)
+	}
+
+	switch pubKeyType {
 	case "ECC":
 		pubKey, err = cryptohelper.ParseECCPublicKey(req.PubKey)
 		if err != nil {
@@ -74,7 +89,7 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 		}
 
 	default:
-		return ResponseData{}, fmt.Errorf("unsupported key type: %s", req.PgpType)
+		return ResponseData{}, fmt.Errorf("unsupported key type")
 	}
 
 	aes := &symmetricencryption.Cryptography{}
@@ -90,7 +105,7 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 	}
 
 	var encPassphrase []byte
-	switch req.PgpType {
+	switch pubKeyType {
 	case "ECC":
 		encPassphrase, err = encryptWithECC([]byte(req.Passphrase), pubKey.(*ecdsa.PublicKey))
 	case "RSA":
@@ -102,7 +117,7 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 	encPassphraseB64 := base64.StdEncoding.EncodeToString(encPassphrase)
 
 	var signature []byte
-	switch req.PgpType {
+	switch pubKeyType {
 	case "ECC":
 		signature, err = signWithECC([]byte(aesRes), privKey.(*ecdsa.PrivateKey))
 	case "RSA":
@@ -120,7 +135,7 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 		EncyrptedPassphrase: encPassphraseB64,
 		Signature:           signatureB64,
 		FolderName:          req.FolderName,
-		AsymAlgType:         req.PgpType,
+		AsymAlgType:         pubKeyType,
 	})
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to save asymmetric data: %v", err)
@@ -138,7 +153,24 @@ func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (Resp
 	var privKey interface{}
 	var err error
 
-	switch req.PgpType {
+	kd := keys.KeyTypeDetection{}
+	pubKeyType, err := kd.DetectKeyType(req.PubKey)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("Error ocurred while detecting pub key type: ", err)
+	}
+	fmt.Println("pub key type: ", pubKeyType)
+
+	privKeyType, err := kd.DetectKeyType(req.PrivKey)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("Error ocurred while detecting priv key type: ", err)
+	}
+	fmt.Println("priv key type: ", privKeyType)
+
+	if pubKeyType != privKeyType {
+		return ResponseData{}, fmt.Errorf("Key type mismatch: Both the public and private keys must be of the same type (either ECC or RSA), but got pub key type: %s and priv key type: %s", pubKeyType, privKeyType)
+	}
+
+	switch pubKeyType {
 	case "ECC":
 		pubKey, err = cryptohelper.ParseECCPublicKey(req.PubKey)
 		if err != nil {
@@ -160,11 +192,11 @@ func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (Resp
 		}
 
 	default:
-		return ResponseData{}, fmt.Errorf("unsupported key type: %s", req.PgpType)
+		return ResponseData{}, fmt.Errorf("unsupported key type")
 	}
 
 	var encPassphrase []byte
-	switch req.PgpType {
+	switch pubKeyType {
 	case "ECC":
 		encPassphrase, err = encryptWithECC([]byte(req.Passphrase), pubKey.(*ecdsa.PublicKey))
 	case "RSA":
@@ -176,7 +208,7 @@ func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (Resp
 	encPassphraseB64 := base64.StdEncoding.EncodeToString(encPassphrase)
 
 	var signature []byte
-	switch req.PgpType {
+	switch pubKeyType {
 	case "ECC":
 		signature, err = signWithECC([]byte(req.Data), privKey.(*ecdsa.PrivateKey))
 	case "RSA":
@@ -194,7 +226,7 @@ func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (Resp
 		EncyrptedPassphrase: encPassphraseB64,
 		Signature:           signatureB64,
 		FolderName:          req.FolderName,
-		AsymAlgType:         req.PgpType,
+		AsymAlgType:         pubKeyType,
 	})
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to save asymmetric data: %v", err)

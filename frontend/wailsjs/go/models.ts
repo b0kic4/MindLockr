@@ -6,7 +6,6 @@ export namespace hybridencryption {
 	    algorithm?: string;
 	    algorithmType?: string;
 	    folderName: string;
-	    pgpType?: string;
 	    pubKey: string;
 	    privKey: string;
 	
@@ -21,7 +20,6 @@ export namespace hybridencryption {
 	        this.algorithm = source["algorithm"];
 	        this.algorithmType = source["algorithmType"];
 	        this.folderName = source["folderName"];
-	        this.pgpType = source["pgpType"];
 	        this.pubKey = source["pubKey"];
 	        this.privKey = source["privKey"];
 	    }

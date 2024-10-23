@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useGenKey } from "@/hooks/keys/useGenKey";
+import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import { useSaveKey } from "@/hooks/keys/useSaveKey";
 import { useToast } from "@/hooks/use-toast";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
@@ -40,15 +41,19 @@ export default function KeysGen() {
 
   // zustand
   const {
+    selectedPgpKeyPair,
     providedPubKey,
     providedPrivKey,
-    encType,
     setProvidedPrivKey,
     setProvidedPubKey,
     clearPriv,
     clearPub,
     clearPair,
   } = usePgpAsymmetricEncryptionInputsStore();
+
+  const { handleHidePrivKey } = usePrivateKeyDecryption({
+    keyPath: selectedPgpKeyPair,
+  });
 
   // effect to update encrypted data asap
   React.useEffect(() => {
@@ -114,7 +119,6 @@ export default function KeysGen() {
       algorithm,
       algorithmType,
       folderName,
-      pgpType: encType,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };
@@ -153,6 +157,7 @@ export default function KeysGen() {
       setPassphrase("");
       setProvidedPrivKey("");
       setProvidedPubKey("");
+      handleHidePrivKey();
       clearPub(), clearPriv(), clearPair();
     }
   };
@@ -176,17 +181,6 @@ export default function KeysGen() {
       <Questions />
 
       <KeyTypeTabs keyType={keyType} setKeyType={setKeyType}>
-        {keyType === "asymmetric" && (
-          <div className="p-4 bg-muted dark:bg-muted-dark rounded-lg mb-4">
-            <p className="text-md text-purple-700 dark:text-purple-500 text-center">
-              <strong>Note:</strong> You’ll use symmetric encryption for the
-              actual data and the passphrase. Then, you’ll encrypt that
-              passphrase using the asymmetric algorithm specified below to
-              securely share both the encrypted data and the passphrase.
-            </p>
-          </div>
-        )}
-
         <div className="flex flex-col">
           <div className="space-y-2">
             {keyType === "asymmetric" && (

@@ -32,33 +32,18 @@ export default function AsymmetricKeyEncryptionForm() {
     // this is ensuring that there are no blocks
     // from select component
     if (decryptedPrivKey && decryptedPrivKey.length > 0) {
-      const cleanedPrivKey = decryptedPrivKey
-        .replace(/-----BEGIN PGP PRIVATE KEY-----/g, "")
-        .replace(/-----END PGP PRIVATE KEY-----/g, "")
-        .replace(/\s+/g, "")
-        .trim();
-      setProvidedPrivKey(cleanedPrivKey);
+      setProvidedPrivKey(decryptedPrivKey);
     }
   }, [decryptedPrivKey, setProvidedPrivKey]);
 
   // this is for manual inputs
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cleanedPubKey = e.target.value
-      .replace(/-----BEGIN PGP PUBLIC KEY-----/g, "")
-      .replace(/-----END PGP PUBLIC KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
-    setProvidedPubKey(cleanedPubKey);
+    setProvidedPubKey(e.target.value);
   };
 
   // this is for manual inputs
   const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cleanedPrivKey = e.target.value
-      .replace(/-----BEGIN PGP PRIVATE KEY-----/g, "")
-      .replace(/-----END PGP PRIVATE KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
-    setProvidedPrivKey(cleanedPrivKey);
+    setProvidedPrivKey(e.target.value);
   };
 
   return (
@@ -182,14 +167,6 @@ export default function AsymmetricKeyEncryptionForm() {
           </div>
         </>
       )}
-      <div className="mt-4 p-2 bg-yellow-100 text-yellow-700 rounded-md">
-        <em className="text-sm">
-          <strong>Important:</strong> If you are providing custom keys, please
-          ensure that both the public and private keys are of the same
-          encryption type (either RSA or ECC). Mixing key types (e.g., RSA
-          public key with ECC private key) is not allowed.
-        </em>
-      </div>
     </div>
   );
 }

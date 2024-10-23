@@ -26,21 +26,12 @@ interface Props {
   data: keys.KeyInfo;
 }
 
-// FIXME:
-// I need to fix when the user
-// provides private key manually
-// to not show the decrypt button
-// (or maybe to have funcionality
-// for user to specify if the key
-// is decrypted or not)
-
 export default function ShareSymEnc({ data }: Props) {
   const { toast } = useToast();
   const {
     selectedPgpKeyPair,
     providedPubKey,
     providedPrivKey,
-    encType,
     setProvidedPrivKey,
     setProvidedPubKey,
     clearPair,
@@ -61,33 +52,18 @@ export default function ShareSymEnc({ data }: Props) {
 
   React.useEffect(() => {
     if (decryptedPrivKey && decryptedPrivKey.length > 0) {
-      const cleanedPrivKey = decryptedPrivKey
-        .replace(/-----BEGIN PGP PRIVATE KEY-----/g, "")
-        .replace(/-----END PGP PRIVATE KEY-----/g, "")
-        .replace(/\s+/g, "")
-        .trim();
-      setProvidedPrivKey(cleanedPrivKey);
+      setProvidedPrivKey(decryptedPrivKey);
     }
   }, [decryptedPrivKey, setProvidedPrivKey]);
 
   // Manual public key input handling
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cleanedPubKey = e.target.value
-      .replace(/-----BEGIN PGP PUBLIC KEY-----/g, "")
-      .replace(/-----END PGP PUBLIC KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
-    setProvidedPubKey(cleanedPubKey);
+    setProvidedPubKey(e.target.value);
   };
 
   // Manual private key input handling
   const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cleanedPrivKey = e.target.value
-      .replace(/-----BEGIN PGP PRIVATE KEY-----/g, "")
-      .replace(/-----END PGP PRIVATE KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
-    setProvidedPrivKey(cleanedPrivKey);
+    setProvidedPrivKey(e.target.value);
   };
 
   const resetState = () => {
@@ -144,7 +120,6 @@ export default function ShareSymEnc({ data }: Props) {
       algorithmType: data.algorithm,
       passphrase,
       folderName,
-      pgpType: encType,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };

@@ -1,29 +1,33 @@
 package cryptohelper
 
 import (
+	"encoding/hex"
 	"fmt"
-	"os"
 )
 
-func GetAESType(keyFilePath string) (string, error) {
-	keyData, err := os.ReadFile(keyFilePath)
+// FIXME: I need to properly implement this fn
+func DetectAESType(keyStr string) (string, error) {
+	// Attempt to decode the key string as hex (if it's in hex format)
+	decodedKey, err := hex.DecodeString(keyStr)
 	if err != nil {
-		return "", fmt.Errorf("Error reading key file %s: %v", keyFilePath, err)
+		// If it's not hex-encoded, use the raw string length
+		decodedKey = []byte(keyStr)
 	}
 
-	keyLength := len(keyData)
+	keyLength := len(decodedKey)
 
-	var algorithm string
+	// Determine the AES type based on the key length
+	var aesType string
 	switch keyLength {
 	case 16:
-		algorithm = "AES-128"
+		aesType = "AES-128"
 	case 24:
-		algorithm = "AES-192"
+		aesType = "AES-192"
 	case 32:
-		algorithm = "AES-256"
+		aesType = "AES-256"
 	default:
-		return "", fmt.Errorf("Unknown key length %d bytes in file %s", keyLength, keyFilePath)
+		return "", fmt.Errorf("unknown key length %d bytes", keyLength)
 	}
 
-	return algorithm, nil
+	return aesType, nil
 }
