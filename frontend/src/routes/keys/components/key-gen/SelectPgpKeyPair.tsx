@@ -26,8 +26,10 @@ export default function SelectPgpKeyPair() {
   const {
     selectedPgpKeyPair,
     setSelectPgpKeyPair,
+    setEncPrivKey,
     setProvidedPrivKey,
     setProvidedPubKey,
+    clearEnKey,
     clearPriv,
     clearPair,
     clearPub,
@@ -48,12 +50,14 @@ export default function SelectPgpKeyPair() {
   }, []);
 
   const handlePrivateKeyReset = () => {
+    setEncPrivKey("");
     setProvidedPrivKey("");
     handleHidePrivKey();
   };
 
   const handleKeyPairChange = (value: string) => {
     if (value !== selectedPgpKeyPair) {
+      setEncPrivKey("");
       setProvidedPrivKey("");
       setProvidedPubKey("");
       handlePrivateKeyReset();
@@ -78,6 +82,7 @@ export default function SelectPgpKeyPair() {
             setIsPublicChecked(true);
           } else if (keyType === "private") {
             const privKey = await RetrievePgpPrivKey(selectedPgpKeyPair);
+            setEncPrivKey(privKey);
             setProvidedPrivKey(privKey);
             setIsPrivateChecked(true);
           }
@@ -95,6 +100,7 @@ export default function SelectPgpKeyPair() {
         setIsPublicChecked(false);
         clearPub();
       } else if (keyType === "private") {
+        setEncPrivKey("");
         setProvidedPrivKey("");
         setIsPrivateChecked(false);
         handleHidePrivKey();
@@ -106,8 +112,8 @@ export default function SelectPgpKeyPair() {
   const handleEncryptionTypeChange = (type: string) => {
     setEncType(type);
 
-    setProvidedPrivKey("");
     clearPub();
+    clearEnKey();
     clearPriv();
     clearPair();
 

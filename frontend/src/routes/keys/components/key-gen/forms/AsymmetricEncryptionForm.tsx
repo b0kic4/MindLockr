@@ -13,6 +13,7 @@ export default function AsymmetricKeyEncryptionForm() {
   const {
     selectedPgpKeyPair,
     providedPubKey,
+    encPrivKey,
     providedPrivKey,
     setProvidedPrivKey,
     setProvidedPubKey,
@@ -25,19 +26,12 @@ export default function AsymmetricKeyEncryptionForm() {
 
   const [isPrivateKeyVisible, setIsPrivateKeyVisible] = React.useState(false);
 
-  // FIXME:
-  // Because of the timeout in handleDecryptPrivKey
-  // we have the priv key is decrypted when we should
-  // not have it
-
   // States to show cleaned keys (without PEM blocks) to the user
   const [shownPubKey, setShownPubKey] = React.useState<string>("");
   const [shownPrivKey, setShownPrivKey] = React.useState<string>("");
 
   // When keys are selected with SelectPgpKeyPair component
   React.useEffect(() => {
-    // every time private key changes we should
-    // set isPrivateKeyVisible to false
     const cleanedPrivKey = providedPrivKey
       .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
       .replace(/-----END [A-Z\s]+ KEY-----/g, "")
@@ -58,6 +52,12 @@ export default function AsymmetricKeyEncryptionForm() {
       handleHidePrivKey();
     }
 
+    // after 3.5 sec update providedPrivKey
+    // to encrypted value
+    if (providedPrivKey != decryptedPrivKey) {
+      setProvidedPrivKey(encPrivKey);
+    }
+
     if (decryptedPrivKey && decryptedPrivKey.length > 0) {
       const cleanedPrivKey = decryptedPrivKey
         .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
@@ -69,13 +69,12 @@ export default function AsymmetricKeyEncryptionForm() {
       const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
       setProvidedPrivKey(formattedDecPrivKey);
     }
-  }, [decryptedPrivKey, setProvidedPrivKey]);
+  }, [decryptedPrivKey]);
 
-  // Handle public key changes for manual input
+  // for manual input
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawPubKey = e.target.value;
 
-    // Clean the input for display
     const cleanedPubKey = rawPubKey
       .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
       .replace(/-----END [A-Z\s]+ KEY-----/g, "")
@@ -84,16 +83,14 @@ export default function AsymmetricKeyEncryptionForm() {
 
     setShownPubKey(cleanedPubKey);
 
-    // Format with PGP PEM blocks for submission
     const formattedPubKey = `-----BEGIN PGP PUBLIC KEY-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY-----`;
     setProvidedPubKey(formattedPubKey);
   };
 
-  // Handle private key changes for manual input
+  // for manual input
   const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawPrivKey = e.target.value;
 
-    // Clean the input for display
     const cleanedPrivKey = rawPrivKey
       .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
       .replace(/-----END [A-Z\s]+ KEY-----/g, "")
@@ -102,7 +99,6 @@ export default function AsymmetricKeyEncryptionForm() {
 
     setShownPrivKey(cleanedPrivKey);
 
-    // Format with PGP PEM blocks for submission
     const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
     setProvidedPrivKey(formattedPrivKey);
   };
@@ -188,6 +184,10 @@ export default function AsymmetricKeyEncryptionForm() {
           value={shownPrivKey || ""}
           onChange={handlePrivateKeyChange}
         />
+        <em className="text-sm text-yellow-500 ml-2">
+          Submit the form when you decrypt your private key with the passphrase.
+          You get 3.5 seconds before the key is encrypted again
+        </em>
       </div>
     </div>
   );

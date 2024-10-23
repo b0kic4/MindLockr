@@ -31,7 +31,7 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
         setDecryptedPrivKey("");
         setIsPrivKeyVisible(false);
         setIsDec(false);
-      }, 30000);
+      }, 3500);
     } catch (error) {
       LogError(error as any);
       toast({
