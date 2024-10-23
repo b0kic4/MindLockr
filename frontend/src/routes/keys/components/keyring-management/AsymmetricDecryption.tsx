@@ -15,6 +15,15 @@ import { EyeIcon, EyeOffIcon, XSquareIcon } from "lucide-react";
 import React from "react";
 import { PacmanLoader } from "react-spinners";
 
+const cleanKey = (key: string) => {
+  let cleanedKey = key
+    .replace(/\n/g, "")
+    .replace(/\r/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return cleanedKey;
+};
+
 const PassphraseFormDecryption = () => {
   // form inputs
   const [privKey, setPrivKey] = React.useState<string>("");
@@ -33,35 +42,17 @@ const PassphraseFormDecryption = () => {
   const { setPassphrase } = useLastDecryptedPassphrase();
 
   const handlePrivateKeyChange = (key: string) => {
-    const cleanedPrivKey = key
-      .replace(/-----BEGIN PGP PRIVATE KEY-----/g, "")
-      .replace(/-----END PGP PRIVATE KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
-    setPrivKey(cleanedPrivKey);
+    const cleanedKey = cleanKey(key);
+    setPrivKey(cleanedKey);
   };
-
-  // FIXME:
-  // We can get the folder name where is saved (ECC, RSA)
-  // and from that to send that as pgp type
 
   // path to be displayed
   const displayPath = selectedFile
     ? selectedFile.path.split("/").slice(-3).join("/")
     : "";
 
-  const extractPgpTypeFromDisplayPath = (displayPath: string): string => {
-    const parts = displayPath.split("/");
-    const baseFolder = parts[0];
-    return baseFolder === "ECC" || baseFolder === "RSA"
-      ? baseFolder
-      : "Unknown";
-  };
-
   const handleDecrypt = async () => {
     if (!selectedFile) return;
-
-    const pgpType = extractPgpTypeFromDisplayPath(displayPath);
 
     try {
       setIsLoading(true);
@@ -79,7 +70,6 @@ const PassphraseFormDecryption = () => {
       const decryptedPassphrase = await DecryptPassphrase(
         loadedPassphraseFromFS,
         privKey,
-        pgpType,
       );
       setDecryptedPassphrase(decryptedPassphrase);
       setPassphrase(decryptedPassphrase);
@@ -170,18 +160,9 @@ const SignatureFormValidation = () => {
     ? selectedFile.path.split("/").slice(-3).join("/")
     : "";
 
-  const extractPgpTypeFromDisplayPath = (displayPath: string): string => {
-    const parts = displayPath.split("/");
-    const baseFolder = parts[0];
-    return baseFolder === "ECC" || baseFolder === "RSA"
-      ? baseFolder
-      : "Unknown";
-  };
-
   const handleValidate = async () => {
     try {
       if (!selectedFile) return;
-      const pgpType = extractPgpTypeFromDisplayPath(displayPath);
       setIsLoading(true);
 
       const foundSymmetricData = await GetEncryptionFromSignature(
@@ -194,12 +175,7 @@ const SignatureFormValidation = () => {
       const response = await VerifyData(
         foundSymmetricData.replace(/\s+/g, "").trim(),
         loadedValidationFile.replace(/\s+/g, "").trim(),
-        pubKey
-          .replace(/-----BEGIN PGP PUBLIC KEY-----/g, "")
-          .replace(/-----END PGP PUBLIC KEY-----/g, "")
-          .replace(/\s+/g, "")
-          .trim(),
-        pgpType,
+        pubKey,
       );
 
       if (response) {
