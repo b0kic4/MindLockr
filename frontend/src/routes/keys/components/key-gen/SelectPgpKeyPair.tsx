@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
+import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import {
   RetrievePgpPrivKey,
@@ -27,8 +28,14 @@ export default function SelectPgpKeyPair() {
     setSelectPgpKeyPair,
     setProvidedPrivKey,
     setProvidedPubKey,
+    clearPriv,
+    clearPair,
     clearPub,
   } = usePgpAsymmetricEncryptionInputsStore();
+
+  const { handleHidePrivKey } = usePrivateKeyDecryption({
+    keyPath: selectedPgpKeyPair,
+  });
 
   const { pgpKeys, fetchPgpKeys } = usePgpKeys();
 
@@ -42,6 +49,7 @@ export default function SelectPgpKeyPair() {
 
   const handlePrivateKeyReset = () => {
     setProvidedPrivKey("");
+    handleHidePrivKey();
   };
 
   const handleKeyPairChange = (value: string) => {
@@ -52,6 +60,7 @@ export default function SelectPgpKeyPair() {
 
       setIsPublicChecked(false);
       setIsPrivateChecked(false);
+      handleHidePrivKey();
     }
     setSelectPgpKeyPair(value);
   };
@@ -88,9 +97,24 @@ export default function SelectPgpKeyPair() {
       } else if (keyType === "private") {
         setProvidedPrivKey("");
         setIsPrivateChecked(false);
+        handleHidePrivKey();
         handlePrivateKeyReset();
       }
     }
+  };
+
+  const handleEncryptionTypeChange = (type: string) => {
+    setEncType(type);
+
+    setProvidedPrivKey("");
+    clearPub();
+    clearPriv();
+    clearPair();
+
+    setIsPublicChecked(false);
+    setIsPrivateChecked(false);
+
+    handleHidePrivKey();
   };
 
   const filteredPgpKeys = pgpKeys.filter((key) => key.type === encType);
@@ -105,7 +129,7 @@ export default function SelectPgpKeyPair() {
         <label className="block text-sm font-medium mb-1 text-foreground dark:text-foreground-dark">
           PGP Key Pair
         </label>
-        <Select value={encType} onValueChange={setEncType}>
+        <Select value={encType} onValueChange={handleEncryptionTypeChange}>
           <SelectTrigger className="w-full bg-gray-700 text-white border border-gray-600 rounded">
             <SelectValue placeholder="Filter by Key Type" />
           </SelectTrigger>

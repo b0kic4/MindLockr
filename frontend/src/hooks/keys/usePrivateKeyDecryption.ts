@@ -9,20 +9,28 @@ interface Props {
 
 export function usePrivateKeyDecryption({ keyPath }: Props) {
   const [decryptedPrivKey, setDecryptedPrivKey] = React.useState<string>("");
+  const [isDec, setIsDec] = React.useState<boolean>(false);
   const [isPrivKeyVisible, setIsPrivKeyVisible] =
     React.useState<boolean>(false);
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    setDecryptedPrivKey("");
+    setIsPrivKeyVisible(false);
+  }, [keyPath]);
 
   const handleDecryptPrivKey = async (passphrase: string) => {
     try {
       const decrypted = await DecryptPgpPrivKey(passphrase, keyPath);
       setDecryptedPrivKey(decrypted);
       setIsPrivKeyVisible(true);
+      setIsDec(true);
 
       // Hide the decrypted private key after 30 seconds
       setTimeout(() => {
         setDecryptedPrivKey("");
         setIsPrivKeyVisible(false);
+        setIsDec(false);
       }, 30000);
     } catch (error) {
       LogError(error as any);
@@ -35,15 +43,17 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
     }
   };
 
-  // Function to hide the private key immediately
+  // Function to clear the decrypted priv key
   const handleHidePrivKey = () => {
     setDecryptedPrivKey("");
     setIsPrivKeyVisible(false);
+    setIsDec(false);
   };
 
   return {
     decryptedPrivKey,
     isPrivKeyVisible,
+    isDec,
     handleDecryptPrivKey,
     handleHidePrivKey,
   };
