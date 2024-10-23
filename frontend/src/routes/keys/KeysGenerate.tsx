@@ -46,6 +46,7 @@ export default function KeysGen() {
     providedPrivKey,
     setProvidedPrivKey,
     setProvidedPubKey,
+    clearEnKey,
     clearPriv,
     clearPub,
     clearPair,
@@ -155,10 +156,8 @@ export default function KeysGen() {
       setFolderName("");
       setData("");
       setPassphrase("");
-      setProvidedPrivKey("");
-      setProvidedPubKey("");
       handleHidePrivKey();
-      clearPub(), clearPriv(), clearPair();
+      clearPub(), clearPriv(), clearPair(), clearEnKey();
     }
   };
 

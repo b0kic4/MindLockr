@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
+import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import {
   RetrievePgpPrivKey,
@@ -25,10 +26,18 @@ export default function SelectPgpKeyPair() {
   const {
     selectedPgpKeyPair,
     setSelectPgpKeyPair,
+    setEncPrivKey,
     setProvidedPrivKey,
     setProvidedPubKey,
+    clearEnKey,
+    clearPriv,
+    clearPair,
     clearPub,
   } = usePgpAsymmetricEncryptionInputsStore();
+
+  const { handleHidePrivKey } = usePrivateKeyDecryption({
+    keyPath: selectedPgpKeyPair,
+  });
 
   const { pgpKeys, fetchPgpKeys } = usePgpKeys();
 
@@ -41,17 +50,21 @@ export default function SelectPgpKeyPair() {
   }, []);
 
   const handlePrivateKeyReset = () => {
+    setEncPrivKey("");
     setProvidedPrivKey("");
+    handleHidePrivKey();
   };
 
   const handleKeyPairChange = (value: string) => {
     if (value !== selectedPgpKeyPair) {
+      setEncPrivKey("");
       setProvidedPrivKey("");
       setProvidedPubKey("");
       handlePrivateKeyReset();
 
       setIsPublicChecked(false);
       setIsPrivateChecked(false);
+      handleHidePrivKey();
     }
     setSelectPgpKeyPair(value);
   };
@@ -69,6 +82,7 @@ export default function SelectPgpKeyPair() {
             setIsPublicChecked(true);
           } else if (keyType === "private") {
             const privKey = await RetrievePgpPrivKey(selectedPgpKeyPair);
+            setEncPrivKey(privKey);
             setProvidedPrivKey(privKey);
             setIsPrivateChecked(true);
           }
@@ -86,11 +100,27 @@ export default function SelectPgpKeyPair() {
         setIsPublicChecked(false);
         clearPub();
       } else if (keyType === "private") {
+        setEncPrivKey("");
         setProvidedPrivKey("");
         setIsPrivateChecked(false);
+        handleHidePrivKey();
         handlePrivateKeyReset();
       }
     }
+  };
+
+  const handleEncryptionTypeChange = (type: string) => {
+    setEncType(type);
+
+    clearPub();
+    clearEnKey();
+    clearPriv();
+    clearPair();
+
+    setIsPublicChecked(false);
+    setIsPrivateChecked(false);
+
+    handleHidePrivKey();
   };
 
   const filteredPgpKeys = pgpKeys.filter((key) => key.type === encType);
@@ -105,7 +135,7 @@ export default function SelectPgpKeyPair() {
         <label className="block text-sm font-medium mb-1 text-foreground dark:text-foreground-dark">
           PGP Key Pair
         </label>
-        <Select value={encType} onValueChange={setEncType}>
+        <Select value={encType} onValueChange={handleEncryptionTypeChange}>
           <SelectTrigger className="w-full bg-gray-700 text-white border border-gray-600 rounded">
             <SelectValue placeholder="Filter by Key Type" />
           </SelectTrigger>

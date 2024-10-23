@@ -6,11 +6,30 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
+	"strings"
 )
+
+func RemovePEMBlocks(pemKey string) string {
+	cleanedKey := strings.ReplaceAll(pemKey, "-----BEGIN PGP PRIVATE KEY-----", "")
+	cleanedKey = strings.ReplaceAll(cleanedKey, "-----END PGP PRIVATE KEY-----", "")
+	cleanedKey = strings.ReplaceAll(cleanedKey, "-----BEGIN PGP PUBLIC KEY-----", "")
+	cleanedKey = strings.ReplaceAll(cleanedKey, "-----END PGP PUBLIC KEY-----", "")
+
+	cleanedKey = strings.ReplaceAll(cleanedKey, "\n", "")
+	cleanedKey = strings.ReplaceAll(cleanedKey, "\r", "")
+
+	cleanedKey = strings.TrimSpace(cleanedKey)
+
+	return cleanedKey
+}
 
 // ECC
 func ParseECCPublicKey(pubKey string) (*ecdsa.PublicKey, error) {
-	pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKey)
+	cleanedKey := RemovePEMBlocks(pubKey)
+
+	fmt.Println("cleanedKey: ", cleanedKey)
+
+	pubKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding public key: %v", err)
 	}
@@ -26,7 +45,11 @@ func ParseECCPublicKey(pubKey string) (*ecdsa.PublicKey, error) {
 }
 
 func ParseECCPrivateKey(privKey string) (*ecdsa.PrivateKey, error) {
-	privKeyBytes, err := base64.StdEncoding.DecodeString(privKey)
+	cleanedKey := RemovePEMBlocks(privKey)
+
+	fmt.Println("cleanedKey: ", cleanedKey)
+
+	privKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding private key: %v", err)
 	}
@@ -39,7 +62,11 @@ func ParseECCPrivateKey(privKey string) (*ecdsa.PrivateKey, error) {
 
 // RSA
 func ParseRSAPublicKey(pubKey string) (*rsa.PublicKey, error) {
-	pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKey)
+	cleanedKey := RemovePEMBlocks(pubKey)
+
+	fmt.Println("cleanedKey: ", cleanedKey)
+
+	pubKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding public key: %v", err)
 	}
@@ -52,7 +79,11 @@ func ParseRSAPublicKey(pubKey string) (*rsa.PublicKey, error) {
 }
 
 func ParseRSAPrivateKey(privKey string) (*rsa.PrivateKey, error) {
-	privKeyBytes, err := base64.StdEncoding.DecodeString(privKey)
+	cleanedKey := RemovePEMBlocks(privKey)
+
+	fmt.Println("cleanedKey: ", cleanedKey)
+
+	privKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding private key: %v", err)
 	}
