@@ -16,6 +16,11 @@ import {
 } from "@wailsjs/go/keys/KeyRetrieve";
 import React from "react";
 
+// FIXME:
+// Fixing state formatting
+// Reseting
+// PEM Blocks
+
 export default function SelectPgpKeyPair() {
   const {
     selectedPgpKeyPair,
