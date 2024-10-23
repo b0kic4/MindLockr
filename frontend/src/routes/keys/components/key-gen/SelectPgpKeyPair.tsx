@@ -19,8 +19,6 @@ import React from "react";
 export default function SelectPgpKeyPair() {
   const {
     selectedPgpKeyPair,
-    encType,
-    setEncType,
     setSelectPgpKeyPair,
     setProvidedPrivKey,
     setProvidedPubKey,
@@ -31,6 +29,7 @@ export default function SelectPgpKeyPair() {
 
   const [isPublicChecked, setIsPublicChecked] = React.useState(false);
   const [isPrivateChecked, setIsPrivateChecked] = React.useState(false);
+  const [encType, setEncType] = React.useState<string>("ECC");
 
   React.useEffect(() => {
     fetchPgpKeys();
@@ -61,12 +60,7 @@ export default function SelectPgpKeyPair() {
         try {
           if (keyType === "public") {
             const pubKey = await RetrievePgpPubKey(selectedPgpKeyPair);
-            const cleanedPubKey = pubKey
-              .replace(/-----BEGIN PGP PUBLIC KEY-----/g, "")
-              .replace(/-----END PGP PUBLIC KEY-----/g, "")
-              .replace(/\s+/g, "")
-              .trim();
-            setProvidedPubKey(cleanedPubKey);
+            setProvidedPubKey(pubKey);
             setIsPublicChecked(true);
           } else if (keyType === "private") {
             const privKey = await RetrievePgpPrivKey(selectedPgpKeyPair);

@@ -28,35 +28,35 @@ func (kd *KeyTypeDetection) DetectKeyType(keyData string) (string, error) {
 		if pubKey, err := x509.ParsePKIXPublicKey(block.Bytes); err == nil {
 			switch pubKey.(type) {
 			case *rsa.PublicKey:
-				return "RSA Public Key (PKIX Format)", nil
+				return "RSA", nil
 			case *ecdsa.PublicKey:
-				return "ECC Public Key", nil
+				return "ECC", nil
 			default:
 				return "Unknown Public Key Type", nil
 			}
 		}
 
 		if _, err := x509.ParsePKCS1PublicKey(block.Bytes); err == nil {
-			return "RSA Public Key (PKCS1 Format)", nil
+			return "RSA", nil
 		}
 
 		return "", errors.New("failed to parse public key (use ParsePKCS1PublicKey instead for this key format)")
 
 	case "PGP PRIVATE KEY", "PRIVATE KEY", "RSA PRIVATE KEY":
 		if _, err := x509.ParseECPrivateKey(block.Bytes); err == nil {
-			return "ECC Private Key", nil
+			return "ECC", nil
 		}
 
 		if _, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
-			return "RSA Private Key (PKCS1 Format)", nil
+			return "RSA", nil
 		}
 
 		if privKey, err := x509.ParsePKCS8PrivateKey(block.Bytes); err == nil {
 			switch privKey.(type) {
 			case *rsa.PrivateKey:
-				return "RSA Private Key (PKCS8 Format)", nil
+				return "RSA", nil
 			case *ecdsa.PrivateKey:
-				return "ECC Private Key", nil
+				return "ECC", nil
 			}
 		}
 

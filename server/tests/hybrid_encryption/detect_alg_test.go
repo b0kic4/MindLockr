@@ -15,14 +15,10 @@ type KeysData struct {
 
 func TestHybridEn(t *testing.T) {
 	myKeys := KeysData{
-		EcPub: `-----BEGIN PGP PUBLIC KEY----------END PGP PUBLIC KEY-----
-`,
-		EcPriv: `-----BEGIN PGP PRIVATE KEY----------END PGP PRIVATE KEY-----
-`,
-		RsaPub: `-----BEGIN PGP PUBLIC KEY----------END PGP PUBLIC KEY-----
-`,
-		RsaPriv: `-----BEGIN PGP PRIVATE KEY----------END PGP PRIVATE KEY-----
-`,
+		EcPub:   `-----BEGIN PGP PUBLIC KEY----------END PGP PUBLIC KEY-----`,
+		EcPriv:  `-----BEGIN PGP PRIVATE KEY----------END PGP PRIVATE KEY-----`,
+		RsaPub:  `-----BEGIN PGP PUBLIC KEY----------END PGP PUBLIC KEY-----`,
+		RsaPriv: `-----BEGIN PGP PRIVATE KEY----------END PGP PRIVATE KEY-----`,
 	}
 
 	fmt.Println(myKeys)
