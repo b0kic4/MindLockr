@@ -94,7 +94,6 @@ export default function SelectPgpKeyPair() {
     }
   };
 
-  // Filtering the PGP keys based on the selected key type
   const filteredPgpKeys = pgpKeys.filter((key) => key.type === encType);
 
   return (
@@ -120,7 +119,6 @@ export default function SelectPgpKeyPair() {
         </Select>
       </div>
 
-      {/* PGP Key Pair Selection */}
       <div className="mb-4">
         <Select value={selectedPgpKeyPair} onValueChange={handleKeyPairChange}>
           <SelectTrigger className="w-full bg-gray-700 text-white border border-gray-600 rounded">
@@ -137,14 +135,6 @@ export default function SelectPgpKeyPair() {
             </SelectGroup>
           </SelectContent>
         </Select>
-      </div>
-      <div className="mt-4 p-2 bg-yellow-100 text-yellow-700 rounded-md">
-        <p className="text-sm">
-          <strong>Important:</strong> Even if you are not using your PGP keys,
-          you must select the correct encryption type (ECC or RSA) based on the
-          custom keys you are providing. This will ensure the program can create
-          valid encryption using your selected key type.
-        </p>
       </div>
       {selectedPgpKeyPair && (
         <div className="mt-2 text-foreground dark:text-foreground-dark">
