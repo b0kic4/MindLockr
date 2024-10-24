@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { LogInfo } from "@wailsjs/runtime/runtime";
+import { cleanShownKey } from "@/lib/utils/useCleanShownKey";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";
@@ -26,24 +26,15 @@ export default function AsymmetricKeyEncryptionForm() {
 
   const [isPrivateKeyVisible, setIsPrivateKeyVisible] = React.useState(false);
 
-  // States to show cleaned keys (without PEM blocks) to the user
   const [shownPubKey, setShownPubKey] = React.useState<string>("");
   const [shownPrivKey, setShownPrivKey] = React.useState<string>("");
 
   // When keys are selected with SelectPgpKeyPair component
   React.useEffect(() => {
-    const cleanedPrivKey = providedPrivKey
-      .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
-      .replace(/-----END [A-Z\s]+ KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
+    const cleanedPrivKey = cleanShownKey(providedPrivKey);
     setShownPrivKey(cleanedPrivKey);
 
-    const cleanedPubKey = providedPubKey
-      .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
-      .replace(/-----END [A-Z\s]+ KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
+    const cleanedPubKey = cleanShownKey(providedPubKey);
     setShownPubKey(cleanedPubKey);
   }, [providedPubKey, providedPrivKey]);
 
@@ -59,11 +50,7 @@ export default function AsymmetricKeyEncryptionForm() {
     }
 
     if (decryptedPrivKey && decryptedPrivKey.length > 0) {
-      const cleanedPrivKey = decryptedPrivKey
-        .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
-        .replace(/-----END [A-Z\s]+ KEY-----/g, "")
-        .replace(/\s+/g, "")
-        .trim();
+      const cleanedPrivKey = cleanShownKey(decryptedPrivKey);
       setShownPrivKey(cleanedPrivKey);
 
       const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
@@ -75,11 +62,7 @@ export default function AsymmetricKeyEncryptionForm() {
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawPubKey = e.target.value;
 
-    const cleanedPubKey = rawPubKey
-      .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
-      .replace(/-----END [A-Z\s]+ KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
+    const cleanedPubKey = cleanShownKey(rawPubKey);
 
     setShownPubKey(cleanedPubKey);
 
@@ -91,11 +74,7 @@ export default function AsymmetricKeyEncryptionForm() {
   const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawPrivKey = e.target.value;
 
-    const cleanedPrivKey = rawPrivKey
-      .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
-      .replace(/-----END [A-Z\s]+ KEY-----/g, "")
-      .replace(/\s+/g, "")
-      .trim();
+    const cleanedPrivKey = cleanShownKey(rawPrivKey);
 
     setShownPrivKey(cleanedPrivKey);
 

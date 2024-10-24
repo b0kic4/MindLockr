@@ -152,17 +152,16 @@ func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (Resp
 	var err error
 
 	kd := keys.KeyTypeDetection{}
+
 	pubKeyType, err := kd.DetectKeyType(req.PubKey)
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("Error ocurred while detecting pub key type: ", err)
 	}
-	fmt.Println("pub key type: ", pubKeyType)
 
 	privKeyType, err := kd.DetectKeyType(req.PrivKey)
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("Error ocurred while detecting priv key type: ", err)
 	}
-	fmt.Println("priv key type: ", privKeyType)
 
 	if pubKeyType != privKeyType {
 		return ResponseData{}, fmt.Errorf("Key type mismatch: Both the public and private keys must be of the same type (either ECC or RSA), but got pub key type: %s and priv key type: %s", pubKeyType, privKeyType)

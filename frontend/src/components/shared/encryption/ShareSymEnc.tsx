@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -14,13 +13,14 @@ import { Label } from "@/components/ui/label";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import { useToast } from "@/hooks/use-toast";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
+import { cleanKey } from "@/lib/utils/useCleanKey";
+import { cleanShownKey } from "@/lib/utils/useCleanShownKey";
 import SelectPgpKeyPair from "@/routes/keys/components/key-gen/SelectPgpKeyPair";
-import { keys } from "@wailsjs/go/models";
-import { Eye, EyeOff, Share } from "lucide-react";
-import React from "react";
-import { hybridencryption } from "@wailsjs/go/models";
 import { PerformHybridEnOnExistingData } from "@wailsjs/go/hybridencryption/HybridEncryption";
 import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
+import { hybridencryption, keys } from "@wailsjs/go/models";
+import { Eye, EyeOff, Share } from "lucide-react";
+import React from "react";
 
 interface Props {
   data: keys.KeyInfo;
@@ -32,12 +32,19 @@ export default function ShareSymEnc({ data }: Props) {
     selectedPgpKeyPair,
     providedPubKey,
     providedPrivKey,
+    encPrivKey,
     setProvidedPrivKey,
     setProvidedPubKey,
+    clearEnKey,
     clearPair,
     clearPriv,
     clearPub,
   } = usePgpAsymmetricEncryptionInputsStore();
+
+  const { decryptedPrivKey, handleDecryptPrivKey, handleHidePrivKey } =
+    usePrivateKeyDecryption({
+      keyPath: selectedPgpKeyPair,
+    });
 
   const [isPrivateKeyVisible, setIsPrivateKeyVisible] = React.useState(false);
 
@@ -45,34 +52,55 @@ export default function ShareSymEnc({ data }: Props) {
   const [folderName, setFolderName] = React.useState<string>("");
   const [passphrase, setPassphrase] = React.useState<string>("");
 
-  const { decryptedPrivKey, handleDecryptPrivKey, handleHidePrivKey } =
-    usePrivateKeyDecryption({
-      keyPath: selectedPgpKeyPair,
-    });
+  const [shownPubKey, setShownPubKey] = React.useState<string>("");
+  const [shownPrivKey, setShownPrivKey] = React.useState<string>("");
 
   React.useEffect(() => {
-    if (decryptedPrivKey && decryptedPrivKey.length > 0) {
-      setProvidedPrivKey(decryptedPrivKey);
+    const cleanedPrivKey = cleanShownKey(providedPrivKey);
+    setShownPrivKey(cleanedPrivKey);
+
+    const cleanedPubKey = cleanShownKey(providedPubKey);
+    setShownPubKey(cleanedPubKey);
+  }, [providedPubKey, providedPrivKey]);
+
+  React.useEffect(() => {
+    if (!providedPrivKey && decryptedPrivKey) {
+      handleHidePrivKey();
     }
-  }, [decryptedPrivKey, setProvidedPrivKey]);
+
+    // after 3.5 sec update providedPrivKey
+    // to encrypted value
+    if (providedPrivKey != decryptedPrivKey) {
+      setProvidedPrivKey(encPrivKey);
+    }
+
+    if (decryptedPrivKey && decryptedPrivKey.length > 0) {
+      const cleanedPrivKey = cleanShownKey(decryptedPrivKey);
+      setShownPrivKey(cleanedPrivKey);
+
+      const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
+      setProvidedPrivKey(formattedDecPrivKey);
+    }
+  }, [decryptedPrivKey]);
 
   // Manual public key input handling
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProvidedPubKey(e.target.value);
+    const cleaned = cleanKey(e.target.value);
+    setProvidedPubKey(cleaned);
   };
 
   // Manual private key input handling
   const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProvidedPrivKey(e.target.value);
+    const cleaned = cleanKey(e.target.value);
+    setProvidedPrivKey(cleaned);
   };
 
   const resetState = () => {
     // Clear all form inputs and state variables
     setFolderName("");
     setPassphrase("");
-    setProvidedPrivKey("");
-    setProvidedPubKey("");
     clearPub();
+    clearEnKey();
     clearPriv();
     clearPair();
     handleHidePrivKey();
@@ -208,14 +236,13 @@ export default function ShareSymEnc({ data }: Props) {
             </Label>
             <Input
               id="publicKey"
-              className="w-full"
               placeholder="Public Key"
-              value={providedPubKey || ""}
+              value={shownPubKey || ""}
               onChange={handlePublicKeyChange}
             />
           </div>
 
-          <div className="space-y-2 mt-4">
+          <div className="space-y-2 mt-4 gap-4">
             <Label
               htmlFor="privateKey"
               className="block text-sm font-medium text-foreground dark:text-foreground-dark"
@@ -241,7 +268,7 @@ export default function ShareSymEnc({ data }: Props) {
               </>
             ) : (
               providedPrivKey && (
-                <>
+                <div className="space-x-2">
                   <em className="text-sm text-red-500">
                     Please decrypt your private key.
                   </em>
@@ -249,15 +276,14 @@ export default function ShareSymEnc({ data }: Props) {
                     onSubmit={handleDecryptPrivKey}
                     keyName={providedPrivKey}
                   />
-                </>
+                </div>
               )
             )}
             <Input
               id="privateKey"
-              className="w-full"
               placeholder="Private Key"
               type={isPrivateKeyVisible ? "text" : "password"}
-              value={providedPrivKey || ""}
+              value={shownPrivKey || ""}
               onChange={handlePrivateKeyChange}
             />
           </div>
