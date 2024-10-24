@@ -2,6 +2,7 @@ package validation
 
 import (
 	"MindLockr/server/cryptography/cryptohelper"
+	"MindLockr/server/filesystem/keys"
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rsa"
@@ -19,8 +20,15 @@ type ECDSASignature struct {
 
 type Validator struct{}
 
-func (v *Validator) VerifyData(data, sig, pubKey, pgpType string) (bool, error) {
-	switch pgpType {
+func (v *Validator) VerifyData(data, sig, pubKey string) (bool, error) {
+	fmt.Println("pubKey: ", pubKey)
+	kd := keys.KeyTypeDetection{}
+	alg, err := kd.DetectKeyType(pubKey)
+	if err != nil {
+		return false, fmt.Errorf("error ocurred while detecting key type: ", err)
+	}
+
+	switch alg {
 	case "ECC":
 		return verifyWithECC(data, sig, pubKey)
 	case "RSA":

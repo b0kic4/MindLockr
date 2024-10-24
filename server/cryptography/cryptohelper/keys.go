@@ -9,23 +9,45 @@ import (
 	"strings"
 )
 
-func RemovePEMBlocks(pemKey string) string {
+func RemovePEMBlocks(pemKey string) (string, error) {
+	// FIXME: NEED TO INSCPECT THIS FUNC
+	// TRY TO FORMAT THE KEYS ON THE FRONT PROPERLY
+	// I think maybe when new lines \n are in the string
+	// the white space between the words stays
+	// example:
+	// PGP
+	// public key
+	// into: PGP publickey but should be: PGPpublickey
 	cleanedKey := strings.ReplaceAll(pemKey, "-----BEGIN PGP PRIVATE KEY-----", "")
 	cleanedKey = strings.ReplaceAll(cleanedKey, "-----END PGP PRIVATE KEY-----", "")
 	cleanedKey = strings.ReplaceAll(cleanedKey, "-----BEGIN PGP PUBLIC KEY-----", "")
 	cleanedKey = strings.ReplaceAll(cleanedKey, "-----END PGP PUBLIC KEY-----", "")
 
+	// Remove all unnecessary spaces, newlines, and carriage returns
 	cleanedKey = strings.ReplaceAll(cleanedKey, "\n", "")
 	cleanedKey = strings.ReplaceAll(cleanedKey, "\r", "")
-
 	cleanedKey = strings.TrimSpace(cleanedKey)
 
-	return cleanedKey
+	// Remove all spaces within the base64 string
+	cleanedKey = strings.ReplaceAll(cleanedKey, " ", "")
+
+	fmt.Println("cleanedKey before return:\n ", cleanedKey)
+
+	// Check if the cleaned key is valid base64
+	_, err := base64.StdEncoding.DecodeString(cleanedKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode cleaned key: %v", err)
+	}
+
+	return cleanedKey, nil
 }
 
 // ECC
 func ParseECCPublicKey(pubKey string) (*ecdsa.PublicKey, error) {
-	cleanedKey := RemovePEMBlocks(pubKey)
+	cleanedKey, err := RemovePEMBlocks(pubKey)
+	if err != nil {
+		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
+	}
 
 	fmt.Println("cleanedKey: ", cleanedKey)
 
@@ -45,7 +67,10 @@ func ParseECCPublicKey(pubKey string) (*ecdsa.PublicKey, error) {
 }
 
 func ParseECCPrivateKey(privKey string) (*ecdsa.PrivateKey, error) {
-	cleanedKey := RemovePEMBlocks(privKey)
+	cleanedKey, err := RemovePEMBlocks(privKey)
+	if err != nil {
+		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
+	}
 
 	fmt.Println("cleanedKey: ", cleanedKey)
 
@@ -62,7 +87,10 @@ func ParseECCPrivateKey(privKey string) (*ecdsa.PrivateKey, error) {
 
 // RSA
 func ParseRSAPublicKey(pubKey string) (*rsa.PublicKey, error) {
-	cleanedKey := RemovePEMBlocks(pubKey)
+	cleanedKey, err := RemovePEMBlocks(pubKey)
+	if err != nil {
+		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
+	}
 
 	fmt.Println("cleanedKey: ", cleanedKey)
 
@@ -79,7 +107,10 @@ func ParseRSAPublicKey(pubKey string) (*rsa.PublicKey, error) {
 }
 
 func ParseRSAPrivateKey(privKey string) (*rsa.PrivateKey, error) {
-	cleanedKey := RemovePEMBlocks(privKey)
+	cleanedKey, err := RemovePEMBlocks(privKey)
+	if err != nil {
+		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
+	}
 
 	fmt.Println("cleanedKey: ", cleanedKey)
 

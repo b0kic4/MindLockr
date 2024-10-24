@@ -2,6 +2,7 @@ package hybriddecryption
 
 import (
 	"MindLockr/server/cryptography/cryptohelper"
+	"MindLockr/server/filesystem/keys"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/ecdh"
@@ -14,17 +15,23 @@ import (
 
 type HybridPassphraseDecryption struct{}
 
-func (hpd *HybridPassphraseDecryption) DecryptPassphrase(encryptedPassphraseB64 string, privKeyB64 string, pgpType string) (string, error) {
+func (hpd *HybridPassphraseDecryption) DecryptPassphrase(encryptedPassphraseB64 string, privKey string) (string, error) {
+	kd := keys.KeyTypeDetection{}
+	alg, err := kd.DetectKeyType(privKey)
+	if err != nil {
+		return "", fmt.Errorf("error ocurred while detecting key type: ", err)
+	}
+
 	encPassphrase, err := base64.StdEncoding.DecodeString(encryptedPassphraseB64)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode encrypted passphrase: %v", err)
 	}
 
-	switch pgpType {
+	switch alg {
 	case "ECC":
-		return decryptWithECC(encPassphrase, privKeyB64)
+		return decryptWithECC(encPassphrase, privKey)
 	case "RSA":
-		return decryptWithRSA(encPassphrase, privKeyB64)
+		return decryptWithRSA(encPassphrase, privKey)
 	default:
 		return "", fmt.Errorf("unsupported key type")
 	}
