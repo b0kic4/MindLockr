@@ -31,8 +31,6 @@ func RemovePEMBlocks(pemKey string) (string, error) {
 	// Remove all spaces within the base64 string
 	cleanedKey = strings.ReplaceAll(cleanedKey, " ", "")
 
-	fmt.Println("cleanedKey before return:\n ", cleanedKey)
-
 	// Check if the cleaned key is valid base64
 	_, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
