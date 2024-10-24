@@ -25,7 +25,7 @@ func (v *Validator) VerifyData(data, sig, pubKey string) (bool, error) {
 	kd := keys.KeyTypeDetection{}
 	alg, err := kd.DetectKeyType(pubKey)
 	if err != nil {
-		return false, fmt.Errorf("error ocurred while detecting key type: ", err)
+		return false, fmt.Errorf("error ocurred while detecting key type: %s", err)
 	}
 
 	switch alg {
