@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
+import { cleanKey } from "@/lib/utils/useCleanKey";
 import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
 import {
   GetEncryptionFromSignature,
@@ -14,15 +15,6 @@ import { LogError } from "@wailsjs/runtime/runtime";
 import { EyeIcon, EyeOffIcon, XSquareIcon } from "lucide-react";
 import React from "react";
 import { PacmanLoader } from "react-spinners";
-
-const cleanKey = (key: string) => {
-  let cleanedKey = key
-    .replace(/\n/g, "")
-    .replace(/\r/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-  return cleanedKey;
-};
 
 const PassphraseFormDecryption = () => {
   // form inputs
@@ -216,7 +208,8 @@ const SignatureFormValidation = () => {
   };
 
   const handlePubKeyChange = (pubKey: string) => {
-    setPubKey(pubKey);
+    const cleanedKey = cleanKey(pubKey);
+    setPubKey(cleanedKey);
   };
 
   return (

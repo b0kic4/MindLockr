@@ -44,8 +44,6 @@ export default function KeysGen() {
     selectedPgpKeyPair,
     providedPubKey,
     providedPrivKey,
-    setProvidedPrivKey,
-    setProvidedPubKey,
     clearEnKey,
     clearPriv,
     clearPub,
