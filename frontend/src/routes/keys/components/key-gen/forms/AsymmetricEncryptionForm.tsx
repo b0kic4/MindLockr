@@ -3,11 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import {
-  cleanKey,
-  appendPgpBlockToKey,
-  cleanShownKey,
-} from "@/lib/utils/useCleanKey";
+import { cleanShownKey } from "@/lib/utils/useCleanKey";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";

@@ -68,8 +68,6 @@ func ParseECCPrivateKey(privKey string) (*ecdsa.PrivateKey, error) {
 		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
 	}
 
-	fmt.Println("cleanedKey: ", cleanedKey)
-
 	privKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding private key: %v", err)
