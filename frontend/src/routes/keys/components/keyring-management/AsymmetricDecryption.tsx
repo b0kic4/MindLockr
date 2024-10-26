@@ -9,47 +9,15 @@ import {
   GetEncryptionFromSignature,
   LoadAsymmetricEnData,
 } from "@wailsjs/go/keys/KeyRetrieve";
-import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
+import {
+  DecryptAES,
+  PerformEveryDecryption,
+} from "@wailsjs/go/symmetricdecryption/Cryptography";
 import { VerifyData } from "@wailsjs/go/validation/Validator";
-import { LogError } from "@wailsjs/runtime/runtime";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { EyeIcon, EyeOffIcon, XSquareIcon } from "lucide-react";
 import React from "react";
 import { PacmanLoader } from "react-spinners";
-
-// so the message should be in the pgp pem block format
-// and we should have the decryption of the message with
-// private key.
-//
-// we should have 3 options:
-// 1. decrypting with passphrase if user knows the passphrase
-// and the passphrase is returned if the user provides the senders private key
-// 2. decrypting with private key - we have covered this
-// 3. validaiton and signing
-// we should also let the user sign or not the data
-// if the user does not sign the data we should tell them that
-// they cannot retrieve the passphrase that is used, also the reciever
-// cannot validate if the sender is actual sender of the data
-//
-// HOW?
-// so message is encrypted with AES symmetric enc
-// the passphrase is encrypted with asymmetric encrytpion
-// we should pass the private key of the reciever
-// and that will decrypt the passphrase.
-// Then we take the decyrpted passphrase and decrypt
-// the actual message with the decrypted passphrase
-//
-// The user should not be able to see the passphrase
-// an any time we do all of that on the server and we
-// are just returning the data that is decrypted
-//
-// validation should also be performed directly from
-// the encrypted message, we should have an option
-// perform validation, providing the senders public key
-// and then it returns if the data has valid sender
-//
-// how should import work?
-// importing the encrypted message:
-// 1. We are
 
 const PassphraseFormDecryption = () => {
   // form inputs
@@ -320,6 +288,8 @@ const SymmetricDataDecryptionForm = () => {
   const displayPath = selectedFile
     ? selectedFile.path.split("/").slice(-3).join("/")
     : "";
+
+  // if type of object or if type of string
 
   const handleDecrypt = async () => {
     try {

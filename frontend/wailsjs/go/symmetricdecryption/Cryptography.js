@@ -5,3 +5,7 @@
 export function DecryptAES(arg1, arg2) {
   return window['go']['symmetricdecryption']['Cryptography']['DecryptAES'](arg1, arg2);
 }
+
+export function PerformEveryDecryption(arg1) {
+  return window['go']['symmetricdecryption']['Cryptography']['PerformEveryDecryption'](arg1);
+}
