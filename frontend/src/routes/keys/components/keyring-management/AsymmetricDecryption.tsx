@@ -9,9 +9,12 @@ import {
   GetEncryptionFromSignature,
   LoadAsymmetricEnData,
 } from "@wailsjs/go/keys/KeyRetrieve";
-import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
+import {
+  DecryptAES,
+  PerformEveryDecryption,
+} from "@wailsjs/go/symmetricdecryption/Cryptography";
 import { VerifyData } from "@wailsjs/go/validation/Validator";
-import { LogError } from "@wailsjs/runtime/runtime";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { EyeIcon, EyeOffIcon, XSquareIcon } from "lucide-react";
 import React from "react";
 import { PacmanLoader } from "react-spinners";
@@ -285,6 +288,8 @@ const SymmetricDataDecryptionForm = () => {
   const displayPath = selectedFile
     ? selectedFile.path.split("/").slice(-3).join("/")
     : "";
+
+  // if type of object or if type of string
 
   const handleDecrypt = async () => {
     try {

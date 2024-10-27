@@ -31,36 +31,37 @@ export default function PGPKeys() {
 
   return (
     <div className="p-6 rounded shadow-md">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold text-foreground dark:text-foreground-dark">
-          Your PGP Keys
-        </h2>
-        <PgpKeysGenForm fetchPgpKeys={fetchPgpKeys} />
-      </div>
+      <div className="mb-4 flex items-center gap-4">
+        <div className="flex items-center flex-grow max-w-md relative">
+          <div className="absolute  left-3 text-gray-400">
+            <TextSearchIcon />
+          </div>
+          <Input
+            type="text"
+            placeholder="Search PGP Keys"
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-      <Select value={selectedType} onValueChange={setSelectedType}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Filter by Key Type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="ECC">ECC</SelectItem>
-            <SelectItem value="RSA">RSA</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+        <div className="flex-shrink-0">
+          <Select value={selectedType} onValueChange={setSelectedType}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by Key Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="ECC">ECC</SelectItem>
+                <SelectItem value="RSA">RSA</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="relative flex items-center text-foreground dark:text-foreground-dark max-w-xs mt-4">
-        <Input
-          type="text"
-          placeholder="Search PGP Keys"
-          className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <div className="absolute left-3 text-gray-400">
-          <TextSearchIcon />
+        <div className="ml-auto">
+          <PgpKeysGenForm fetchPgpKeys={fetchPgpKeys} />
         </div>
       </div>
 

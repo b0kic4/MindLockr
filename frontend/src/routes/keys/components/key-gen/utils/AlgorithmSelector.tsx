@@ -5,7 +5,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import AlgorithmTypeDescription from "./AlgorithmTypeDescription";
 
 type Props = {
   algorithm: string;
@@ -49,7 +48,6 @@ export default function AlgorithmSelector({
               </SelectItem>
             </SelectContent>
           </Select>
-          <AlgorithmTypeDescription algorithmType={algorithmType} />
         </>
       )}
     </>

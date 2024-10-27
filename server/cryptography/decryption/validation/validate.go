@@ -21,7 +21,6 @@ type ECDSASignature struct {
 type Validator struct{}
 
 func (v *Validator) VerifyData(data, sig, pubKey string) (bool, error) {
-	fmt.Println("pubKey: ", pubKey)
 	kd := keys.KeyTypeDetection{}
 	alg, err := kd.DetectKeyType(pubKey)
 	if err != nil {

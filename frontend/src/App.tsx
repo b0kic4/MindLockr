@@ -4,8 +4,6 @@ import { Sidebar } from "./components/shared/sidebar/Sidebar";
 import Home from "./routes/Home";
 import KeysNav from "./routes/keys/components/KeysNav";
 import KeyringManagement from "./routes/keys/KeyringManagement";
-import KeysGen from "./routes/keys/KeysGenerate";
-import KeysIE from "./routes/keys/KeysImportExport";
 import KeysSigningSignature from "./routes/keys/KeysSigningSignature";
 import PGPKeys from "./routes/keys/PGPKeys";
 
@@ -13,7 +11,9 @@ import PGPKeys from "./routes/keys/PGPKeys";
 const KeysLayout = () => {
   return (
     <div className="flex flex-col w-full h-full">
-      <KeysNav />
+      <div className="flex justify-center items-center">
+        <KeysNav />
+      </div>
       <div className="flex-1 overflow-y-auto p-4">
         <Outlet />
       </div>
@@ -32,8 +32,6 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/keys" element={<KeysLayout />}>
               <Route index element={<PGPKeys />} />
-              <Route path="generate" element={<KeysGen />} />
-              <Route path="import-export" element={<KeysIE />} />
               <Route path="keyring" element={<KeyringManagement />} />
               <Route path="signing" element={<KeysSigningSignature />} />
             </Route>

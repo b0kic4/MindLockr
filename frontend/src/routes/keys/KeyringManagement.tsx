@@ -7,6 +7,7 @@ import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile"
 import { KeyInfo } from "@/lib/types/keys";
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
+import KeysGenModal from "./components/key-gen/KeyGenModal";
 import AsymmetricDecryption from "./components/keyring-management/AsymmetricDecryption";
 import { FileTreeAccordion } from "./components/keyring-management/AsymmetricFileTreeAccordion";
 import { getKeyColumns } from "./components/keyring-management/KeyColumns";
@@ -73,12 +74,11 @@ export default function KeyringManagement() {
 
   return (
     <div className="p-6 bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
-      <div className="mb-4 flex items-center gap-3 max-w-lg">
-        <KeyTypeFilter
-          filterKeyType={filterKeyType}
-          setFilterKeyType={setFilterKeyType}
-        />
-        <div className="relative flex items-center text-foreground dark:text-foreground-dark">
+      <div className="mb-4 flex items-center">
+        <div className="flex items-center flex-grow max-w-md relative">
+          <div className="absolute  left-3 text-gray-400">
+            <TextSearchIcon />
+          </div>
           <Input
             type="text"
             placeholder="Search..."
@@ -86,12 +86,22 @@ export default function KeyringManagement() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <div className="absolute left-3 text-gray-400">
-            <TextSearchIcon />
-          </div>
+        </div>
+
+        <div className="ml-4 flex items-center">
+          <KeyTypeFilter
+            filterKeyType={filterKeyType}
+            setFilterKeyType={setFilterKeyType}
+          />
+        </div>
+
+        <div className="ml-auto">
+          <KeysGenModal fetchKeys={fetchKeys} />
         </div>
       </div>
+
       {renderContent()}
+
       {selectedKey && isDecrypted && (
         <DecryptedDataComponent
           keyInfo={selectedKey}
