@@ -96,7 +96,7 @@ export default function KeyringManagement() {
         </div>
 
         <div className="ml-auto">
-          <KeysGenModal />
+          <KeysGenModal fetchKeys={fetchKeys} />
         </div>
       </div>
 

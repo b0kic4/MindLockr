@@ -26,7 +26,11 @@ import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption
 import { hybridencryption } from "@wailsjs/go/models";
 import { LogError } from "@wailsjs/runtime/runtime";
 
-export default function KeysGenModal() {
+interface Props {
+  fetchKeys: () => Promise<void>;
+}
+
+export default function KeysGenModal({ fetchKeys }: Props) {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
@@ -177,6 +181,8 @@ export default function KeysGenModal() {
       setKeyFileName("");
       setEncryptedData("");
     }
+
+    await fetchKeys();
   };
   return (
     <Dialog>

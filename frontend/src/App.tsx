@@ -12,7 +12,9 @@ import PGPKeys from "./routes/keys/PGPKeys";
 const KeysLayout = () => {
   return (
     <div className="flex flex-col w-full h-full">
-      <KeysNav />
+      <div className="flex justify-center items-center">
+        <KeysNav />
+      </div>
       <div className="flex-1 overflow-y-auto p-4">
         <Outlet />
       </div>
