@@ -195,7 +195,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 text-black dark:text-gray-200">
         <DialogHeader>
           <DialogTitle>Key Generation & Encryption</DialogTitle>
           <DialogDescription>
