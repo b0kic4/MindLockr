@@ -82,10 +82,10 @@ export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow-lg transition-all"
+          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow-lg transition-all"
           variant="default"
         >
-          Generate PGP Keys
+          Generate New PGP Keys
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">

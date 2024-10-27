@@ -74,7 +74,7 @@ export default function KeyringManagement() {
 
   return (
     <div className="p-6 bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
-      <div className="mb-4 flex items-center gap">
+      <div className="mb-4 flex items-center">
         <div className="flex items-center flex-grow max-w-md relative">
           <div className="absolute  left-3 text-gray-400">
             <TextSearchIcon />
