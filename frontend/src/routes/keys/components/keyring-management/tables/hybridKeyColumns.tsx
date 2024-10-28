@@ -1,7 +1,3 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { keys } from "@wailsjs/go/models";
-import { LogInfo } from "@wailsjs/runtime/runtime";
-import { Search, KeyRound, Trash } from "lucide-react";
 import {
   Portal,
   Tooltip,
@@ -9,6 +5,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
+import { ColumnDef } from "@tanstack/react-table";
+import { keys } from "@wailsjs/go/models";
+import { LogInfo } from "@wailsjs/runtime/runtime";
+import { KeyRound, Search, Trash } from "lucide-react";
+
+// TODO:
+// So we are generating the hybrid files (3 of them)
+// into one single folder
+// when user wants to export the keys
+// we need to transform that into one .gpg or .pgp
+// file
 
 export const getHybridKeyColumns = (
   handleDelete: (file: any) => void,
@@ -24,13 +31,8 @@ export const getHybridKeyColumns = (
   return [
     {
       accessorKey: "name",
-      header: "File Name",
+      header: "Data Name",
       cell: ({ row }) => row.original.name,
-    },
-    {
-      accessorKey: "path",
-      header: "Folder Path",
-      cell: ({ row }) => row.original.path,
     },
     {
       accessorKey: "actions",
