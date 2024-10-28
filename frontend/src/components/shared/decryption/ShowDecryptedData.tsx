@@ -1,32 +1,36 @@
-import { PassphraseDialog } from "@/components/shared/decryption/PassphraseDialog";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { KeyInfo } from "@/lib/types/keys";
-import React from "react";
-import { PacmanLoader } from "react-spinners";
 import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
 import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
+import React, { useState } from "react";
+import { PacmanLoader } from "react-spinners";
 
 interface DecryptedDataProps {
   keyInfo: KeyInfo;
   onClose: () => void;
 }
 
-type DataToDecrypt = {
-  encryptedData: string;
-  passphrase: string;
-};
-
 const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
   keyInfo,
   onClose,
 }) => {
-  const [decryptedData, setDecryptedData] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [decryptedData, setDecryptedData] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const [passphrase, setPassphrase] = useState("");
 
-  // need to handle the onClose state
-
-  const handleDecryptPassphraseSubmit = async (passphrase: string) => {
+  const handleDecryptPassphraseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     try {
       const encryptedData = await LoadEncryptedKeyContent(
@@ -34,15 +38,10 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
         keyInfo.algorithm,
       );
 
-      const dataToDecrypt: DataToDecrypt = {
-        encryptedData: encryptedData,
-        passphrase: passphrase,
-      };
-
-      const decrypted = await DecryptAES(
-        keyInfo.algorithm as any,
-        dataToDecrypt,
-      );
+      const decrypted = await DecryptAES(keyInfo.algorithm as any, {
+        encryptedData,
+        passphrase,
+      });
 
       setDecryptedData(decrypted);
     } catch (error) {
@@ -58,41 +57,62 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="p-6 max-w-lg w-full rounded-lg shadow-lg">
-        {!decryptedData && (
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark dark:border-0">
+        <DialogHeader>
+          <DialogTitle>
+            Decrypt Key: {keyInfo.name.slice(0, 10) + "..."}
+          </DialogTitle>
+        </DialogHeader>
+
+        {!decryptedData ? (
           <>
             {isLoading ? (
               <div className="flex justify-center items-center">
                 <PacmanLoader size={8} color="#fff" />
               </div>
             ) : (
-              <PassphraseDialog
-                onClose={onClose}
-                onSubmit={handleDecryptPassphraseSubmit}
-                keyName={keyInfo.name}
-              />
+              <form onSubmit={handleDecryptPassphraseSubmit}>
+                <div className="mb-4">
+                  <Input
+                    type="password"
+                    placeholder="Enter Passphrase"
+                    value={passphrase}
+                    onChange={(e) => setPassphrase(e.target.value)}
+                    required
+                    className="w-full"
+                  />
+                </div>
+                <DialogFooter>
+                  <Button type="submit">Decrypt</Button>
+                  <DialogClose asChild>
+                    <Button variant="ghost" onClick={onClose}>
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </form>
             )}
           </>
-        )}
-        {decryptedData && (
-          <div className="mt-6 p-4 bg-background dark:bg-background-dark rounded-lg">
-            <h3 className="text-lg font-semibold text-foreground dark:text-foreground-dark mb-2">
-              Decrypted Data
-            </h3>
-            <pre className="whitespace-pre-wrap text-gray-700 bg-gray-100 p-2 rounded-lg mb-4">
+        ) : (
+          <div className="p-4 bg-gray-100 rounded-md">
+            <pre className="whitespace-pre-wrap text-gray-700">
               {decryptedData}
             </pre>
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none"
-            >
-              Close
-            </button>
           </div>
         )}
-      </div>
-    </div>
+
+        {decryptedData && (
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="ghost" onClick={onClose}>
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -9,12 +9,9 @@ import {
   GetEncryptionFromSignature,
   LoadAsymmetricEnData,
 } from "@wailsjs/go/keys/KeyRetrieve";
-import {
-  DecryptAES,
-  PerformEveryDecryption,
-} from "@wailsjs/go/symmetricdecryption/Cryptography";
+import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
 import { VerifyData } from "@wailsjs/go/validation/Validator";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
+import { LogError } from "@wailsjs/runtime/runtime";
 import { EyeIcon, EyeOffIcon, XSquareIcon } from "lucide-react";
 import React from "react";
 import { PacmanLoader } from "react-spinners";

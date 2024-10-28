@@ -32,16 +32,9 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
   };
 
   return (
-    <Dialog
-      defaultOpen
-      onOpenChange={(open) => {
-        if (!open) {
-          onClose();
-        }
-      }}
-    >
+    <Dialog>
       <DialogTrigger>
-        <KeyRound />
+        <KeyRound className="w-5 h-5 text-green-500 hover:text-green-500 text-center" />
       </DialogTrigger>
       <DialogContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark dark:border-0">
         <DialogHeader>
@@ -64,7 +57,9 @@ export const PassphraseDialog: React.FC<PassphraseDialogProps> = ({
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit">Decrypt</Button>
+            <DialogClose>
+              <Button type="submit">Decrypt</Button>
+            </DialogClose>
           </DialogFooter>
         </form>
       </DialogContent>

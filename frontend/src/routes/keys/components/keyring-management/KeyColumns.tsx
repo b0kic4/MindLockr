@@ -1,36 +1,32 @@
+import DecryptedDataComponent from "@/components/shared/decryption/ShowDecryptedData";
 import ShareSymEnc from "@/components/shared/encryption/ShareSymEnc";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { KeyInfo } from "@/lib/types/keys";
 import { Portal } from "@radix-ui/react-portal";
 import { createColumnHelper } from "@tanstack/react-table";
-import { KeyRound, Trash } from "lucide-react";
+import { KeyRound } from "lucide-react";
+import { useState } from "react";
+import DeleteKeyDialog from "./DeleteKeyDialog";
 
-interface KeyInfo {
-  name: string;
-  algorithm: string;
-  type: "Symmetric" | "Asymmetric";
-}
-
-export const getKeyColumns = (
-  handleDelete: (key: KeyInfo) => void,
-  handleDecrypt: (key: KeyInfo) => void,
-) => {
+export const getKeyColumns = (handleDelete: (key: KeyInfo) => void) => {
   const columnHelper = createColumnHelper<KeyInfo>();
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [currentKey, setCurrentKey] = useState<KeyInfo | null>(null);
+
+  const handleOpenDialog = (key: KeyInfo) => {
+    setCurrentKey(key);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setCurrentKey(null);
+  };
 
   return [
     columnHelper.accessor("name", {
@@ -52,53 +48,56 @@ export const getKeyColumns = (
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 justify-center items-center">
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger>
                 <button
-                  onClick={() => handleDecrypt(row.original)}
-                  aria-label={`Decrypt key ${row.original.name}`}
+                  aria-label="Decrypt"
+                  onClick={() => handleOpenDialog(row.original)}
                 >
                   <KeyRound className="w-5 h-5 text-green-500 hover:text-green-500" />
                 </button>
               </TooltipTrigger>
               <Portal>
-                <TooltipContent className="z-50 p-2 bg-white ">
+                <TooltipContent className="z-50 p-2 bg-white">
                   <p className="text-sm">Decrypt</p>
                 </TooltipContent>
               </Portal>
             </Tooltip>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <button aria-label={`Delete key ${row.original.name}`}>
-                  <Trash className="w-5 h-5 text-red-500" />
-                </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your encrypted file and remove its data from your
-                    filesystem.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="border-0">
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => handleDelete(row.original)}
-                    aria-label={`Delete key ${row.original.name}`}
-                  >
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+
+            {openDialog && currentKey && (
+              <DecryptedDataComponent
+                keyInfo={currentKey}
+                onClose={handleCloseDialog}
+              />
+            )}
+
+            <Tooltip>
+              <TooltipTrigger>
+                <DeleteKeyDialog
+                  keyInfo={row.original}
+                  onDelete={handleDelete}
+                />
+              </TooltipTrigger>
+              <Portal>
+                <TooltipContent className="z-50 p-2 bg-white">
+                  <p className="text-sm">Delete key</p>
+                </TooltipContent>
+              </Portal>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger>
+                <ShareSymEnc data={row.original} />
+              </TooltipTrigger>
+              <Portal>
+                <TooltipContent className="z-50 p-2 bg-white">
+                  <p className="text-sm">Transform into hybrid encryption</p>
+                </TooltipContent>
+              </Portal>
+            </Tooltip>
           </TooltipProvider>
-          <ShareSymEnc data={row.original} />
         </div>
       ),
       meta: { align: "right" },
