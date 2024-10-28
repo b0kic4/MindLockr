@@ -1,50 +1,62 @@
-import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
-import { useDeleteKey } from "@/hooks/keys/useDeleteKey";
+import { useHybDeleteKey, useSymDeleteKey } from "@/hooks/keys/useDeleteKey";
 import { useKeys } from "@/hooks/keys/useKeys";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
+import { SymmetricDataTable } from "@/routes/keys/components/keyring-management/tables/symmetric-table";
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
 import KeysGenModal from "./components/key-gen/KeyGenModal";
 import AsymmetricDecryption from "./components/keyring-management/AsymmetricDecryption";
-import { FileTreeAccordion } from "./components/keyring-management/AsymmetricFileTreeAccordion";
-import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
+import { HybridDataTable } from "./components/keyring-management/tables/hybrid-table";
+import { getHybridKeyColumns } from "./components/keyring-management/tables/hybridKeyColumns";
+import { getSymmetricKeyColumns } from "./components/keyring-management/tables/symmetricKeyColumns";
 
 export default function KeyringManagement() {
   const { keys, fetchKeys } = useKeys();
   const [filterKeyType, setFilterKeyType] = React.useState<string>("Symmetric");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
 
-  const { handleDelete } = useDeleteKey({ fetchKeys });
+  const { handleSymDelete } = useSymDeleteKey({ fetchKeys });
+  const { handleHybDelete } = useHybDeleteKey({ fetchKeys });
   const { selectedFile } = useSelectedAsymmetricFileStore();
 
-  const columns = React.useMemo(
-    () => getKeyColumns(handleDelete),
-    [handleDelete],
+  const symcolumns = React.useMemo(
+    () => getSymmetricKeyColumns(handleSymDelete),
+    [handleSymDelete],
+  );
+
+  const hybcolumns = React.useMemo(
+    () => getHybridKeyColumns(handleHybDelete),
+    [handleHybDelete],
   );
 
   const symmetricFilteredKeys = keys.symmetric.filter((key) =>
     key.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const hybridFilteredKeys = keys.asymmetric.filter((key) =>
+    key.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // in the hybrid encryption table
+  // we should have the
+  // verify button
+  // decrypt button
+  //
+  // we should have a in Select => ALL, SYMMETRIC and HYBRID (ASYMMETRIC)
+
   const renderContent = () => {
     if (filterKeyType === "Symmetric") {
-      return <DataTable data={symmetricFilteredKeys} columns={columns} />;
+      return (
+        <SymmetricDataTable data={symmetricFilteredKeys} columns={symcolumns} />
+      );
     } else if (filterKeyType === "Asymmetric") {
       return (
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4">
-            <FileTreeAccordion />
-          </div>
-          <div className="col-span-8">
-            {selectedFile ? (
-              <AsymmetricDecryption />
-            ) : (
-              <p className="text-center text-muted">Select a key to decrypt</p>
-            )}
-          </div>
-        </div>
+        <HybridDataTable
+          data={hybridFilteredKeys}
+          columns={hybcolumns as any}
+        />
       );
     } else {
       return (

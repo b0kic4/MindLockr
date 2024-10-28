@@ -18,7 +18,10 @@ interface DataTableProps<TData> {
   columns: ColumnDef<TData, any>[];
 }
 
-export function DataTable<TData>({ data, columns }: DataTableProps<TData>) {
+export function SymmetricDataTable<TData>({
+  data,
+  columns,
+}: DataTableProps<TData>) {
   const table = useReactTable({
     data,
     columns,

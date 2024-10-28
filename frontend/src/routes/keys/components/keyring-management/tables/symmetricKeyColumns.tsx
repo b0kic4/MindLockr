@@ -11,9 +11,11 @@ import { Portal } from "@radix-ui/react-portal";
 import { createColumnHelper } from "@tanstack/react-table";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
-import DeleteKeyDialog from "./DeleteKeyDialog";
+import DeleteKeyDialog from "../DeleteKeyDialog";
 
-export const getKeyColumns = (handleDelete: (key: KeyInfo) => void) => {
+export const getSymmetricKeyColumns = (
+  handleDelete: (key: KeyInfo) => void,
+) => {
   const columnHelper = createColumnHelper<KeyInfo>();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [currentKey, setCurrentKey] = useState<KeyInfo | null>(null);
