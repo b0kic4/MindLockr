@@ -154,9 +154,12 @@ export namespace keys {
 	    }
 	}
 	export class RequestData {
+	    Email: string;
+	    Name: string;
 	    EnType: string;
 	    Usage: string;
 	    Passphrase: string;
+	    Curve: string;
 	    Bits: number;
 	
 	    static createFrom(source: any = {}) {
@@ -165,9 +168,12 @@ export namespace keys {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Email = source["Email"];
+	        this.Name = source["Name"];
 	        this.EnType = source["EnType"];
 	        this.Usage = source["Usage"];
 	        this.Passphrase = source["Passphrase"];
+	        this.Curve = source["Curve"];
 	        this.Bits = source["Bits"];
 	    }
 	}

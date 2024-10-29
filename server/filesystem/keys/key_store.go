@@ -32,9 +32,7 @@ func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent, algorithm
 // 2. opening file for writing
 // 3. writing the encrypted key to file
 
-// passing privKey as string because we are
-// storing the encrypted value in here
-func SavePgpPrivKey(privKey, keyName string) error {
+func SavePgpPrivKey(privKeyArmor string, keyName string, enType string) error {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
 
@@ -42,22 +40,17 @@ func SavePgpPrivKey(privKey, keyName string) error {
 		return fmt.Errorf("Please initialize the folder where you want to store private key")
 	}
 
-	keysDir := filepath.Join(folderPath, "pgp", keyName)
+	// Include the encryption type in the path
+	keysDir := filepath.Join(folderPath, "pgp", enType, keyName)
 
-	err := os.MkdirAll(keysDir, os.ModePerm)
+	err := os.MkdirAll(keysDir, 0700) // Set directory permissions to 0700
 	if err != nil {
 		return fmt.Errorf("failed to create keys directory: %v", err)
 	}
 
-	keyFilePath := filepath.Join(keysDir, "private.pem")
+	keyFilePath := filepath.Join(keysDir, "private.asc") // Use .asc extension
 
-	file, err := os.OpenFile(keyFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
-	if err != nil {
-		return fmt.Errorf("failed to open private key file: %v", err)
-	}
-	defer file.Close()
-
-	_, err = file.WriteString(privKey)
+	err = os.WriteFile(keyFilePath, []byte(privKeyArmor), 0600) // Use 0600 permissions
 	if err != nil {
 		return fmt.Errorf("failed to write private key to file: %v", err)
 	}
@@ -69,7 +62,7 @@ func SavePgpPrivKey(privKey, keyName string) error {
 // 2. open the file for writing
 // 3. write the public key to the file
 
-func SavePgpPublicKey(pubKey []byte, keyName string) error {
+func SavePgpPublicKey(pubKeyArmor string, keyName string, enType string) error {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
 
@@ -77,22 +70,17 @@ func SavePgpPublicKey(pubKey []byte, keyName string) error {
 		return fmt.Errorf("Please initialize the folder where you want to store public key")
 	}
 
-	keysDir := filepath.Join(folderPath, "pgp", keyName)
+	// Include the encryption type in the path
+	keysDir := filepath.Join(folderPath, "pgp", enType, keyName)
 
-	err := os.MkdirAll(keysDir, os.ModePerm)
+	err := os.MkdirAll(keysDir, 0755) // Set directory permissions to 0755
 	if err != nil {
 		return fmt.Errorf("failed to create keys directory: %v", err)
 	}
 
-	keyFilePath := filepath.Join(keysDir, "public.pem")
+	keyFilePath := filepath.Join(keysDir, "public.asc") // Use .asc extension
 
-	file, err := os.OpenFile(keyFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to open public key file: %v", err)
-	}
-	defer file.Close()
-
-	_, err = file.Write(pubKey)
+	err = os.WriteFile(keyFilePath, []byte(pubKeyArmor), 0644) // Use 0644 permissions
 	if err != nil {
 		return fmt.Errorf("failed to write public key to file: %v", err)
 	}

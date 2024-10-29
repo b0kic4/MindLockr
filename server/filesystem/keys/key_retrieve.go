@@ -214,7 +214,7 @@ func (kr *KeyRetrieve) getPgpKeysFromDirectory(basePath string, keyType string) 
 }
 
 func (kr *KeyRetrieve) RetrievePgpPubKey(keyFolderPath string) (string, error) {
-	pubKeyPath := filepath.Join(keyFolderPath, "public.pem")
+	pubKeyPath := filepath.Join(keyFolderPath, "public.asc")
 
 	pubKeyPEM, err := os.ReadFile(pubKeyPath)
 	if err != nil {
@@ -225,7 +225,7 @@ func (kr *KeyRetrieve) RetrievePgpPubKey(keyFolderPath string) (string, error) {
 }
 
 func (kr *KeyRetrieve) RetrievePgpPrivKey(keyFolderPath string) (string, error) {
-	privKeyPath := filepath.Join(keyFolderPath, "private.pem")
+	privKeyPath := filepath.Join(keyFolderPath, "private.asc")
 
 	encryptedPrivKeyHex, err := os.ReadFile(privKeyPath)
 	if err != nil {

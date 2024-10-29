@@ -6,7 +6,6 @@ import { SymmetricDataTable } from "@/routes/keys/components/keyring-management/
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
 import KeysGenModal from "./components/key-gen/KeyGenModal";
-import AsymmetricDecryption from "./components/keyring-management/AsymmetricDecryption";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
 import { HybridDataTable } from "./components/keyring-management/tables/hybrid-table";
 import { getHybridKeyColumns } from "./components/keyring-management/tables/hybridKeyColumns";

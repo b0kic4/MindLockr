@@ -10,6 +10,12 @@ require (
 )
 
 require (
+	github.com/ProtonMail/go-crypto v1.1.0-beta.0-proton // indirect
+	github.com/cloudflare/circl v1.3.7 // indirect
+)
+
+require (
+	github.com/ProtonMail/gopenpgp/v3 v3.0.0-beta.2-proton
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
