@@ -53,7 +53,7 @@ export default function AsymmetricKeyEncryptionForm() {
       const cleanedPrivKey = cleanShownKey(decryptedPrivKey);
       setShownPrivKey(cleanedPrivKey);
 
-      const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
+      const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
       setProvidedPrivKey(formattedDecPrivKey);
     }
   }, [decryptedPrivKey]);
@@ -65,7 +65,7 @@ export default function AsymmetricKeyEncryptionForm() {
     const cleanedPubKey = cleanShownKey(rawPubKey);
     setShownPubKey(cleanedPubKey);
 
-    const formattedPubKey = `-----BEGIN PGP PUBLIC KEY-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY-----`;
+    const formattedPubKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY BLOCK-----`;
     setProvidedPubKey(formattedPubKey);
   };
 
@@ -77,7 +77,7 @@ export default function AsymmetricKeyEncryptionForm() {
 
     setShownPrivKey(cleanedPrivKey);
 
-    const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
+    const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
     setProvidedPrivKey(formattedPrivKey);
   };
 

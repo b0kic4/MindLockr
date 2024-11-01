@@ -26,7 +26,7 @@ export default function NumberOfBitsRSA() {
         <SelectGroup>
           <SelectLabel>Bits</SelectLabel>
           <SelectItem value="3072">3072</SelectItem>
-          <SelectItem value="4096">4096 (high security)</SelectItem>
+          <SelectItem value="4096">4096</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

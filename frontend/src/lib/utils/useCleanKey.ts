@@ -2,23 +2,23 @@ export const appendPgpBlockToKey = (key: string, type: string) => {
   // FIXME:
   // this is not being used we are appending
   // in the form like this:
-  // const formattedPubKey = `-----BEGIN PGP PUBLIC KEY-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY-----`;
-  // const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
+  // const formattedPubKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY BLOCK-----`;
+  // const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
 
   // Ensure the key type is uppercase (PUBLIC or PRIVATE)
   const upperType = type.toUpperCase();
 
   // Define the expected header and footer
-  const header = `-----BEGIN PGP ${upperType} KEY-----`;
-  const footer = `-----END PGP ${upperType} KEY-----`;
+  const header = `-----BEGIN PGP ${upperType} KEY BLOCK-----`;
+  const footer = `-----END PGP ${upperType} KEY BLOCK-----`;
 
   // Create regex patterns to check for existing headers and footers
   const headerRegex = new RegExp(
-    `-----BEGIN\\s*PGP\\s*${upperType}\\s*KEY-----`,
+    `-----BEGIN\\s*PGP\\s*${upperType}\\s*KEY BLOCK-----`,
     "i",
   );
   const footerRegex = new RegExp(
-    `-----END\\s*PGP\\s*${upperType}\\s*KEY-----`,
+    `-----END\\s*PGP\\s*${upperType}\\s*KEY BLOCK-----`,
     "i",
   );
 
@@ -31,8 +31,8 @@ export const appendPgpBlockToKey = (key: string, type: string) => {
     return key;
   } else {
     // Remove any existing headers and footers to prevent duplication
-    let cleanedKey = key.replace(/-----BEGIN [A-Z\s]+ KEY-----/gi, "");
-    cleanedKey = cleanedKey.replace(/-----END [A-Z\s]+ KEY-----/gi, "");
+    let cleanedKey = key.replace(/-----BEGIN [A-Z\s]+ KEY BLOCK-----/gi, "");
+    cleanedKey = cleanedKey.replace(/-----END [A-Z\s]+ KEY BLOCK-----/gi, "");
     cleanedKey = cleanedKey.replace(/\s+/g, "").trim(); // Remove all whitespace
 
     // Split the content into lines of 64 characters
@@ -46,8 +46,8 @@ export const appendPgpBlockToKey = (key: string, type: string) => {
 
 export const cleanShownKey = (key: string) => {
   return key
-    .replace(/-----BEGIN [A-Z\s]+ KEY-----/g, "")
-    .replace(/-----END [A-Z\s]+ KEY-----/g, "")
+    .replace(/-----BEGIN [A-Z\s]+ KEY BLOCK-----/g, "")
+    .replace(/-----END [A-Z\s]+ KEY BLOCK-----/g, "")
     .replace(/\s+/g, "")
     .trim();
 };
@@ -56,19 +56,19 @@ export const cleanKey = (key: string) => {
   // Normalize headers and footers
   let normalizedKey = key
     .replace(
-      /-----BEGIN\s*PGP\s*(PUBLIC|PRIVATE)\s*KEY-----/gi,
+      /-----BEGIN\s*PGP\s*(PUBLIC|PRIVATE)\s*KEY BLOCK-----/gi,
       (match, p1) => `-----BEGIN PGP ${p1.toUpperCase()} KEY-----`,
     )
     .replace(
-      /-----END\s*PGP\s*(PUBLIC|PRIVATE)\s*KEY-----/gi,
+      /-----END\s*PGP\s*(PUBLIC|PRIVATE)\s*KEY BLOCK-----/gi,
       (match, p1) => `-----END PGP ${p1.toUpperCase()} KEY-----`,
     )
     .replace(
-      /-----BEGINPGP(PUBLIC|PRIVATE)KEY-----/gi,
+      /-----BEGINPGP(PUBLIC|PRIVATE)KEY BLOCK-----/gi,
       (match, p1) => `-----BEGIN PGP ${p1.toUpperCase()} KEY-----`,
     )
     .replace(
-      /-----ENDPGP(PUBLIC|PRIVATE)KEY-----/gi,
+      /-----ENDPGP(PUBLIC|PRIVATE)KEY BLOCK-----/gi,
       (match, p1) => `-----END PGP ${p1.toUpperCase()} KEY-----`,
     );
 
@@ -77,10 +77,10 @@ export const cleanKey = (key: string) => {
 
   // Extract headers and footers
   const headerMatch = normalizedKey.match(
-    /-----BEGIN PGP (PUBLIC|PRIVATE) KEY-----/,
+    /-----BEGIN PGP (PUBLIC|PRIVATE) KEY BLOCK-----/,
   );
   const footerMatch = normalizedKey.match(
-    /-----END PGP (PUBLIC|PRIVATE) KEY-----/,
+    /-----END PGP (PUBLIC|PRIVATE) KEY BLOCK-----/,
   );
 
   if (!headerMatch || !footerMatch) {
@@ -89,8 +89,8 @@ export const cleanKey = (key: string) => {
   }
 
   const keyType = headerMatch[1].toUpperCase();
-  const header = `-----BEGIN PGP ${keyType} KEY-----`;
-  const footer = `-----END PGP ${keyType} KEY-----`;
+  const header = `-----BEGIN PGP ${keyType} KEY BLOCK-----`;
+  const footer = `-----END PGP ${keyType} KEY BLOCK-----`;
 
   // Extract the content between header and footer
   const contentMatch = normalizedKey.match(
