@@ -44,9 +44,9 @@ type PgpKeyInfo struct {
 	Type       string `json:"type"`
 }
 
-func (kr *KeyRetrieve) LoadEncryptedKeyContent(keyName string, algorithmType string) (string, error) {
+func (kr *KeyRetrieve) LoadEncryptedKeyContent(keyName string) (string, error) {
 	folderPath := kr.folderInstance.GetFolderPath()
-	keyFilePath := filepath.Join(folderPath, "keys", "symmetric", algorithmType, keyName)
+	keyFilePath := filepath.Join(folderPath, "keys", "symmetric", keyName)
 
 	content, err := os.ReadFile(keyFilePath)
 	if err != nil {
@@ -111,49 +111,27 @@ func (kr *KeyRetrieve) GetEncryptionFromSignature(sigPath string) (string, error
 }
 
 func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
-	// Get the folder path from the instance
 	folderPath := kr.folderInstance.GetFolderPath()
 
-	// Define the keys subdirectory
 	keysBaseFolderPath := filepath.Join(folderPath, "keys/symmetric")
 
-	// Check if the base keys folder exists
 	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Keys folder does not exist at: %s", err)
+		return nil, fmt.Errorf("Keys folder does not exist at: %s", keysBaseFolderPath)
 	}
 
-	// Create a slice to store key file info
 	var keyFiles []KeyInfo
 
-	// Iterate through subdirectories (e.g., AES-128, AES-192, etc.)
-	subdirs, err := os.ReadDir(keysBaseFolderPath)
+	files, err := os.ReadDir(keysBaseFolderPath)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading keys folder: %v", err)
 	}
 
-	// Traverse through each subdirectory (which represents an algorithm)
-	for _, subdir := range subdirs {
-		if subdir.IsDir() {
-			algorithm := subdir.Name() // Use the folder name as the algorithm (e.g., AES-128)
-
-			// Path to the directory that contains the actual key files
-			algoDirPath := filepath.Join(keysBaseFolderPath, algorithm)
-
-			// Read all files in the algorithm directory
-			files, err := os.ReadDir(algoDirPath)
-			if err != nil {
-				return nil, fmt.Errorf("Error reading algorithm directory %s: %v", algorithm, err)
-			}
-
-			// Iterate over each file in the directory
-			for _, file := range files {
-				if !file.IsDir() {
-					keyFiles = append(keyFiles, KeyInfo{
-						Name:      file.Name(),
-						Algorithm: algorithm,
-					})
-				}
-			}
+	for _, file := range files {
+		if !file.IsDir() && file.Name() != ".DS_Store" {
+			keyFiles = append(keyFiles, KeyInfo{
+				Name:      file.Name(),
+				Algorithm: "AES-256",
+			})
 		}
 	}
 

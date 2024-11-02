@@ -37,14 +37,8 @@ export default function AlgorithmSelector({
               <SelectValue placeholder="Select AES Encryption Type" />
             </SelectTrigger>
             <SelectContent className="bg-card dark:bg-card-dark text-foreground dark:text-foreground-dark">
-              <SelectItem value="AES-128">
-                AES - 128 (16 character Passphrase)
-              </SelectItem>
-              <SelectItem value="AES-192">
-                AES - 192 (24 character Passphrase)
-              </SelectItem>
-              <SelectItem value="AES-256">
-                AES - 256 (32 character Passphrase)
+              <SelectItem defaultChecked value="AES-256">
+                AES - 256
               </SelectItem>
             </SelectContent>
           </Select>

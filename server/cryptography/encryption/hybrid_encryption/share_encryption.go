@@ -46,6 +46,19 @@ type SaveAsymmetricDataRequest struct {
 	FolderName          string
 }
 
+// I should implement:
+// 1. encrypt and sign function
+// 2. encrypt function
+// 3. sign function
+// 4. decrypt and validate
+// 5. validate
+// 6. decrypt
+//
+// See how the validation works, where is all of that binded
+// How when decrypting we are getting the message
+// Where is the reciptients public key binded
+// Where is the senders private key binded
+
 func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, error) {
 	var pubKey interface{}
 	var privKey interface{}

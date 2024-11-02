@@ -10,11 +10,11 @@ import (
 type KeyStore struct{}
 
 // SaveSymmetricKey saves a symmetric encryption key to the specified folder
-func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent, algorithmUsed string) error {
+func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent string) error {
 	// Ensure the 'keys/symmetric/algorithmUsed' subdirectory exists
-	keysDir := filepath.Join(folderPath, "keys/symmetric", algorithmUsed)
+	keysDir := filepath.Join(folderPath, "keys/symmetric")
 	if err := os.MkdirAll(keysDir, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create keys/symmetric/%s directory: %v", algorithmUsed, err)
+		return fmt.Errorf("failed to create keys/symmetric/%s directory: ", err)
 	}
 
 	// Create the full path for the key file (with .key extension)

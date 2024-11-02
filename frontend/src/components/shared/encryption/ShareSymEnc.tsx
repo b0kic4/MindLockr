@@ -134,7 +134,7 @@ export default function ShareSymEnc({ data }: Props) {
       return;
     }
 
-    const loadedData = await LoadEncryptedKeyContent(data.name, data.algorithm);
+    const loadedData = await LoadEncryptedKeyContent(data.name);
 
     if (!loadedData) {
       return toast({

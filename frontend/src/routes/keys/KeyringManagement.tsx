@@ -1,7 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { useHybDeleteKey, useSymDeleteKey } from "@/hooks/keys/useDeleteKey";
 import { useKeys } from "@/hooks/keys/useKeys";
-import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import { SymmetricDataTable } from "@/routes/keys/components/keyring-management/tables/symmetric-table";
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
@@ -18,7 +17,6 @@ export default function KeyringManagement() {
 
   const { handleSymDelete } = useSymDeleteKey({ fetchKeys });
   const { handleHybDelete } = useHybDeleteKey({ fetchKeys });
-  const { selectedFile } = useSelectedAsymmetricFileStore();
 
   const symcolumns = React.useMemo(
     () => getSymmetricKeyColumns(handleSymDelete),

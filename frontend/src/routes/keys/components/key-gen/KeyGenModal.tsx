@@ -34,7 +34,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
-  const [algorithmType, setAlgorithmType] = React.useState<string>("");
+  const [algorithmType, setAlgorithmType] = React.useState<string>("AES-256");
 
   // utils for encryption (asymmetric)
   const [folderName, setFolderName] = React.useState<string>("");
@@ -172,7 +172,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
   };
 
   const handleSaveKey = async () => {
-    await saveKey(keyFileName, encryptedData, algorithmType);
+    await saveKey(keyFileName, encryptedData);
 
     if (!errorWhenSaving) {
       setData("");
@@ -184,6 +184,17 @@ export default function KeysGenModal({ fetchKeys }: Props) {
 
     await fetchKeys();
   };
+
+  const clearEn = () => {
+    setData("");
+    setPassphrase("");
+    setAlgorithm("AES");
+    setKeyFileName("");
+    setEncryptedData("");
+    handleHidePrivKey();
+    clearPub(), clearPriv(), clearPair(), clearEnKey();
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -235,7 +246,16 @@ export default function KeysGenModal({ fetchKeys }: Props) {
           </KeyTypeTabs>
 
           {keyType === "symmetric" && (
-            <EncryptedDataDisplay encryptedData={encryptedData} />
+            <div>
+              <EncryptedDataDisplay encryptedData={encryptedData} />
+              <Button
+                onClick={clearEn}
+                variant={"link"}
+                className="flex underline"
+              >
+                Clear
+              </Button>
+            </div>
           )}
 
           {encryptedData && keyType === "symmetric" && (

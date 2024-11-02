@@ -4,14 +4,12 @@ go 1.21
 
 toolchain go1.23.0
 
-require (
-	github.com/wailsapp/wails/v2 v2.9.2
-	golang.org/x/crypto v0.27.0
-)
+require github.com/wailsapp/wails/v2 v2.9.2
 
 require (
 	github.com/ProtonMail/go-crypto v1.1.0-beta.0-proton // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
+	golang.org/x/crypto v0.27.0 // indirect
 )
 
 require (

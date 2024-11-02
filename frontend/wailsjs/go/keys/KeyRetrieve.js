@@ -18,8 +18,8 @@ export function LoadAsymmetricEnData(arg1) {
   return window['go']['keys']['KeyRetrieve']['LoadAsymmetricEnData'](arg1);
 }
 
-export function LoadEncryptedKeyContent(arg1, arg2) {
-  return window['go']['keys']['KeyRetrieve']['LoadEncryptedKeyContent'](arg1, arg2);
+export function LoadEncryptedKeyContent(arg1) {
+  return window['go']['keys']['KeyRetrieve']['LoadEncryptedKeyContent'](arg1);
 }
 
 export function RetrieveAsymmetricKeys() {
