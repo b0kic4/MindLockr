@@ -17,12 +17,11 @@ import EncryptedDataDisplay from "./EncryptedDataDisplay";
 import AsymmetricKeyEncryptionForm from "./forms/AsymmetricEncryptionForm";
 import EncryptionForm from "./forms/EncryptionForm";
 import KeySaveForm from "./forms/KeySaveForm";
-import AlgorithmSelector from "./utils/AlgorithmSelector";
 import KeyTypeTabs from "./utils/KeyTypeTabs";
 import Questions from "./utils/Questions";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption";
+import { HybEn } from "@wailsjs/go/hybridencryption/HybridEncryption";
 import { hybridencryption } from "@wailsjs/go/models";
 import { LogError } from "@wailsjs/runtime/runtime";
 
@@ -34,9 +33,8 @@ export default function KeysGenModal({ fetchKeys }: Props) {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
-  const [algorithmType, setAlgorithmType] = React.useState<string>("AES-256");
 
-  // utils for encryption (asymmetric)
+  // asymmetric enc (hyb)
   const [folderName, setFolderName] = React.useState<string>("");
 
   // encrypted string
@@ -77,7 +75,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       data,
       passphrase,
       algorithm,
-      algorithmType,
     };
 
     await generateKey(requestData);
@@ -107,7 +104,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     if (!data) missingFields.push("Data");
     if (!passphrase) missingFields.push("Passphrase");
     if (!algorithm) missingFields.push("Algorithm");
-    if (!algorithmType) missingFields.push("Algorithm Type");
     if (!folderName) missingFields.push("Folder Name");
     if (!providedPubKey) missingFields.push("Public Key");
     if (!providedPrivKey) missingFields.push("Private Key");
@@ -128,15 +124,13 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       data,
       passphrase,
       algorithm,
-      algorithmType,
       folderName,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };
 
     try {
-      const response: hybridencryption.ResponseData =
-        await EncryptSharedData(reqData);
+      const response: hybridencryption.ResponseData = await HybEn(reqData);
       setEncryptedData(response.SymmetricData);
 
       toast({
@@ -215,7 +209,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
         </DialogHeader>
 
         {/* Scrollable Content */}
-        <div className="space-y-6 overflow-auto max-h-[70vh] p-4">
+        <div className="space-y-6 overflow-auto max-h-[60vh] p-4">
           <Questions />
 
           <KeyTypeTabs keyType={keyType} setKeyType={setKeyType}>
@@ -235,19 +229,12 @@ export default function KeysGenModal({ fetchKeys }: Props) {
                 passphrase={passphrase}
                 setPassphrase={setPassphrase}
               />
-              <AlgorithmSelector
-                algorithm={algorithm}
-                setAlgorithm={setAlgorithm}
-                algorithmType={algorithmType}
-                setAlgorithmType={setAlgorithmType}
-              />
               {keyType === "asymmetric" && <AsymmetricKeyEncryptionForm />}
             </div>
           </KeyTypeTabs>
 
           {keyType === "symmetric" && (
             <div>
-              <EncryptedDataDisplay encryptedData={encryptedData} />
               <Button
                 onClick={clearEn}
                 variant={"link"}
@@ -255,6 +242,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
               >
                 Clear
               </Button>
+              <EncryptedDataDisplay encryptedData={encryptedData} />
             </div>
           )}
 

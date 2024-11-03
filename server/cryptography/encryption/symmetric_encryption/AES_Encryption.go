@@ -7,10 +7,9 @@ import (
 )
 
 type RequestData struct {
-	Data          string `json:"data"`
-	Passphrase    string `json:"passphrase"`
-	Algorithm     string `json:"algorithm"`
-	AlgorithmType string `json:"algorithmType"`
+	Data       string `json:"data"`
+	Passphrase string `json:"passphrase"`
+	Algorithm  string `json:"algorithm"`
 }
 
 type DataToEncrypt struct {

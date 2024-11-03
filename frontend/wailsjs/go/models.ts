@@ -4,7 +4,6 @@ export namespace hybridencryption {
 	    data: string;
 	    passphrase: string;
 	    algorithm?: string;
-	    algorithmType?: string;
 	    folderName: string;
 	    pubKey: string;
 	    privKey: string;
@@ -18,7 +17,6 @@ export namespace hybridencryption {
 	        this.data = source["data"];
 	        this.passphrase = source["passphrase"];
 	        this.algorithm = source["algorithm"];
-	        this.algorithmType = source["algorithmType"];
 	        this.folderName = source["folderName"];
 	        this.pubKey = source["pubKey"];
 	        this.privKey = source["privKey"];
@@ -219,7 +217,6 @@ export namespace symmetricencryption {
 	    data: string;
 	    passphrase: string;
 	    algorithm: string;
-	    algorithmType: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RequestData(source);
@@ -230,7 +227,6 @@ export namespace symmetricencryption {
 	        this.data = source["data"];
 	        this.passphrase = source["passphrase"];
 	        this.algorithm = source["algorithm"];
-	        this.algorithmType = source["algorithmType"];
 	    }
 	}
 
