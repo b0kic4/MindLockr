@@ -32,6 +32,7 @@ interface Props {
 export default function KeysGenModal({ fetchKeys }: Props) {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
+  const [privKeyPassphrase, setPrivKeyPassphrase] = React.useState<string>("");
   const [algorithm, setAlgorithm] = React.useState("AES");
 
   // asymmetric enc (hyb)
@@ -103,6 +104,8 @@ export default function KeysGenModal({ fetchKeys }: Props) {
 
     if (!data) missingFields.push("Data");
     if (!passphrase) missingFields.push("Passphrase");
+    if (privKeyPassphrase.length == 0)
+      missingFields.push("Private Key Passphrase");
     if (!algorithm) missingFields.push("Algorithm");
     if (!folderName) missingFields.push("Folder Name");
     if (!providedPubKey) missingFields.push("Public Key");
@@ -123,6 +126,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     const reqData: hybridencryption.RequestData = {
       data,
       passphrase,
+      privPassphrase: privKeyPassphrase,
       algorithm,
       folderName,
       pubKey: providedPubKey,
@@ -161,6 +165,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       setData("");
       setPassphrase("");
       handleHidePrivKey();
+      setPrivKeyPassphrase("");
       clearPub(), clearPriv(), clearPair(), clearEnKey();
     }
   };
@@ -229,7 +234,11 @@ export default function KeysGenModal({ fetchKeys }: Props) {
                 passphrase={passphrase}
                 setPassphrase={setPassphrase}
               />
-              {keyType === "asymmetric" && <AsymmetricKeyEncryptionForm />}
+              {keyType === "asymmetric" && (
+                <AsymmetricKeyEncryptionForm
+                  setPrivKeyPassphrase={setPrivKeyPassphrase}
+                />
+              )}
             </div>
           </KeyTypeTabs>
 

@@ -148,6 +148,7 @@ export default function ShareSymEnc({ data }: Props) {
     const reqData: hybridencryption.RequestData = {
       data: loadedData,
       passphrase,
+      privPassphrase: "",
       folderName,
       pubKey: providedPubKey,
       privKey: providedPrivKey,

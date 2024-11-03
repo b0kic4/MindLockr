@@ -207,7 +207,7 @@ func (pgpKeysGen *PgpKeysGen) DecryptPgpPrivKey(passphrase string, keyPath strin
 	// Unlock the key using the passphrase
 	unlockedKeyObj, err := encryptedKeyObj.Unlock([]byte(passphrase))
 	if err != nil {
-		return "", fmt.Errorf("failed to unlock private key: %v", err)
+		return "", fmt.Errorf("failed to unlock private key %v", err)
 	}
 
 	// Optionally, you can re-armor the unlocked key if you need the decrypted armored key

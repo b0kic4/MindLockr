@@ -1,5 +1,5 @@
 import { DecryptPgpPrivKey } from "@wailsjs/go/keys/PgpKeysGen";
-import { LogError } from "@wailsjs/runtime/runtime.js";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
 import React from "react";
 import { useToast } from "../use-toast";
 
@@ -38,8 +38,40 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
         variant: "destructive",
         className: "bg-red-500 border-0",
         title: "Uh oh! Something went wrong.",
-        description: "Error decrypting the private key.",
+        description:
+          "Error decrypting the private key. Please check the passphrase provided",
       });
+    }
+  };
+
+  const handleDecryptReturnPassphrase = async (
+    passphrase: string,
+  ): Promise<string> => {
+    try {
+      const decrypted = await DecryptPgpPrivKey(passphrase, keyPath);
+      setDecryptedPrivKey(decrypted);
+      setIsPrivKeyVisible(true);
+      setIsDec(true);
+
+      toast({
+        variant: "default",
+        className: "bg-green-500 border-0",
+        title: "Passphrase is Valid",
+        description:
+          "The Passphrase of the private key is valida you can proceed",
+      });
+
+      return passphrase;
+    } catch (error) {
+      LogError(error as any);
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description:
+          "Error decrypting the private key. Please check the passphrase provided",
+      });
+      return "";
     }
   };
 
@@ -56,5 +88,6 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
     isDec,
     handleDecryptPrivKey,
     handleHidePrivKey,
+    handleDecryptReturnPassphrase,
   };
 }

@@ -3,6 +3,7 @@ export namespace hybridencryption {
 	export class RequestData {
 	    data: string;
 	    passphrase: string;
+	    privPassphrase: string;
 	    algorithm?: string;
 	    folderName: string;
 	    pubKey: string;
@@ -16,6 +17,7 @@ export namespace hybridencryption {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.data = source["data"];
 	        this.passphrase = source["passphrase"];
+	        this.privPassphrase = source["privPassphrase"];
 	        this.algorithm = source["algorithm"];
 	        this.folderName = source["folderName"];
 	        this.pubKey = source["pubKey"];
