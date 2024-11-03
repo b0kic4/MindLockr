@@ -187,6 +187,10 @@ export default function AsymmetricKeyEncryptionForm({
           value={shownPrivKey || ""}
           onChange={handlePrivateKeyChange}
         />
+        <em className="text-sm text-yellow-500 ml-2">
+          Fill out the required information first. Once private key is
+          decrypted, you have 5 seconds to submit the form.
+        </em>
       </div>
     </div>
   );

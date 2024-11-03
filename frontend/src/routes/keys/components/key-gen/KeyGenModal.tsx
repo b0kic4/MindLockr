@@ -134,8 +134,8 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     };
 
     try {
-      const response: hybridencryption.ResponseData = await HybEn(reqData);
-      setEncryptedData(response.SymmetricData);
+      const response: string = await HybEn(reqData);
+      setEncryptedData(response);
 
       toast({
         variant: "default",
@@ -169,6 +169,10 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       clearPub(), clearPriv(), clearPair(), clearEnKey();
     }
   };
+
+  // if there is encrypted data
+  // then we need to display the component
+  // that is going to display pgp message
 
   const handleSaveKey = async () => {
     await saveKey(keyFileName, encryptedData);

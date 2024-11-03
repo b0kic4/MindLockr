@@ -13,7 +13,8 @@ import { keys } from "@wailsjs/go/models";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import { DecryptButton } from "@/components/shared/decryption/DecryptButton";
 import { Button } from "@/components/ui/button";
-import { EyeOff, Copy } from "lucide-react";
+import { EyeOff } from "lucide-react";
+import { FiCheck, FiCopy } from "react-icons/fi";
 
 interface PgpKeyAccordionItemProps {
   keyName: keys.PgpKeyInfo;
@@ -26,6 +27,7 @@ const PgpKeyAccordionItem: React.FC<PgpKeyAccordionItemProps> = ({
   const [privateKey, setPrivateKey] = React.useState<string>("");
 
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
+  const [copied, setCopied] = React.useState(false);
 
   const handleToggle = () => {
     setIsExpanded((prev) => !prev);
@@ -54,8 +56,10 @@ const PgpKeyAccordionItem: React.FC<PgpKeyAccordionItemProps> = ({
     }
   }, [isExpanded, keyName, publicKey, privateKey]);
 
-  const handleCopyToClipboard = (text: string) => {
+  const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -72,12 +76,16 @@ const PgpKeyAccordionItem: React.FC<PgpKeyAccordionItemProps> = ({
                 className="w-full h-32 p-3 border border-gray-600 dark:border-gray-400 bg-gray-200 dark:bg-gray-900 rounded-md resize"
               />
               <Button
-                onClick={() => handleCopyToClipboard(publicKey)}
+                onClick={() => handleCopy(publicKey)}
                 variant="ghost"
-                className="absolute right-2 top-2"
+                className="absolute right-2 top-2 flex items-center"
               >
-                <Copy className="w-5 h-5" />
-                Copy
+                {copied ? (
+                  <FiCheck className="w-5 h-5 text-green-500 transition duration-200 ease-in-out" />
+                ) : (
+                  <FiCopy className="w-5 h-5" />
+                )}
+                <span className="sr-only">Copy</span>
               </Button>
             </div>
           </div>
@@ -93,15 +101,17 @@ const PgpKeyAccordionItem: React.FC<PgpKeyAccordionItemProps> = ({
               />
               <Button
                 onClick={() =>
-                  handleCopyToClipboard(
-                    decryptedPrivKey ? decryptedPrivKey : privateKey,
-                  )
+                  handleCopy(decryptedPrivKey ? decryptedPrivKey : privateKey)
                 }
                 variant="ghost"
-                className="absolute right-2 top-2"
+                className="absolute right-2 top-2 flex items-center"
               >
-                <Copy className="w-5 h-5" />
-                Copy
+                {copied ? (
+                  <FiCheck className="w-5 h-5 text-green-500 transition duration-200 ease-in-out" />
+                ) : (
+                  <FiCopy className="w-5 h-5" />
+                )}
+                <span className="sr-only">Copy</span>
               </Button>
             </div>
             <div className="flex justify-end items-center space-x-4">

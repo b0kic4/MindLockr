@@ -1,13 +1,13 @@
 import { Input } from "@/components/ui/input";
 import { useHybDeleteKey, useSymDeleteKey } from "@/hooks/keys/useDeleteKey";
 import { useKeys } from "@/hooks/keys/useKeys";
-import { SymmetricDataTable } from "@/routes/keys/components/keyring-management/tables/symmetric-table";
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
 import KeysGenModal from "./components/key-gen/KeyGenModal";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
 import { HybridDataTable } from "./components/keyring-management/tables/hybrid-table";
 import { getHybridKeyColumns } from "./components/keyring-management/tables/hybridKeyColumns";
+import { SymmetricDataTable } from "./components/keyring-management/tables/symmetric-table";
 import { getSymmetricKeyColumns } from "./components/keyring-management/tables/symmetricKeyColumns";
 
 export default function KeyringManagement() {

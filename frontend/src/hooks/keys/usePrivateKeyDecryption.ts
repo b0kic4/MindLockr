@@ -1,5 +1,5 @@
 import { DecryptPgpPrivKey } from "@wailsjs/go/keys/PgpKeysGen";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
+import { LogError } from "@wailsjs/runtime/runtime.js";
 import React from "react";
 import { useToast } from "../use-toast";
 
@@ -26,12 +26,12 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
       setIsPrivKeyVisible(true);
       setIsDec(true);
 
-      // Hide the decrypted private key after 30 seconds
+      // Hide the decrypted private key after 3 seconds
       setTimeout(() => {
         setDecryptedPrivKey("");
         setIsPrivKeyVisible(false);
         setIsDec(false);
-      }, 3500);
+      }, 5000);
     } catch (error) {
       LogError(error as any);
       toast({
@@ -52,6 +52,12 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
       setDecryptedPrivKey(decrypted);
       setIsPrivKeyVisible(true);
       setIsDec(true);
+
+      setTimeout(() => {
+        setDecryptedPrivKey("");
+        setIsPrivKeyVisible(false);
+        setIsDec(false);
+      }, 5000);
 
       toast({
         variant: "default",
