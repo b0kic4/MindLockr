@@ -13,8 +13,7 @@ import { Label } from "@/components/ui/label";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import { useToast } from "@/hooks/use-toast";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { cleanKey } from "@/lib/utils/useCleanKey";
-import { cleanShownKey } from "@/lib/utils/useCleanShownKey";
+import { cleanShownKey } from "@/lib/utils/useCleanKey";
 import SelectPgpKeyPair from "@/routes/keys/components/key-gen/SelectPgpKeyPair";
 import { PerformHybridEnOnExistingData } from "@wailsjs/go/hybridencryption/HybridEncryption";
 import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
@@ -56,14 +55,6 @@ export default function ShareSymEnc({ data }: Props) {
   const [shownPrivKey, setShownPrivKey] = React.useState<string>("");
 
   React.useEffect(() => {
-    const cleanedPrivKey = cleanShownKey(providedPrivKey);
-    setShownPrivKey(cleanedPrivKey);
-
-    const cleanedPubKey = cleanShownKey(providedPubKey);
-    setShownPubKey(cleanedPubKey);
-  }, [providedPubKey, providedPrivKey]);
-
-  React.useEffect(() => {
     if (!providedPrivKey && decryptedPrivKey) {
       handleHidePrivKey();
     }
@@ -83,16 +74,27 @@ export default function ShareSymEnc({ data }: Props) {
     }
   }, [decryptedPrivKey]);
 
-  // Manual public key input handling
+  // for manual input
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cleaned = cleanKey(e.target.value);
-    setProvidedPubKey(cleaned);
+    const rawPubKey = e.target.value;
+
+    const cleanedPubKey = cleanShownKey(rawPubKey);
+    setShownPubKey(cleanedPubKey);
+
+    const formattedPubKey = `-----BEGIN PGP PUBLIC KEY-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY-----`;
+    setProvidedPubKey(formattedPubKey);
   };
 
-  // Manual private key input handling
+  // for manual input
   const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cleaned = cleanKey(e.target.value);
-    setProvidedPrivKey(cleaned);
+    const rawPrivKey = e.target.value;
+
+    const cleanedPrivKey = cleanShownKey(rawPrivKey);
+
+    setShownPrivKey(cleanedPrivKey);
+
+    const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
+    setProvidedPrivKey(formattedPrivKey);
   };
 
   const resetState = () => {

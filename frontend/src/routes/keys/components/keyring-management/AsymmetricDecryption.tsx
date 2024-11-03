@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
-import { cleanKey } from "@/lib/utils/useCleanKey";
+import { cleanShownKey } from "@/lib/utils/useCleanKey";
 import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
 import {
   GetEncryptionFromSignature,
@@ -33,9 +33,14 @@ const PassphraseFormDecryption = () => {
   const { selectedFile } = useSelectedAsymmetricFileStore();
   const { setPassphrase } = useLastDecryptedPassphrase();
 
-  const handlePrivateKeyChange = (key: string) => {
-    const cleanedKey = cleanKey(key);
-    setPrivKey(cleanedKey);
+  const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawPrivKey = e.target.value;
+
+    const cleanedPrivKey = cleanShownKey(rawPrivKey);
+
+    const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
+
+    setPrivKey(formattedPrivKey);
   };
 
   // path to be displayed
@@ -103,7 +108,7 @@ const PassphraseFormDecryption = () => {
       </div>
       <Input
         value={privKey}
-        onChange={(e) => handlePrivateKeyChange(e.target.value)}
+        onChange={handlePrivateKeyChange}
         type="password"
         placeholder="Enter recipient's private key"
         className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-foreground"
@@ -207,9 +212,14 @@ const SignatureFormValidation = () => {
     }
   };
 
-  const handlePubKeyChange = (pubKey: string) => {
-    const cleanedKey = cleanKey(pubKey);
-    setPubKey(cleanedKey);
+  const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawPubKey = e.target.value;
+
+    const cleanedPubKey = cleanShownKey(rawPubKey);
+
+    const formattedPubKey = `-----BEGIN PGP PUBLIC KEY-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY-----`;
+
+    setPubKey(formattedPubKey);
   };
 
   return (
@@ -224,7 +234,7 @@ const SignatureFormValidation = () => {
         <p>Validation File: {displayPath}</p>
         <Input
           value={pubKey}
-          onChange={(e) => handlePubKeyChange(e.target.value)}
+          onChange={handlePublicKeyChange}
           type="password"
           placeholder="Enter senders's public key"
           className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-foreground"
@@ -275,6 +285,8 @@ const SymmetricDataDecryptionForm = () => {
   const displayPath = selectedFile
     ? selectedFile.path.split("/").slice(-3).join("/")
     : "";
+
+  // if type of object or if type of string
 
   const handleDecrypt = async () => {
     try {

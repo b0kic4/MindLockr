@@ -53,12 +53,12 @@ func (he *HybridEncryption) EncryptSharedData(req RequestData) (ResponseData, er
 	kd := keys.KeyTypeDetection{}
 	pubKeyType, err := kd.DetectKeyType(req.PubKey)
 	if err != nil {
-		return ResponseData{}, fmt.Errorf("Error ocurred while detecting pub key type: ", err)
+		return ResponseData{}, fmt.Errorf("Error ocurred while detecting pub key type: %v ", err)
 	}
 
 	privKeyType, err := kd.DetectKeyType(req.PrivKey)
 	if err != nil {
-		return ResponseData{}, fmt.Errorf("Error ocurred while detecting priv key type: ", err)
+		return ResponseData{}, fmt.Errorf("Error ocurred while detecting priv key type: %v", err)
 	}
 
 	if pubKeyType != privKeyType {
@@ -155,12 +155,12 @@ func (he *HybridEncryption) PerformHybridEnOnExistingData(req RequestData) (Resp
 
 	pubKeyType, err := kd.DetectKeyType(req.PubKey)
 	if err != nil {
-		return ResponseData{}, fmt.Errorf("Error ocurred while detecting pub key type: ", err)
+		return ResponseData{}, fmt.Errorf("Error ocurred while detecting pub key type: %v", err)
 	}
 
 	privKeyType, err := kd.DetectKeyType(req.PrivKey)
 	if err != nil {
-		return ResponseData{}, fmt.Errorf("Error ocurred while detecting priv key type: ", err)
+		return ResponseData{}, fmt.Errorf("Error ocurred while detecting priv key type: %v", err)
 	}
 
 	if pubKeyType != privKeyType {

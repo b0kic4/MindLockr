@@ -3,3 +3,5 @@
 import {symmetricdecryption} from '../models';
 
 export function DecryptAES(arg1:string,arg2:symmetricdecryption.DataToDecrypt):Promise<string>;
+
+export function PerformEveryDecryption(arg1:symmetricdecryption.DataToDecrypt):Promise<{[key: string]: string}>;

@@ -6,8 +6,7 @@ import (
 	"path/filepath"
 )
 
-// TODO: need to refactor this
-func (kr *KeyRetrieve) DeleteKey(ki KeyInfo) bool {
+func (kr *KeyRetrieve) DeleteSymKey(ki KeyInfo) bool {
 	folderPath := kr.folderInstance.GetFolderPath()
 	keyFilePath := filepath.Join(folderPath, "keys", "symmetric", ki.Algorithm, ki.Name)
 
@@ -17,5 +16,13 @@ func (kr *KeyRetrieve) DeleteKey(ki KeyInfo) bool {
 		return false
 	}
 
+	return true
+}
+
+// delete:
+// 1. sig file
+// 2. passphrase file
+// 3. encrypted_data file
+func (kr *KeyRetrieve) DeleteHybKey(ki KeyInfo) bool {
 	return true
 }

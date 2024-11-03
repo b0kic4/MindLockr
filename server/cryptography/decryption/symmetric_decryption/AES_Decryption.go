@@ -18,16 +18,52 @@ type DataToDecrypt struct {
 type Cryptography struct{}
 
 func (c *Cryptography) DecryptAES(algorithmType string, data DataToDecrypt) (string, error) {
-	switch algorithmType {
-	case "AES-128":
-		return AES128Decryption(data)
-	case "AES-192":
-		return AES192Decryption(data)
-	case "AES-256":
-		return AES256Decryption(data)
-	default:
-		return "", fmt.Errorf("unsupported AES type: %s", algorithmType)
+	if algorithmType != "" {
+		switch algorithmType {
+		case "AES-128":
+			return AES128Decryption(data)
+		case "AES-192":
+			return AES192Decryption(data)
+		case "AES-256":
+			return AES256Decryption(data)
+		default:
+			return "", fmt.Errorf("unsupported AES type: %s", algorithmType)
+		}
 	}
+
+	return "", fmt.Errorf("algorithmType must be provided")
+}
+
+func (c *Cryptography) PerformEveryDecryption(data DataToDecrypt) (map[string]string, error) {
+	results := make(map[string]string)
+
+	// Try AES-128 decryption
+	plainText128, err := AES128Decryption(data)
+	if err == nil {
+		results["AES-128"] = plainText128
+	} else {
+		results["AES-128"] = fmt.Sprintf("Failed: %v", err)
+	}
+
+	// Try AES-192 decryption
+	plainText192, err := AES192Decryption(data)
+	if err == nil {
+		results["AES-192"] = plainText192
+	} else {
+		results["AES-192"] = fmt.Sprintf("Failed: %v", err)
+	}
+
+	// Try AES-256 decryption
+	plainText256, err := AES256Decryption(data)
+	if err == nil {
+		results["AES-256"] = plainText256
+	} else {
+		results["AES-256"] = fmt.Sprintf("Failed: %v", err)
+	}
+
+	fmt.Println("results: ", results)
+
+	return results, nil
 }
 
 func AES128Decryption(data DataToDecrypt) (string, error) {

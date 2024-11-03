@@ -19,7 +19,7 @@ func (hpd *HybridPassphraseDecryption) DecryptPassphrase(encryptedPassphraseB64 
 	kd := keys.KeyTypeDetection{}
 	alg, err := kd.DetectKeyType(privKey)
 	if err != nil {
-		return "", fmt.Errorf("error ocurred while detecting key type: ", err)
+		return "", fmt.Errorf("error ocurred while detecting key type: %v", err)
 	}
 
 	encPassphrase, err := base64.StdEncoding.DecodeString(encryptedPassphraseB64)

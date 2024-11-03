@@ -1,66 +1,62 @@
-import DecryptedDataComponent from "@/components/shared/decryption/ShowDecryptedData";
-import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
-import { useDeleteKey } from "@/hooks/keys/useDeleteKey";
+import { useHybDeleteKey, useSymDeleteKey } from "@/hooks/keys/useDeleteKey";
 import { useKeys } from "@/hooks/keys/useKeys";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
-import { KeyInfo } from "@/lib/types/keys";
+import { SymmetricDataTable } from "@/routes/keys/components/keyring-management/tables/symmetric-table";
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
+import KeysGenModal from "./components/key-gen/KeyGenModal";
 import AsymmetricDecryption from "./components/keyring-management/AsymmetricDecryption";
-import { FileTreeAccordion } from "./components/keyring-management/AsymmetricFileTreeAccordion";
-import { getKeyColumns } from "./components/keyring-management/KeyColumns";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
+import { HybridDataTable } from "./components/keyring-management/tables/hybrid-table";
+import { getHybridKeyColumns } from "./components/keyring-management/tables/hybridKeyColumns";
+import { getSymmetricKeyColumns } from "./components/keyring-management/tables/symmetricKeyColumns";
 
 export default function KeyringManagement() {
   const { keys, fetchKeys } = useKeys();
   const [filterKeyType, setFilterKeyType] = React.useState<string>("Symmetric");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
-  const [selectedKey, setSelectedKey] = React.useState<KeyInfo | null>(null);
-  const [isDecrypted, setIsDecrypted] = React.useState(false);
 
-  const { handleDelete } = useDeleteKey({ fetchKeys });
+  const { handleSymDelete } = useSymDeleteKey({ fetchKeys });
+  const { handleHybDelete } = useHybDeleteKey({ fetchKeys });
   const { selectedFile } = useSelectedAsymmetricFileStore();
 
-  const handleDecrypt = (key: KeyInfo) => {
-    // this is passed to KeyColumns
-    // key button is just used to change the state
-    // of displaying decrypted data component
-    setSelectedKey(key);
-    setIsDecrypted(true);
-  };
+  const symcolumns = React.useMemo(
+    () => getSymmetricKeyColumns(handleSymDelete),
+    [handleSymDelete],
+  );
 
-  const handleDialogClose = () => {
-    setIsDecrypted(false);
-    setSelectedKey(null);
-  };
-
-  const columns = React.useMemo(
-    () => getKeyColumns(handleDelete, handleDecrypt),
-    [handleDelete, handleDecrypt],
+  const hybcolumns = React.useMemo(
+    () => getHybridKeyColumns(handleHybDelete),
+    [handleHybDelete],
   );
 
   const symmetricFilteredKeys = keys.symmetric.filter((key) =>
     key.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const hybridFilteredKeys = keys.asymmetric.filter((key) =>
+    key.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // in the hybrid encryption table
+  // we should have the
+  // verify button
+  // decrypt button
+  //
+  // we should have a in Select => ALL, SYMMETRIC and HYBRID (ASYMMETRIC)
+
   const renderContent = () => {
     if (filterKeyType === "Symmetric") {
-      return <DataTable data={symmetricFilteredKeys} columns={columns} />;
+      return (
+        <SymmetricDataTable data={symmetricFilteredKeys} columns={symcolumns} />
+      );
     } else if (filterKeyType === "Asymmetric") {
       return (
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4">
-            <FileTreeAccordion />
-          </div>
-          <div className="col-span-8">
-            {selectedFile ? (
-              <AsymmetricDecryption />
-            ) : (
-              <p className="text-center text-muted">Select a key to decrypt</p>
-            )}
-          </div>
-        </div>
+        <HybridDataTable
+          data={hybridFilteredKeys}
+          columns={hybcolumns as any}
+        />
       );
     } else {
       return (
@@ -73,12 +69,11 @@ export default function KeyringManagement() {
 
   return (
     <div className="p-6 bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
-      <div className="mb-4 flex items-center gap-3 max-w-lg">
-        <KeyTypeFilter
-          filterKeyType={filterKeyType}
-          setFilterKeyType={setFilterKeyType}
-        />
-        <div className="relative flex items-center text-foreground dark:text-foreground-dark">
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex items-center flex-grow max-w-md relative">
+          <div className="absolute left-3 text-gray-400">
+            <TextSearchIcon />
+          </div>
           <Input
             type="text"
             placeholder="Search..."
@@ -86,18 +81,20 @@ export default function KeyringManagement() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <div className="absolute left-3 text-gray-400">
-            <TextSearchIcon />
-          </div>
+        </div>
+
+        <div className="ml-4 flex items-center">
+          <KeyTypeFilter
+            filterKeyType={filterKeyType}
+            setFilterKeyType={setFilterKeyType}
+          />
+        </div>
+
+        <div className="ml-auto">
+          <KeysGenModal fetchKeys={fetchKeys} />
         </div>
       </div>
       {renderContent()}
-      {selectedKey && isDecrypted && (
-        <DecryptedDataComponent
-          keyInfo={selectedKey}
-          onClose={handleDialogClose}
-        />
-      )}
     </div>
   );
 }

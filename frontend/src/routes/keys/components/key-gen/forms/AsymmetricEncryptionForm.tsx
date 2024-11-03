@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { cleanShownKey } from "@/lib/utils/useCleanShownKey";
+import { cleanShownKey } from "@/lib/utils/useCleanKey";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";
@@ -63,7 +63,6 @@ export default function AsymmetricKeyEncryptionForm() {
     const rawPubKey = e.target.value;
 
     const cleanedPubKey = cleanShownKey(rawPubKey);
-
     setShownPubKey(cleanedPubKey);
 
     const formattedPubKey = `-----BEGIN PGP PUBLIC KEY-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY-----`;

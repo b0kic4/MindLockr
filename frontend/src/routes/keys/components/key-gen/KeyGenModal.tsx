@@ -1,24 +1,36 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useGenKey } from "@/hooks/keys/useGenKey";
-import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
-import { useSaveKey } from "@/hooks/keys/useSaveKey";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import React from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useGenKey } from "@/hooks/keys/useGenKey";
+import { useSaveKey } from "@/hooks/keys/useSaveKey";
+import { Input } from "@/components/ui/input";
+import EncryptedDataDisplay from "./EncryptedDataDisplay";
+import AsymmetricKeyEncryptionForm from "./forms/AsymmetricEncryptionForm";
+import EncryptionForm from "./forms/EncryptionForm";
+import KeySaveForm from "./forms/KeySaveForm";
+import AlgorithmSelector from "./utils/AlgorithmSelector";
+import KeyTypeTabs from "./utils/KeyTypeTabs";
+import Questions from "./utils/Questions";
+import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption";
 import { hybridencryption } from "@wailsjs/go/models";
 import { LogError } from "@wailsjs/runtime/runtime";
-import React from "react";
-import EncryptedDataDisplay from "./components/key-gen/EncryptedDataDisplay";
-import AsymmetricKeyEncryptionForm from "./components/key-gen/forms/AsymmetricEncryptionForm";
-import EncryptionForm from "./components/key-gen/forms/EncryptionForm";
-import KeySaveForm from "./components/key-gen/forms/KeySaveForm";
-import AlgorithmSelector from "./components/key-gen/utils/AlgorithmSelector";
-import KeyTypeTabs from "./components/key-gen/utils/KeyTypeTabs";
-import Questions from "./components/key-gen/utils/Questions";
 
-export default function KeysGen() {
-  // data for encryption (symmetric)
+interface Props {
+  fetchKeys: () => Promise<void>;
+}
+
+export default function KeysGenModal({ fetchKeys }: Props) {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [algorithm, setAlgorithm] = React.useState("AES");
@@ -169,74 +181,92 @@ export default function KeysGen() {
       setKeyFileName("");
       setEncryptedData("");
     }
+
+    await fetchKeys();
   };
-
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-6 rounded-lg">
-      <h2 className="text-2xl font-semibold">Key Generation & Encryption</h2>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          className="bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow-lg transition-all"
+          variant="default"
+        >
+          + Add New Key / Encrypt New Message
+        </Button>
+      </DialogTrigger>
 
-      <Questions />
+      <DialogContent className="w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 text-black dark:text-gray-200">
+        <DialogHeader>
+          <DialogTitle>Key Generation & Encryption</DialogTitle>
+          <DialogDescription>
+            Please provide the necessary information for encryption.
+          </DialogDescription>
+        </DialogHeader>
 
-      <KeyTypeTabs keyType={keyType} setKeyType={setKeyType}>
-        <div className="flex flex-col">
-          <div className="space-y-2">
-            {keyType === "asymmetric" && (
-              <Input
-                id="folderName"
-                value={folderName}
-                onChange={(e) => setFolderName(e.target.value)}
-                placeholder="Specify the folder name to store data"
-                className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+        {/* Scrollable Content */}
+        <div className="space-y-6 overflow-auto max-h-[70vh] p-4">
+          <Questions />
+
+          <KeyTypeTabs keyType={keyType} setKeyType={setKeyType}>
+            <div className="flex flex-col space-y-2">
+              {keyType === "asymmetric" && (
+                <Input
+                  id="folderName"
+                  value={folderName}
+                  onChange={(e) => setFolderName(e.target.value)}
+                  placeholder="Specify the folder name to store data"
+                  className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+                />
+              )}
+              <EncryptionForm
+                data={data}
+                setData={setData}
+                passphrase={passphrase}
+                setPassphrase={setPassphrase}
               />
-            )}
-            <EncryptionForm
-              data={data}
-              setData={setData}
-              passphrase={passphrase}
-              setPassphrase={setPassphrase}
-            />
+              <AlgorithmSelector
+                algorithm={algorithm}
+                setAlgorithm={setAlgorithm}
+                algorithmType={algorithmType}
+                setAlgorithmType={setAlgorithmType}
+              />
+              {keyType === "asymmetric" && <AsymmetricKeyEncryptionForm />}
+            </div>
+          </KeyTypeTabs>
 
-            <AlgorithmSelector
-              algorithm={algorithm}
-              setAlgorithm={setAlgorithm}
-              algorithmType={algorithmType}
-              setAlgorithmType={setAlgorithmType}
-            />
-          </div>
+          {keyType === "symmetric" && (
+            <EncryptedDataDisplay encryptedData={encryptedData} />
+          )}
 
-          {keyType === "asymmetric" && <AsymmetricKeyEncryptionForm />}
+          {encryptedData && keyType === "symmetric" && (
+            <KeySaveForm
+              keyFileName={keyFileName}
+              setKeyFileName={setKeyFileName}
+              handleSaveKey={handleSaveKey}
+            />
+          )}
         </div>
-      </KeyTypeTabs>
 
-      {keyType == "symmetric" && (
-        <Button
-          onClick={handleGenerateKey}
-          className="bg-blue-500 text-white p-3 rounded w-full"
-        >
-          Encrypt Data with Symmetric Key
-        </Button>
-      )}
+        <DialogFooter>
+          {keyType === "symmetric" && (
+            <Button
+              onClick={handleGenerateKey}
+              className="bg-blue-600 text-white p-3 rounded w-full"
+            >
+              Encrypt Data with Symmetric Key
+            </Button>
+          )}
 
-      {keyType == "asymmetric" && (
-        <Button
-          onClick={handleGenerateSharableData}
-          className="bg-blue-500 text-white p-3 rounded w-full"
-        >
-          Generate Sharable Encryption
-        </Button>
-      )}
-
-      {keyType == "symmetric" && (
-        <EncryptedDataDisplay encryptedData={encryptedData} />
-      )}
-
-      {encryptedData && keyType == "symmetric" && (
-        <KeySaveForm
-          keyFileName={keyFileName}
-          setKeyFileName={setKeyFileName}
-          handleSaveKey={handleSaveKey}
-        />
-      )}
-    </div>
+          {keyType === "asymmetric" && (
+            <Button
+              onClick={handleGenerateSharableData}
+              className="bg-blue-500 text-white p-3 rounded w-full"
+            >
+              Generate Sharable Encryption
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

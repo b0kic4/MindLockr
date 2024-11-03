@@ -47,8 +47,6 @@ func ParseECCPublicKey(pubKey string) (*ecdsa.PublicKey, error) {
 		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
 	}
 
-	fmt.Println("cleanedKey: ", cleanedKey)
-
 	pubKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding public key: %v", err)
@@ -70,8 +68,6 @@ func ParseECCPrivateKey(privKey string) (*ecdsa.PrivateKey, error) {
 		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
 	}
 
-	fmt.Println("cleanedKey: ", cleanedKey)
-
 	privKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding private key: %v", err)
@@ -90,8 +86,6 @@ func ParseRSAPublicKey(pubKey string) (*rsa.PublicKey, error) {
 		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
 	}
 
-	fmt.Println("cleanedKey: ", cleanedKey)
-
 	pubKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding public key: %v", err)
@@ -109,8 +103,6 @@ func ParseRSAPrivateKey(privKey string) (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error when removing pem blocks: %w", err)
 	}
-
-	fmt.Println("cleanedKey: ", cleanedKey)
 
 	privKeyBytes, err := base64.StdEncoding.DecodeString(cleanedKey)
 	if err != nil {

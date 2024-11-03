@@ -22,7 +22,7 @@ export const KeyTypeFilter: React.FC<KeyTypeFilterProps> = ({
     </SelectTrigger>
     <SelectContent>
       <SelectItem value="Symmetric">Symmetric</SelectItem>
-      <SelectItem value="Asymmetric">Asymmetric</SelectItem>
+      <SelectItem value="Asymmetric">Hybrid</SelectItem>
     </SelectContent>
   </Select>
 );
