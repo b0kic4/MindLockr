@@ -9,11 +9,7 @@ export function useSaveKey() {
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
 
-  const saveKey = async (
-    keyFileName: string,
-    encryptedData: string,
-    algorithmType: string,
-  ) => {
+  const saveKey = async (keyFileName: string, encryptedData: string) => {
     setLoading(true);
     setError(null);
 
@@ -52,12 +48,7 @@ export function useSaveKey() {
     }
 
     try {
-      await SaveSymmetricKey(
-        folderPath,
-        keyFileName,
-        encryptedData,
-        algorithmType,
-      );
+      await SaveSymmetricKey(folderPath, keyFileName, encryptedData);
       toast({
         variant: "default",
         className: "border-0",

@@ -299,7 +299,7 @@ const SymmetricDataDecryptionForm = () => {
         passphrase: passphraseInput,
       };
 
-      const decrypted = await DecryptAES(algorithmType, dataToDecrypt);
+      const decrypted = await DecryptAES(dataToDecrypt);
       setDecryptedData(decrypted);
 
       toast({

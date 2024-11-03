@@ -13,7 +13,6 @@ import { KeyRound, Search, Trash } from "lucide-react";
 // TODO:
 // So we are generating the hybrid files (3 of them)
 // into one single folder
-// when user wants to export the keys
 // we need to transform that into one .gpg or .pgp
 // file
 
@@ -21,11 +20,11 @@ export const getHybridKeyColumns = (
   handleDelete: (file: any) => void,
 ): ColumnDef<keys.FileInfo, any>[] => {
   const handleVerify = (file: keys.FolderInfo) => {
-    LogInfo(JSON.stringify(file));
+    // LogInfo(JSON.stringify(file));
   };
 
   const handleDecrypt = (file: keys.FolderInfo) => {
-    LogInfo(JSON.stringify(file));
+    // LogInfo(JSON.stringify(file));
   };
 
   return [

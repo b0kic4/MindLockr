@@ -10,14 +10,6 @@ import (
 )
 
 func RemovePEMBlocks(pemKey string) (string, error) {
-	// FIXME: NEED TO INSCPECT THIS FUNC
-	// TRY TO FORMAT THE KEYS ON THE FRONT PROPERLY
-	// I think maybe when new lines \n are in the string
-	// the white space between the words stays
-	// example:
-	// PGP
-	// public key
-	// into: PGP publickey but should be: PGPpublickey
 	cleanedKey := strings.ReplaceAll(pemKey, "-----BEGIN PGP PRIVATE KEY-----", "")
 	cleanedKey = strings.ReplaceAll(cleanedKey, "-----END PGP PRIVATE KEY-----", "")
 	cleanedKey = strings.ReplaceAll(cleanedKey, "-----BEGIN PGP PUBLIC KEY-----", "")

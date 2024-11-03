@@ -33,12 +33,9 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
     e.preventDefault();
     setIsLoading(true);
     try {
-      const encryptedData = await LoadEncryptedKeyContent(
-        keyInfo.name,
-        keyInfo.algorithm,
-      );
+      const encryptedData = await LoadEncryptedKeyContent(keyInfo.name);
 
-      const decrypted = await DecryptAES(keyInfo.algorithm as any, {
+      const decrypted = await DecryptAES({
         encryptedData,
         passphrase,
       });

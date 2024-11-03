@@ -26,20 +26,58 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
       setIsPrivKeyVisible(true);
       setIsDec(true);
 
-      // Hide the decrypted private key after 30 seconds
+      // Hide the decrypted private key after 3 seconds
       setTimeout(() => {
         setDecryptedPrivKey("");
         setIsPrivKeyVisible(false);
         setIsDec(false);
-      }, 3500);
+      }, 5000);
     } catch (error) {
       LogError(error as any);
       toast({
         variant: "destructive",
         className: "bg-red-500 border-0",
         title: "Uh oh! Something went wrong.",
-        description: "Error decrypting the private key.",
+        description:
+          "Error decrypting the private key. Please check the passphrase provided",
       });
+    }
+  };
+
+  const handleDecryptReturnPassphrase = async (
+    passphrase: string,
+  ): Promise<string> => {
+    try {
+      const decrypted = await DecryptPgpPrivKey(passphrase, keyPath);
+      setDecryptedPrivKey(decrypted);
+      setIsPrivKeyVisible(true);
+      setIsDec(true);
+
+      setTimeout(() => {
+        setDecryptedPrivKey("");
+        setIsPrivKeyVisible(false);
+        setIsDec(false);
+      }, 5000);
+
+      toast({
+        variant: "default",
+        className: "bg-green-500 border-0",
+        title: "Passphrase is Valid",
+        description:
+          "The Passphrase of the private key is valida you can proceed",
+      });
+
+      return passphrase;
+    } catch (error) {
+      LogError(error as any);
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Uh oh! Something went wrong.",
+        description:
+          "Error decrypting the private key. Please check the passphrase provided",
+      });
+      return "";
     }
   };
 
@@ -56,5 +94,6 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
     isDec,
     handleDecryptPrivKey,
     handleHidePrivKey,
+    handleDecryptReturnPassphrase,
   };
 }

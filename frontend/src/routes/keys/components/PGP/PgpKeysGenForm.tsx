@@ -19,6 +19,8 @@ import React from "react";
 import SelectAlg from "./SelectAlgorithm";
 import NumberOfBitsRSA from "./SelectNumberOfBitsForRSA";
 import { PacmanLoader } from "react-spinners";
+import SelectCurve from "./SelectCurve";
+import useSelectCurve from "@/lib/store/useSelectCurve";
 
 type Props = {
   fetchPgpKeys: () => void;
@@ -26,22 +28,28 @@ type Props = {
 
 export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
   const [keyName, setKeyName] = React.useState<string>("");
+  const [name, setName] = React.useState<string>("");
+  const [email, setEmail] = React.useState<string>("");
   const [passphrase, setPassphrase] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { toast } = useToast();
 
   const { selectedAlg, clearSelectedAlg } = useSelectAlgPgpGen();
   const { selectedBits, clearSelectedBits } = useSelectNumOfBits();
+  const { selectedCurve, clearSelectedCurve } = useSelectCurve();
 
   const genKeys = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       const response = await GeneratePGPKeys({
+        Name: name,
+        Email: email,
         EnType: selectedAlg,
         Usage: keyName,
         Passphrase: passphrase,
         Bits: selectedBits,
+        Curve: selectedCurve,
       });
 
       if (response.PubKey && response.PrivKey) {
@@ -75,6 +83,7 @@ export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
       setPassphrase("");
       clearSelectedBits();
       clearSelectedAlg();
+      clearSelectedCurve();
     }
   };
 
@@ -121,12 +130,45 @@ export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
                 className="col-span-3"
                 placeholder="Enter passphrase"
               />
+
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                value={name}
+                id="name"
+                onChange={(e) => setName(e.target.value)}
+                type="text"
+                className="col-span-3"
+                placeholder="Optional: Provide a name to help identify its usage."
+              />
+
+              <Label htmlFor="email" className="text-right">
+                Email
+              </Label>
+              <Input
+                value={email}
+                id="email"
+                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                className="col-span-3"
+                placeholder="Optional: Your email helps others verify your key, but it's not required."
+              />
+
+              <small className="col-span-4 text-gray-500 text-left pl-2">
+                You don’t have to provide your real name or email. This
+                information is only used to help identify and verify the key
+                when it's shared with others. If you prefer, you can use an
+                alias or leave these fields blank.
+              </small>
+
               <Label htmlFor="algorithm" className="text-right">
                 Algorithm
               </Label>
               <div className="col-span-3">
                 <SelectAlg />
               </div>
+
               {selectedAlg === "RSA" && (
                 <>
                   <Label htmlFor="bits" className="text-right">
@@ -134,6 +176,17 @@ export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
                   </Label>
                   <div className="col-span-3">
                     <NumberOfBitsRSA />
+                  </div>
+                </>
+              )}
+
+              {selectedAlg === "ECC" && (
+                <>
+                  <Label htmlFor="bits" className="text-right">
+                    Number of Bits
+                  </Label>
+                  <div className="col-span-3">
+                    <SelectCurve />
                   </div>
                 </>
               )}

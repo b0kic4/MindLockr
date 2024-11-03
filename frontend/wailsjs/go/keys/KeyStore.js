@@ -6,6 +6,6 @@ export function SaveAsymmetricData(arg1) {
   return window['go']['keys']['KeyStore']['SaveAsymmetricData'](arg1);
 }
 
-export function SaveSymmetricKey(arg1, arg2, arg3, arg4) {
-  return window['go']['keys']['KeyStore']['SaveSymmetricKey'](arg1, arg2, arg3, arg4);
+export function SaveSymmetricKey(arg1, arg2, arg3) {
+  return window['go']['keys']['KeyStore']['SaveSymmetricKey'](arg1, arg2, arg3);
 }
