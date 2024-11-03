@@ -29,7 +29,7 @@ type SaveAsymmetricDataRequest struct {
 // I need to have the experation date of the
 // keys for user to assign when the keys should expire
 
-// I should implement:
+// TODO: I should implement:
 // 1. encrypt and sign function
 // 2. encrypt function
 // 3. sign function
@@ -39,6 +39,8 @@ type SaveAsymmetricDataRequest struct {
 
 // ENCRYPT AND SIGN FUNCTION
 func (he *HybridEncryption) HybEn(req RequestData) (string, error) {
+	fmt.Println("public key: \n", req.PubKey)
+
 	recipientPubKey, err := crypto.NewKeyFromArmored(req.PubKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to ge the pub key from armored in hyb en: %s", err)

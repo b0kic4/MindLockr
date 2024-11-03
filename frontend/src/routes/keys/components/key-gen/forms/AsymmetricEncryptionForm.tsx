@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import { cleanShownKey } from "@/lib/utils/useCleanKey";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";
@@ -48,10 +47,7 @@ export default function AsymmetricKeyEncryptionForm({
   // pass this function to the decrypt buton
   const getPassphrasePrivKey = async (passphrase: string) => {
     const providedPassphrase = await handleDecryptReturnPassphrase(passphrase);
-
     if (providedPassphrase.length > 0) setPrivKeyPassphrase(providedPassphrase);
-
-    LogInfo(providedPassphrase);
   };
 
   // When keys are selected with SelectPgpKeyPair component
@@ -78,7 +74,7 @@ export default function AsymmetricKeyEncryptionForm({
       const cleanedPrivKey = cleanShownKey(decryptedPrivKey);
       setShownPrivKey(cleanedPrivKey);
 
-      const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
+      const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
       setProvidedPrivKey(formattedDecPrivKey);
     }
   }, [decryptedPrivKey]);
@@ -90,7 +86,7 @@ export default function AsymmetricKeyEncryptionForm({
     const cleanedPubKey = cleanShownKey(rawPubKey);
     setShownPubKey(cleanedPubKey);
 
-    const formattedPubKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY BLOCK-----`;
+    const formattedPubKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n${cleanedPubKey}\n-----END PGP PUBLIC KEY BLOCK-----`;
     setProvidedPubKey(formattedPubKey);
   };
 
@@ -102,7 +98,7 @@ export default function AsymmetricKeyEncryptionForm({
 
     setShownPrivKey(cleanedPrivKey);
 
-    const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
+    const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
     setProvidedPrivKey(formattedPrivKey);
   };
 
