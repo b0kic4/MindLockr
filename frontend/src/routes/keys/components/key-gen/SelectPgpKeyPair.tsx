@@ -15,12 +15,8 @@ import {
   RetrievePgpPrivKey,
   RetrievePgpPubKey,
 } from "@wailsjs/go/keys/KeyRetrieve";
+import { LogInfo } from "@wailsjs/runtime/runtime";
 import React from "react";
-
-// FIXME:
-// Fixing state formatting
-// Reseting
-// PEM Blocks
 
 export default function SelectPgpKeyPair() {
   const {

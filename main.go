@@ -1,10 +1,10 @@
 package main
 
 import (
-	hybriddecryption "MindLockr/server/cryptography/decryption/hybrid_decryption"
+	hybdec "MindLockr/server/cryptography/decryption/hyb_dec"
 	symmetricdecryption "MindLockr/server/cryptography/decryption/symmetric_decryption"
 	"MindLockr/server/cryptography/decryption/validation"
-	hybridencryption "MindLockr/server/cryptography/encryption/hybrid_encryption"
+	hybenc "MindLockr/server/cryptography/encryption/hyb_enc"
 	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
 	"MindLockr/server/filesystem"
 	"MindLockr/server/filesystem/keys"
@@ -25,8 +25,8 @@ var assets embed.FS
 func main() {
 	symmetric_encryption := &symmetricencryption.Cryptography{}
 	symmetric_decryption := &symmetricdecryption.Cryptography{}
-	hybrid_encryption := &hybridencryption.HybridEncryption{}
-	hybrid_decryption := &hybriddecryption.HybridPassphraseDecryption{}
+	hyb_enc := &hybenc.HybEnc{}
+	hyb_dec := &hybdec.HybDec{}
 	validator := &validation.Validator{}
 	folder := filesystem.GetFolderInstance()
 	keyRetrieve := keys.NewKeyRetrieve(folder)
@@ -102,8 +102,8 @@ func main() {
 			keyRetrieve,
 			keyStore,
 			pgpKeys,
-			hybrid_encryption,
-			hybrid_decryption,
+			hyb_enc,
+			hyb_dec,
 			validator,
 		},
 	})

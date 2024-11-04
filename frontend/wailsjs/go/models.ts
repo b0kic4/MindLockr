@@ -1,10 +1,46 @@
-export namespace hybridencryption {
+export namespace hybdec {
+	
+	export class RequestData {
+	    data: string;
+	    privPassphrase: string;
+	    folderName?: string;
+	    pubKey: string;
+	    privKey: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RequestData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.data = source["data"];
+	        this.privPassphrase = source["privPassphrase"];
+	        this.folderName = source["folderName"];
+	        this.pubKey = source["pubKey"];
+	        this.privKey = source["privKey"];
+	    }
+	}
+	export class ReturnType {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new ReturnType(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
+	    }
+	}
+
+}
+
+export namespace hybenc {
 	
 	export class RequestData {
 	    data: string;
 	    passphrase: string;
 	    privPassphrase: string;
-	    algorithm?: string;
 	    folderName: string;
 	    pubKey: string;
 	    privKey: string;
@@ -18,7 +54,6 @@ export namespace hybridencryption {
 	        this.data = source["data"];
 	        this.passphrase = source["passphrase"];
 	        this.privPassphrase = source["privPassphrase"];
-	        this.algorithm = source["algorithm"];
 	        this.folderName = source["folderName"];
 	        this.pubKey = source["pubKey"];
 	        this.privKey = source["privKey"];

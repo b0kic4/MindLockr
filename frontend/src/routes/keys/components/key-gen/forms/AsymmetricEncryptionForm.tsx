@@ -1,10 +1,10 @@
 import { DecryptButton } from "@/components/shared/decryption/DecryptButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import { cleanShownKey } from "@/lib/utils/useCleanKey";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";
@@ -48,20 +48,8 @@ export default function AsymmetricKeyEncryptionForm({
   // pass this function to the decrypt buton
   const getPassphrasePrivKey = async (passphrase: string) => {
     const providedPassphrase = await handleDecryptReturnPassphrase(passphrase);
-
     if (providedPassphrase.length > 0) setPrivKeyPassphrase(providedPassphrase);
-
-    LogInfo(providedPassphrase);
   };
-
-  // When keys are selected with SelectPgpKeyPair component
-  React.useEffect(() => {
-    const cleanedPrivKey = cleanShownKey(providedPrivKey);
-    setShownPrivKey(cleanedPrivKey);
-
-    const cleanedPubKey = cleanShownKey(providedPubKey);
-    setShownPubKey(cleanedPubKey);
-  }, [providedPubKey, providedPrivKey]);
 
   React.useEffect(() => {
     if (!providedPrivKey && decryptedPrivKey) {
@@ -75,35 +63,24 @@ export default function AsymmetricKeyEncryptionForm({
     }
 
     if (decryptedPrivKey && decryptedPrivKey.length > 0) {
-      const cleanedPrivKey = cleanShownKey(decryptedPrivKey);
-      setShownPrivKey(cleanedPrivKey);
-
-      const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
-      setProvidedPrivKey(formattedDecPrivKey);
+      setProvidedPrivKey(decryptedPrivKey);
     }
   }, [decryptedPrivKey]);
 
   // for manual input
-  const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePublicKeyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const rawPubKey = e.target.value;
-
-    const cleanedPubKey = cleanShownKey(rawPubKey);
-    setShownPubKey(cleanedPubKey);
-
-    const formattedPubKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY BLOCK-----`;
-    setProvidedPubKey(formattedPubKey);
+    setProvidedPubKey(rawPubKey);
+    setShownPubKey(rawPubKey);
   };
 
   // for manual input
-  const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePrivateKeyChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
     const rawPrivKey = e.target.value;
-
-    const cleanedPrivKey = cleanShownKey(rawPrivKey);
-
-    setShownPrivKey(cleanedPrivKey);
-
-    const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY BLOCK-----`;
-    setProvidedPrivKey(formattedPrivKey);
+    setProvidedPrivKey(rawPrivKey);
+    setShownPrivKey(rawPrivKey);
   };
 
   return (
@@ -130,10 +107,10 @@ export default function AsymmetricKeyEncryptionForm({
             Public Key
           </label>
         </div>
-        <Input
+        <Textarea
           id="publicKey"
           placeholder="Public Key"
-          value={shownPubKey || ""}
+          value={providedPubKey || ""}
           onChange={handlePublicKeyChange}
         />
       </div>
@@ -180,11 +157,10 @@ export default function AsymmetricKeyEncryptionForm({
           )}
         </div>
 
-        <Input
+        <Textarea
           id="privateKey"
           placeholder="Private Key"
-          type={isPrivateKeyVisible ? "text" : "password"}
-          value={shownPrivKey || ""}
+          value={providedPrivKey}
           onChange={handlePrivateKeyChange}
         />
         <em className="text-sm text-yellow-500 ml-2">

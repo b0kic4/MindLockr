@@ -4,7 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import { cleanShownKey } from "@/lib/utils/useCleanKey";
-import { DecryptPassphrase } from "@wailsjs/go/hybriddecryption/HybridPassphraseDecryption";
+import { DecryptAndValidate } from "@wailsjs/go/hybdec/HybDec";
+import { hybdec } from "@wailsjs/go/models";
 import {
   GetEncryptionFromSignature,
   LoadAsymmetricEnData,
@@ -64,12 +65,7 @@ const PassphraseFormDecryption = () => {
           description: "Selected File not found in file system",
         });
 
-      const decryptedPassphrase = await DecryptPassphrase(
-        loadedPassphraseFromFS,
-        privKey,
-      );
-      setDecryptedPassphrase(decryptedPassphrase);
-      setPassphrase(decryptedPassphrase);
+      // DECRYPT AND VALIDATE
 
       toast({
         variant: "default",

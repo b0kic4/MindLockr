@@ -21,6 +21,10 @@ export default function PGPKeys() {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const [selectedType, setSelectedType] = React.useState<string>("all");
 
+  React.useEffect(() => {
+    fetchPgpKeys();
+  }, []);
+
   const filteredKeys = pgpKeys
     .filter((keyName) =>
       keyName.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
