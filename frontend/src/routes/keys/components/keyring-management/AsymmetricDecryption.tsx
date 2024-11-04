@@ -4,8 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import useLastDecryptedPassphrase from "@/lib/store/useLastDecryptedPassphrase";
 import useSelectedAsymmetricFileStore from "@/lib/store/useSelectAsymmetricFile";
 import { cleanShownKey } from "@/lib/utils/useCleanKey";
-import { DecryptAndValidate } from "@wailsjs/go/hybdec/HybDec";
-import { hybdec } from "@wailsjs/go/models";
 import {
   GetEncryptionFromSignature,
   LoadAsymmetricEnData,

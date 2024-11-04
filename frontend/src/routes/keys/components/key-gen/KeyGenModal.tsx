@@ -29,6 +29,9 @@ interface Props {
   fetchKeys: () => Promise<void>;
 }
 
+// Maybe to tansform the component to be the
+// Sheet
+
 export default function KeysGenModal({ fetchKeys }: Props) {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
@@ -204,7 +207,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
           className="bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow-lg transition-all"
           variant="default"
         >
-          + Add New Key / Encrypt New Message
+          Encrypt New Message
         </Button>
       </DialogTrigger>
 
