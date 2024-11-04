@@ -15,9 +15,9 @@ import { useToast } from "@/hooks/use-toast";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import { cleanShownKey } from "@/lib/utils/useCleanKey";
 import SelectPgpKeyPair from "@/routes/keys/components/key-gen/SelectPgpKeyPair";
-import { HybEn } from "@wailsjs/go/hybridencryption/HybridEncryption";
+import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
 import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
-import { hybridencryption, keys } from "@wailsjs/go/models";
+import { hybenc, keys } from "@wailsjs/go/models";
 import { Eye, EyeOff, Share } from "lucide-react";
 import React from "react";
 
@@ -145,7 +145,7 @@ export default function ShareSymEnc({ data }: Props) {
       });
     }
 
-    const reqData: hybridencryption.RequestData = {
+    const reqData: hybenc.RequestData = {
       data: loadedData,
       passphrase,
       privPassphrase: "",
@@ -155,7 +155,7 @@ export default function ShareSymEnc({ data }: Props) {
     };
 
     try {
-      await HybEn(reqData);
+      await EncryptAndSign(reqData);
       toast({
         variant: "default",
         title: "Encryption Successful",

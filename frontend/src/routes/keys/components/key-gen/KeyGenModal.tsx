@@ -21,8 +21,8 @@ import KeyTypeTabs from "./utils/KeyTypeTabs";
 import Questions from "./utils/Questions";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { HybEn } from "@wailsjs/go/hybridencryption/HybridEncryption";
-import { hybridencryption } from "@wailsjs/go/models";
+import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
+import { hybenc } from "@wailsjs/go/models";
 import { LogError } from "@wailsjs/runtime/runtime";
 
 interface Props {
@@ -123,18 +123,17 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       return;
     }
 
-    const reqData: hybridencryption.RequestData = {
+    const reqData: hybenc.RequestData = {
       data,
       passphrase,
       privPassphrase: privKeyPassphrase,
-      algorithm,
       folderName,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };
 
     try {
-      const response: string = await HybEn(reqData);
+      const response: string = await EncryptAndSign(reqData);
       setEncryptedData(response);
 
       toast({
