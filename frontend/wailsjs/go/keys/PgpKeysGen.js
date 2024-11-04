@@ -6,14 +6,22 @@ export function DecryptPgpPrivKey(arg1, arg2) {
   return window['go']['keys']['PgpKeysGen']['DecryptPgpPrivKey'](arg1, arg2);
 }
 
-export function GenerateEcPgpKeys(arg1) {
-  return window['go']['keys']['PgpKeysGen']['GenerateEcPgpKeys'](arg1);
+export function GenECC(arg1) {
+  return window['go']['keys']['PgpKeysGen']['GenECC'](arg1);
+}
+
+export function GenRSA(arg1) {
+  return window['go']['keys']['PgpKeysGen']['GenRSA'](arg1);
+}
+
+export function GenStoreECC(arg1) {
+  return window['go']['keys']['PgpKeysGen']['GenStoreECC'](arg1);
+}
+
+export function GenStoreRSA(arg1) {
+  return window['go']['keys']['PgpKeysGen']['GenStoreRSA'](arg1);
 }
 
 export function GeneratePGPKeys(arg1) {
   return window['go']['keys']['PgpKeysGen']['GeneratePGPKeys'](arg1);
-}
-
-export function GenerateRsaPgpKeys(arg1) {
-  return window['go']['keys']['PgpKeysGen']['GenerateRsaPgpKeys'](arg1);
 }
