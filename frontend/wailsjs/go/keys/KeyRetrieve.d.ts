@@ -6,8 +6,6 @@ export function DeleteHybKey(arg1:keys.KeyInfo):Promise<boolean>;
 
 export function DeleteSymKey(arg1:keys.KeyInfo):Promise<boolean>;
 
-export function GetEncryptionFromSignature(arg1:string):Promise<string>;
-
 export function LoadAsymmetricEnData(arg1:string):Promise<string>;
 
 export function LoadEncryptedKeyContent(arg1:string):Promise<string>;

@@ -10,10 +10,6 @@ export function DeleteSymKey(arg1) {
   return window['go']['keys']['KeyRetrieve']['DeleteSymKey'](arg1);
 }
 
-export function GetEncryptionFromSignature(arg1) {
-  return window['go']['keys']['KeyRetrieve']['GetEncryptionFromSignature'](arg1);
-}
-
 export function LoadAsymmetricEnData(arg1) {
   return window['go']['keys']['KeyRetrieve']['LoadAsymmetricEnData'](arg1);
 }

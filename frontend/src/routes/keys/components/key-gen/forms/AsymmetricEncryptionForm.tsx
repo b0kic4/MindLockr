@@ -1,10 +1,8 @@
 import { DecryptButton } from "@/components/shared/decryption/DecryptButton";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { cleanShownKey } from "@/lib/utils/useCleanKey";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";
@@ -41,9 +39,6 @@ export default function AsymmetricKeyEncryptionForm({
 
   const [isPrivateKeyVisible, setIsPrivateKeyVisible] = React.useState(false);
 
-  const [shownPubKey, setShownPubKey] = React.useState<string>("");
-  const [shownPrivKey, setShownPrivKey] = React.useState<string>("");
-
   // get the passphrase of the function from hook
   // pass this function to the decrypt buton
   const getPassphrasePrivKey = async (passphrase: string) => {
@@ -71,7 +66,6 @@ export default function AsymmetricKeyEncryptionForm({
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const rawPubKey = e.target.value;
     setProvidedPubKey(rawPubKey);
-    setShownPubKey(rawPubKey);
   };
 
   // for manual input
@@ -80,17 +74,10 @@ export default function AsymmetricKeyEncryptionForm({
   ) => {
     const rawPrivKey = e.target.value;
     setProvidedPrivKey(rawPrivKey);
-    setShownPrivKey(rawPrivKey);
   };
 
   return (
-    <div className="space-y-4 p-4 bg-muted dark:bg-muted-dark mt-4 rounded-lg">
-      <h3 className="text-lg font-semibold">Asymmetric Key Encryption</h3>
-      <p className="text-sm text-foreground dark:text-foreground-dark">
-        Please select a PGP key pair or provide custom keys for asymmetric
-        encryption.
-      </p>
-
+    <div className="space-y-4 p-4 mt-4 rounded-lg">
       <div className="space-y-2">
         <div className="flex items-center justify-center">
           <SelectPgpKeyPair />
@@ -110,6 +97,7 @@ export default function AsymmetricKeyEncryptionForm({
         <Textarea
           id="publicKey"
           placeholder="Public Key"
+          className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
           value={providedPubKey || ""}
           onChange={handlePublicKeyChange}
         />
@@ -161,9 +149,10 @@ export default function AsymmetricKeyEncryptionForm({
           id="privateKey"
           placeholder="Private Key"
           value={providedPrivKey}
+          className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
           onChange={handlePrivateKeyChange}
         />
-        <em className="text-sm text-yellow-500 ml-2">
+        <em className="text-sm text-purple-500 ml-2">
           Fill out the required information first. Once private key is
           decrypted, you have 5 seconds to submit the form.
         </em>

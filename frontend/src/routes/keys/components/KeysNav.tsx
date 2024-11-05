@@ -27,7 +27,7 @@ export default function KeysNav() {
             }`
           }
         >
-          Keyring & Message Vault
+          Message Vault
         </NavLink>
 
         {/* <NavLink */}

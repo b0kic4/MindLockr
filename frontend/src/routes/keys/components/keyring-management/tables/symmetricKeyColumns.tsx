@@ -36,21 +36,11 @@ export const getSymmetricKeyColumns = (
       cell: (info) => info.getValue(),
       meta: { align: "left" },
     }),
-    columnHelper.accessor("algorithm", {
-      header: "Algorithm",
-      cell: (info) => info.getValue(),
-      meta: { align: "left" },
-    }),
-    columnHelper.accessor("type", {
-      header: "Key Type",
-      cell: (info) => info.getValue(),
-      meta: { align: "left" },
-    }),
     columnHelper.display({
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="flex space-x-4 justify-center items-center">
+        <div className="flex space-x-4">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
