@@ -15,7 +15,6 @@ import {
   RetrievePgpPrivKey,
   RetrievePgpPubKey,
 } from "@wailsjs/go/keys/KeyRetrieve";
-import { LogInfo } from "@wailsjs/runtime/runtime";
 import React from "react";
 
 export default function SelectPgpKeyPair() {

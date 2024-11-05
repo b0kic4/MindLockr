@@ -32,6 +32,10 @@ export default function PGPKeys() {
       selectedType === "all" ? true : key.type === selectedType,
     );
 
+  // I should have a component that will be displayed under the list of the keys
+  // with showing more informaiton about the key pair from entity or smth like that
+  // just like on the gpa
+
   return (
     <div className="p-6 rounded shadow-md">
       <div className="mb-4 flex items-center gap-4">

@@ -11,21 +11,26 @@ export default function ListKeys({ keys }: { keys: keys.PgpKeyInfo[] }) {
   const handleAction = (action: string, key: keys.PgpKeyInfo) => {
     switch (action) {
       case "copyPublic":
+        // we should call the RetrievePgpPublicKey
         console.log("Copy public key:", key);
         break;
       case "copyPrivate":
+        // we should call the RetrievePgpPrivateKey
         console.log("Copy private key:", key);
         break;
       case "delete":
         console.log("Delete key pair:", key);
         break;
       case "edit":
+        // in here expiration should be handled
         console.log("Edit key:", key);
         break;
       case "export":
         console.log("Export key:", key);
         break;
       case "copyFingerprint":
+        // We need to implement this
+        // first load the public key and then get the fingerprint
         console.log("Copy fingerprint:", key);
         break;
       default:
@@ -34,17 +39,28 @@ export default function ListKeys({ keys }: { keys: keys.PgpKeyInfo[] }) {
   };
 
   return (
-    <div className="space-y-2">
-      {keys.map((key: keys.PgpKeyInfo) => (
+    <div className="flex flex-col line">
+      <div className="flex px-4 py-2 justify-around text-black dark:text-white font-bold">
+        <span className="w-1/3">Key Name</span>
+        <span className="w-1/3">Type</span>
+        <span className="w-1/3">Created</span>
+        <span className="w-1/3">Expires</span>
+        <span className="w-1/3">User</span>
+      </div>
+
+      {keys.map((key) => (
         <ContextMenu key={key.name}>
           <ContextMenuTrigger>
-            <div className="p-4 border rounded-md cursor-pointer">
-              {key.name} ({key.type})
+            <div className="flex px-4 py-2 justify-around items-center cursor-pointer border-b">
+              <span className="w-1/3">{key.name}</span>
+              <span className="w-1/3"></span>
+              <span className="w-1/3"></span>
             </div>
           </ContextMenuTrigger>
+
           <ContextMenuContent>
             <ContextMenuItem onSelect={() => handleAction("copyPublic", key)}>
-              Copy
+              Copy Public Key
             </ContextMenuItem>
             <ContextMenuItem onSelect={() => handleAction("copyPrivate", key)}>
               Copy Private Key
