@@ -8,12 +8,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
-import { Accordion } from "@radix-ui/react-accordion";
 import { TextSearchIcon } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import React from "react";
-import PgpKeyAccordionItem from "./components/PGP/PgpKeyAccordionItem";
 import { PgpKeysGenForm } from "./components/PGP/PgpKeysGenForm";
+import ListKeys from "./components/keyring-management/keys-list";
 
 export default function PGPKeys() {
   const { pgpKeys, fetchPgpKeys } = usePgpKeys();
@@ -71,11 +70,7 @@ export default function PGPKeys() {
 
       {pgpKeys.length > 0 ? (
         filteredKeys.length > 0 ? (
-          <Accordion type="multiple" className="mt-4">
-            {filteredKeys.map((keyName) => (
-              <PgpKeyAccordionItem keyName={keyName} />
-            ))}
-          </Accordion>
+          <ListKeys keys={filteredKeys} />
         ) : (
           <p className="text-gray-600 text-center mt-8">
             No PGP keys match your search.
