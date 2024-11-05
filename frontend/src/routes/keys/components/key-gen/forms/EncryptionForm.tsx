@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 type Props = {
   data: string;
@@ -16,12 +17,18 @@ export default function EncryptionForm({
 }: Props) {
   return (
     <>
+      <Label className="flex" htmlFor="message">
+        Message
+      </Label>
       <Textarea
         placeholder="Type your message in here"
         value={data}
         onChange={(e) => setData(e.target.value)}
         className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
       />
+      <Label className="flex" htmlFor="passphrase">
+        Passphrase
+      </Label>
       <Input
         type="password"
         placeholder="Passphrase for Encryption"

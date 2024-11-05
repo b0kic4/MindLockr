@@ -59,20 +59,13 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
         setIsDec(false);
       }, 5000);
 
-      toast({
-        variant: "default",
-        className: "bg-green-500 border-0",
-        title: "Passphrase is Valid",
-        description:
-          "The Passphrase of the private key is valida you can proceed",
-      });
-
       return passphrase;
     } catch (error) {
       LogError(error as any);
       toast({
         variant: "destructive",
-        className: "bg-red-500 border-0",
+        className:
+          "bg-red-500 border-0 top-0 right-0 data-[state=closed]:slide-out-to-right-full",
         title: "Uh oh! Something went wrong.",
         description:
           "Error decrypting the private key. Please check the passphrase provided",
