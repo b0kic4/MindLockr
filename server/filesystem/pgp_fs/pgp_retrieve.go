@@ -1,4 +1,4 @@
-package pgpget
+package pgpfs
 
 import (
 	"MindLockr/server/filesystem"

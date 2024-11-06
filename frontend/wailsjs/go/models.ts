@@ -155,6 +155,31 @@ export namespace hybenc {
 
 }
 
+export namespace pgpfs {
+	
+	export class PgpKeyInfo {
+	    name: string;
+	    publicKey: string;
+	    privateKey: string;
+	    folderPath: string;
+	    type: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PgpKeyInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.publicKey = source["publicKey"];
+	        this.privateKey = source["privateKey"];
+	        this.folderPath = source["folderPath"];
+	        this.type = source["type"];
+	    }
+	}
+
+}
+
 export namespace pgpgen {
 	
 	export class RequestData {
@@ -193,31 +218,6 @@ export namespace pgpgen {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.PrivKey = source["PrivKey"];
 	        this.PubKey = source["PubKey"];
-	    }
-	}
-
-}
-
-export namespace pgpget {
-	
-	export class PgpKeyInfo {
-	    name: string;
-	    publicKey: string;
-	    privateKey: string;
-	    folderPath: string;
-	    type: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new PgpKeyInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.name = source["name"];
-	        this.publicKey = source["publicKey"];
-	        this.privateKey = source["privateKey"];
-	        this.folderPath = source["folderPath"];
-	        this.type = source["type"];
 	    }
 	}
 

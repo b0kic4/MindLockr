@@ -5,10 +5,10 @@ import {
   ContextMenuTrigger,
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
-import { pgpget } from "@wailsjs/go/models";
+import { pgpfs } from "@wailsjs/go/models";
 
-export default function ListKeys({ keys }: { keys: pgpget.PgpKeyInfo[] }) {
-  const handleAction = (action: string, key: pgpget.PgpKeyInfo) => {
+export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
+  const handleAction = (action: string, key: pgpfs.PgpKeyInfo) => {
     switch (action) {
       case "copyPublic":
         // we should call the RetrievePgpPublicKey

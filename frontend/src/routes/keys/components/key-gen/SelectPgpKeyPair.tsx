@@ -14,7 +14,7 @@ import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncr
 import {
   RetrievePgpPrivKey,
   RetrievePgpPubKey,
-} from "@wailsjs/go/pgpget/PgpRetrieve";
+} from "@wailsjs/go/pgpfs/PgpRetrieve";
 import React from "react";
 
 export default function SelectPgpKeyPair() {
