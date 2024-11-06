@@ -1,4 +1,4 @@
-package keys
+package en
 
 import (
 	"MindLockr/server/filesystem"
@@ -10,7 +10,7 @@ import (
 type KeyStore struct{}
 
 // SaveSymmetricKey saves a symmetric encryption key to the specified folder
-func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent string) error {
+func (ks *KeyStore) SaveSymEn(folderPath, fileName, keyContent string) error {
 	// Ensure the 'keys/symmetric/algorithmUsed' subdirectory exists
 	keysDir := filepath.Join(folderPath, "keys/symmetric")
 	if err := os.MkdirAll(keysDir, os.ModePerm); err != nil {
@@ -28,66 +28,6 @@ func (ks *KeyStore) SaveSymmetricKey(folderPath, fileName, keyContent string) er
 	return nil
 }
 
-// 1. creating the keys dir
-// 2. opening file for writing
-// 3. writing the encrypted key to file
-
-func SavePgpPrivKey(privKeyArmor string, keyName string, enType string) error {
-	folderInstance := filesystem.GetFolderInstance()
-	folderPath := folderInstance.GetFolderPath()
-
-	if folderPath == "" {
-		return fmt.Errorf("Please initialize the folder where you want to store private key")
-	}
-
-	// Include the encryption type in the path
-	keysDir := filepath.Join(folderPath, "pgp", enType, keyName)
-
-	err := os.MkdirAll(keysDir, 0700) // Set directory permissions to 0700
-	if err != nil {
-		return fmt.Errorf("failed to create keys directory: %v", err)
-	}
-
-	keyFilePath := filepath.Join(keysDir, "private.asc") // Use .asc extension
-
-	err = os.WriteFile(keyFilePath, []byte(privKeyArmor), 0600) // Use 0600 permissions
-	if err != nil {
-		return fmt.Errorf("failed to write private key to file: %v", err)
-	}
-
-	return nil
-}
-
-// 1. create the keys dir
-// 2. open the file for writing
-// 3. write the public key to the file
-
-func SavePgpPublicKey(pubKeyArmor string, keyName string, enType string) error {
-	folderInstance := filesystem.GetFolderInstance()
-	folderPath := folderInstance.GetFolderPath()
-
-	if folderPath == "" {
-		return fmt.Errorf("Please initialize the folder where you want to store public key")
-	}
-
-	// Include the encryption type in the path
-	keysDir := filepath.Join(folderPath, "pgp", enType, keyName)
-
-	err := os.MkdirAll(keysDir, 0755) // Set directory permissions to 0755
-	if err != nil {
-		return fmt.Errorf("failed to create keys directory: %v", err)
-	}
-
-	keyFilePath := filepath.Join(keysDir, "public.asc") // Use .asc extension
-
-	err = os.WriteFile(keyFilePath, []byte(pubKeyArmor), 0644) // Use 0644 permissions
-	if err != nil {
-		return fmt.Errorf("failed to write public key to file: %v", err)
-	}
-
-	return nil
-}
-
 type HybridRequestData struct {
 	SymmetricData       string
 	AlgSymEnc           string
@@ -97,7 +37,7 @@ type HybridRequestData struct {
 	AsymAlgType         string
 }
 
-func (ks *KeyStore) SaveAsymmetricData(req HybridRequestData) error {
+func (ks *KeyStore) SaveHybEn(req HybridRequestData) error {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
 

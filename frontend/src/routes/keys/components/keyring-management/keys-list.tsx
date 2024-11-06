@@ -5,10 +5,10 @@ import {
   ContextMenuTrigger,
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
-import { keys } from "@wailsjs/go/models";
+import { pgpget } from "@wailsjs/go/models";
 
-export default function ListKeys({ keys }: { keys: keys.PgpKeyInfo[] }) {
-  const handleAction = (action: string, key: keys.PgpKeyInfo) => {
+export default function ListKeys({ keys }: { keys: pgpget.PgpKeyInfo[] }) {
+  const handleAction = (action: string, key: pgpget.PgpKeyInfo) => {
     switch (action) {
       case "copyPublic":
         // we should call the RetrievePgpPublicKey
@@ -30,7 +30,7 @@ export default function ListKeys({ keys }: { keys: keys.PgpKeyInfo[] }) {
         break;
       case "copyFingerprint":
         // We need to implement this
-        // first load the public key and then get the fingerprint
+        // first load the public key and then enget the fingerprint
         console.log("Copy fingerprint:", key);
         break;
       default:

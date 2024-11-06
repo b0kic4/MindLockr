@@ -1,4 +1,4 @@
-package keys
+package en
 
 import (
 	"MindLockr/server/filesystem"
@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 )
 
-type KeyRetrieve struct {
+type EnRetrieve struct {
 	folderInstance *filesystem.Folder
 }
 
-func NewKeyRetrieve(folder *filesystem.Folder) *KeyRetrieve {
-	return &KeyRetrieve{
+func NewEnRetrieve(folder *filesystem.Folder) *EnRetrieve {
+	return &EnRetrieve{
 		folderInstance: folder,
 	}
 }
@@ -43,7 +43,7 @@ type PgpKeyInfo struct {
 	Type       string `json:"type"`
 }
 
-func (kr *KeyRetrieve) LoadEncryptedKeyContent(keyName string) (string, error) {
+func (kr *EnRetrieve) LoadEncryptedContent(keyName string) (string, error) {
 	folderPath := kr.folderInstance.GetFolderPath()
 	keyFilePath := filepath.Join(folderPath, "keys", "symmetric", keyName)
 
@@ -55,7 +55,7 @@ func (kr *KeyRetrieve) LoadEncryptedKeyContent(keyName string) (string, error) {
 	return string(content), nil
 }
 
-func (kr *KeyRetrieve) LoadAsymmetricEnData(dataFilePath string) (string, error) {
+func (kr *EnRetrieve) LoadAsymEnData(dataFilePath string) (string, error) {
 	dataPath := filepath.Join(dataFilePath)
 
 	content, err := os.ReadFile(dataPath)
@@ -66,7 +66,7 @@ func (kr *KeyRetrieve) LoadAsymmetricEnData(dataFilePath string) (string, error)
 	return string(content), nil
 }
 
-func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
+func (kr *EnRetrieve) RetrieveSymEn() ([]KeyInfo, error) {
 	folderPath := kr.folderInstance.GetFolderPath()
 
 	keysBaseFolderPath := filepath.Join(folderPath, "keys/symmetric")
@@ -94,82 +94,7 @@ func (kr *KeyRetrieve) RetrieveSymmetricKeys() ([]KeyInfo, error) {
 	return keyFiles, nil
 }
 
-func (kr *KeyRetrieve) RetrievePgpKeys() ([]PgpKeyInfo, error) {
-	folderPath := kr.folderInstance.GetFolderPath()
-
-	eccBaseFolderPath := filepath.Join(folderPath, "pgp", "ECC")
-	rsaBaseFolderPath := filepath.Join(folderPath, "pgp", "RSA")
-
-	eccKeys := []PgpKeyInfo{}
-	rsaKeys := []PgpKeyInfo{}
-	var err error
-
-	// Pass the key type "ECC" when retrieving ECC keys
-	eccKeys, err = kr.getPgpKeysFromDirectory(eccBaseFolderPath, "ECC")
-	if err != nil {
-		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving ECC PGP keys: %v", err)
-	}
-
-	// Pass the key type "RSA" when retrieving RSA keys
-	rsaKeys, err = kr.getPgpKeysFromDirectory(rsaBaseFolderPath, "RSA")
-	if err != nil {
-		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving RSA PGP keys: %v", err)
-	}
-
-	return append(eccKeys, rsaKeys...), nil
-}
-
-func (kr *KeyRetrieve) getPgpKeysFromDirectory(basePath string, keyType string) ([]PgpKeyInfo, error) {
-	pgpKeys := []PgpKeyInfo{}
-
-	if _, err := os.Stat(basePath); os.IsNotExist(err) {
-		return pgpKeys, nil
-	}
-
-	keyFolders, err := os.ReadDir(basePath)
-	if err != nil {
-		return []PgpKeyInfo{}, fmt.Errorf("Error reading PGP keys folder: %v", err)
-	}
-
-	for _, keyFolder := range keyFolders {
-		if keyFolder.IsDir() {
-			keyName := keyFolder.Name()
-			keyFolderPath := filepath.Join(basePath, keyName)
-
-			pgpKeys = append(pgpKeys, PgpKeyInfo{
-				Name:       keyName,
-				FolderPath: keyFolderPath,
-				Type:       keyType, // Add the type (ECC or RSA)
-			})
-		}
-	}
-
-	return pgpKeys, nil
-}
-
-func (kr *KeyRetrieve) RetrievePgpPubKey(keyFolderPath string) (string, error) {
-	pubKeyPath := filepath.Join(keyFolderPath, "public.asc")
-
-	pubKeyPEM, err := os.ReadFile(pubKeyPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read public key file: %v", err)
-	}
-
-	return string(pubKeyPEM), nil
-}
-
-func (kr *KeyRetrieve) RetrievePgpPrivKey(keyFolderPath string) (string, error) {
-	privKeyPath := filepath.Join(keyFolderPath, "private.asc")
-
-	encryptedPrivKeyHex, err := os.ReadFile(privKeyPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read private key file: %v", err)
-	}
-
-	return string(encryptedPrivKeyHex), nil
-}
-
-func (kr *KeyRetrieve) RetrieveAsymmetricKeys() ([]FolderInfo, error) {
+func (kr *EnRetrieve) RetrieveAsymEn() ([]FolderInfo, error) {
 	folderPath := kr.folderInstance.GetFolderPath()
 	keysBaseFolderPath := filepath.Join(folderPath, "keys/asymmetric")
 

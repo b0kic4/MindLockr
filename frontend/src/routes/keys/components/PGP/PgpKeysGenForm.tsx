@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import useSelectAlgPgpGen from "@/lib/store/useSelectAlgPgpGen";
 import useSelectNumOfBits from "@/lib/store/useSelectNumberOfBits";
-import { GeneratePGPKeys } from "@wailsjs/go/keys/PgpKeysGen";
+import { GeneratePGPKeys } from "@wailsjs/go/pgpgen/PgpKeysGen";
 import { LogError } from "@wailsjs/runtime/runtime";
 import React from "react";
 import SelectAlg from "./SelectAlgorithm";

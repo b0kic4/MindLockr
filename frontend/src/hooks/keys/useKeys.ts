@@ -1,8 +1,8 @@
 import React from "react";
 import {
-  RetrieveAsymmetricKeys,
-  RetrieveSymmetricKeys,
-} from "../../../wailsjs/go/keys/KeyRetrieve";
+  RetrieveSymEn,
+  RetrieveAsymEn,
+} from "../../../wailsjs/go/en/EnRetrieve";
 import {
   LogError,
   LogPrint,
@@ -40,12 +40,12 @@ export function useKeys() {
 
   const fetchKeys = async () => {
     try {
-      const [symmetricKeys, asymmetricFolders] = await Promise.all([
-        RetrieveSymmetricKeys().catch((error) => {
+      const [symEn, asymFolders] = await Promise.all([
+        RetrieveSymEn().catch((error) => {
           LogWarning("No symmetric keys found or error occurred: " + error);
           return [];
         }),
-        RetrieveAsymmetricKeys().catch((error) => {
+        RetrieveAsymEn().catch((error) => {
           LogWarning("No asymmetric keys found or error occurred: " + error);
           return [];
         }),
@@ -53,13 +53,13 @@ export function useKeys() {
 
       LogPrint("Keys retrieved successfully.");
 
-      const symmetric = (symmetricKeys || []).map((key) => ({
+      const symmetric = (symEn || []).map((key) => ({
         name: key.name,
         algorithm: key.algorithm,
         type: "Symmetric" as const,
       }));
 
-      const asymmetric = asymmetricFolders || [];
+      const asymmetric = asymFolders || [];
 
       setKeys({ symmetric, asymmetric });
     } catch (error) {
