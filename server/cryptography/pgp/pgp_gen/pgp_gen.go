@@ -1,9 +1,8 @@
-package keys
+package pgpgen
 
 import (
+	pgpfs "MindLockr/server/filesystem/pgp_fs"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/ProtonMail/gopenpgp/v3/constants"
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
@@ -104,12 +103,12 @@ func (pgpKeysGen *PgpKeysGen) GenStoreRSA(req RequestData) (ReturnType, error) {
 
 	var err error
 
-	err = SavePgpPrivKey(privKey, req.Usage, req.EnType)
+	err = pgpfs.SavePgpPrivKey(privKey, req.Usage, req.EnType)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
 	}
 
-	err = SavePgpPublicKey(pubKey, req.Usage, req.EnType)
+	err = pgpfs.SavePgpPublicKey(pubKey, req.Usage, req.EnType)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
 	}
@@ -174,12 +173,12 @@ func (pgpKeysGen *PgpKeysGen) GenStoreECC(req RequestData) (ReturnType, error) {
 		return ReturnType{}, fmt.Errorf("failed while extracting armored private key: %s", err)
 	}
 
-	err = SavePgpPrivKey(privKey, req.Usage, req.EnType)
+	err = pgpfs.SavePgpPrivKey(privKey, req.Usage, req.EnType)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
 	}
 
-	err = SavePgpPublicKey(pubKey, req.Usage, req.EnType)
+	err = pgpfs.SavePgpPublicKey(pubKey, req.Usage, req.EnType)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
 	}
@@ -310,33 +309,4 @@ func (pgpKeysGen *PgpKeysGen) GenECC(req RequestData) (ReturnType, error) {
 		PrivKey: privKey,
 		PubKey:  pubKey,
 	}, nil
-}
-
-func (pgpKeysGen *PgpKeysGen) DecryptPgpPrivKey(passphrase string, keyPath string) (string, error) {
-	// Read the armored encrypted private key from the file
-	privKeyPath := filepath.Join(keyPath, "private.asc")
-
-	encryptedPrivKeyArmor, err := os.ReadFile(privKeyPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read private key file: %v", err)
-	}
-
-	// Load the armored key into a crypto.Key object
-	encryptedKeyObj, err := crypto.NewKeyFromArmored(string(encryptedPrivKeyArmor))
-	if err != nil {
-		return "", fmt.Errorf("failed to parse armored private key: %v", err)
-	}
-
-	// Unlock the key using the passphrase
-	unlockedKeyObj, err := encryptedKeyObj.Unlock([]byte(passphrase))
-	if err != nil {
-		return "", fmt.Errorf("failed to unlock private key %v", err)
-	}
-
-	// Optionally, you can re-armor the unlocked key if you need the decrypted armored key
-	decryptedPrivKeyArmor, err := unlockedKeyObj.Armor()
-	if err != nil {
-		return "", fmt.Errorf("failed to armor unlocked private key: %v", err)
-	}
-	return decryptedPrivKeyArmor, nil
 }

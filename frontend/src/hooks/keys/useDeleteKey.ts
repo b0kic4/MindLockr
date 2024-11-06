@@ -1,22 +1,26 @@
 import React from "react";
 import { KeyInfo } from "@/lib/types/keys";
-import {
-  DeleteSymKey,
-  DeleteHybKey,
-} from "../../../wailsjs/go/keys/KeyRetrieve";
 import { useToast } from "@/hooks/use-toast";
 
 interface UseDeleteKeyParams {
   fetchKeys: () => Promise<void>;
 }
 
+async function DeleteSymKey(en: KeyInfo): Promise<string> {
+  return "";
+}
+
+async function DeleteHybKey(en: KeyInfo): Promise<string> {
+  return "";
+}
+
 // this work only for symmetric encryption
-export function useSymDeleteKey({ fetchKeys }: UseDeleteKeyParams) {
+export function useSymDeleteEn({ fetchKeys }: UseDeleteKeyParams) {
   const { toast } = useToast();
 
   const handleSymDelete = React.useCallback(
-    async (key: KeyInfo) => {
-      const response = await DeleteSymKey(key);
+    async (en: KeyInfo) => {
+      const response = await DeleteSymKey(en);
       if (response) {
         await fetchKeys();
         toast({
@@ -39,7 +43,7 @@ export function useSymDeleteKey({ fetchKeys }: UseDeleteKeyParams) {
   return { handleSymDelete };
 }
 
-export function useHybDeleteKey({ fetchKeys }: UseDeleteKeyParams) {
+export function useHybDeleteEn({ fetchKeys }: UseDeleteKeyParams) {
   const { toast } = useToast();
 
   // FIXME: NEED TO CONFIGURE THE TYPE

@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { useHybDeleteKey, useSymDeleteKey } from "@/hooks/keys/useDeleteKey";
+import { useHybDeleteEn, useSymDeleteEn } from "@/hooks/keys/useDeleteKey";
 import { useKeys } from "@/hooks/keys/useKeys";
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
@@ -15,8 +15,8 @@ export default function KeyringManagement() {
   const [filterKeyType, setFilterKeyType] = React.useState<string>("Symmetric");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
 
-  const { handleSymDelete } = useSymDeleteKey({ fetchKeys });
-  const { handleHybDelete } = useHybDeleteKey({ fetchKeys });
+  const { handleSymDelete } = useSymDeleteEn({ fetchKeys });
+  const { handleHybDelete } = useHybDeleteEn({ fetchKeys });
 
   const symcolumns = React.useMemo(
     () => getSymmetricKeyColumns(handleSymDelete),

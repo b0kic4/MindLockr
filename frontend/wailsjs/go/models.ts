@@ -1,68 +1,4 @@
-export namespace hybdec {
-	
-	export class RequestData {
-	    data: string;
-	    privPassphrase: string;
-	    folderName?: string;
-	    pubKey: string;
-	    privKey: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new RequestData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.data = source["data"];
-	        this.privPassphrase = source["privPassphrase"];
-	        this.folderName = source["folderName"];
-	        this.pubKey = source["pubKey"];
-	        this.privKey = source["privKey"];
-	    }
-	}
-	export class ReturnType {
-	
-	
-	    static createFrom(source: any = {}) {
-	        return new ReturnType(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	
-	    }
-	}
-
-}
-
-export namespace hybenc {
-	
-	export class RequestData {
-	    data: string;
-	    passphrase: string;
-	    privPassphrase: string;
-	    folderName: string;
-	    pubKey: string;
-	    privKey: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new RequestData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.data = source["data"];
-	        this.passphrase = source["passphrase"];
-	        this.privPassphrase = source["privPassphrase"];
-	        this.folderName = source["folderName"];
-	        this.pubKey = source["pubKey"];
-	        this.privKey = source["privKey"];
-	    }
-	}
-
-}
-
-export namespace keys {
+export namespace en {
 	
 	export class FileInfo {
 	    name: string;
@@ -152,26 +88,75 @@ export namespace keys {
 	        this.algorithm = source["algorithm"];
 	    }
 	}
-	export class PgpKeyInfo {
-	    name: string;
-	    publicKey: string;
-	    privateKey: string;
-	    folderPath: string;
-	    type: string;
+
+}
+
+export namespace hybdec {
+	
+	export class RequestData {
+	    data: string;
+	    privPassphrase: string;
+	    folderName?: string;
+	    pubKey: string;
+	    privKey: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new PgpKeyInfo(source);
+	        return new RequestData(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.name = source["name"];
-	        this.publicKey = source["publicKey"];
-	        this.privateKey = source["privateKey"];
-	        this.folderPath = source["folderPath"];
-	        this.type = source["type"];
+	        this.data = source["data"];
+	        this.privPassphrase = source["privPassphrase"];
+	        this.folderName = source["folderName"];
+	        this.pubKey = source["pubKey"];
+	        this.privKey = source["privKey"];
 	    }
 	}
+	export class ReturnType {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new ReturnType(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
+	    }
+	}
+
+}
+
+export namespace hybenc {
+	
+	export class RequestData {
+	    data: string;
+	    passphrase: string;
+	    privPassphrase: string;
+	    folderName: string;
+	    pubKey: string;
+	    privKey: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RequestData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.data = source["data"];
+	        this.passphrase = source["passphrase"];
+	        this.privPassphrase = source["privPassphrase"];
+	        this.folderName = source["folderName"];
+	        this.pubKey = source["pubKey"];
+	        this.privKey = source["privKey"];
+	    }
+	}
+
+}
+
+export namespace pgpgen {
+	
 	export class RequestData {
 	    Email: string;
 	    Name: string;
@@ -208,6 +193,31 @@ export namespace keys {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.PrivKey = source["PrivKey"];
 	        this.PubKey = source["PubKey"];
+	    }
+	}
+
+}
+
+export namespace pgpget {
+	
+	export class PgpKeyInfo {
+	    name: string;
+	    publicKey: string;
+	    privateKey: string;
+	    folderPath: string;
+	    type: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PgpKeyInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.publicKey = source["publicKey"];
+	        this.privateKey = source["privateKey"];
+	        this.folderPath = source["folderPath"];
+	        this.type = source["type"];
 	    }
 	}
 

@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { KeyInfo } from "@/lib/types/keys";
-import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
+import { LoadEncryptedContent } from "@wailsjs/go/en/EnRetrieve";
 import { DecryptAES } from "@wailsjs/go/symmetricdecryption/Cryptography";
 import React, { useState } from "react";
 import { PacmanLoader } from "react-spinners";
@@ -33,7 +33,7 @@ const DecryptedDataComponent: React.FC<DecryptedDataProps> = ({
     e.preventDefault();
     setIsLoading(true);
     try {
-      const encryptedData = await LoadEncryptedKeyContent(keyInfo.name);
+      const encryptedData = await LoadEncryptedContent(keyInfo.name);
 
       const decrypted = await DecryptAES({
         encryptedData,

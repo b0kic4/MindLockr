@@ -6,8 +6,7 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import { ColumnDef } from "@tanstack/react-table";
-import { keys } from "@wailsjs/go/models";
-import { LogInfo } from "@wailsjs/runtime/runtime";
+import { en } from "@wailsjs/go/models";
 import { KeyRound, Search, Trash } from "lucide-react";
 
 // TODO:
@@ -18,14 +17,10 @@ import { KeyRound, Search, Trash } from "lucide-react";
 
 export const getHybridKeyColumns = (
   handleDelete: (file: any) => void,
-): ColumnDef<keys.FileInfo, any>[] => {
-  const handleVerify = (file: keys.FolderInfo) => {
-    // LogInfo(JSON.stringify(file));
-  };
+): ColumnDef<en.FileInfo, any>[] => {
+  const handleVerify = (file: en.FolderInfo) => {};
 
-  const handleDecrypt = (file: keys.FolderInfo) => {
-    // LogInfo(JSON.stringify(file));
-  };
+  const handleDecrypt = (file: en.FolderInfo) => {};
 
   return [
     {

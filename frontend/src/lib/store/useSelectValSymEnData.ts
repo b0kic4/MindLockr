@@ -1,14 +1,14 @@
 import { create } from "zustand";
-import { keys } from "@wailsjs/go/models";
+import { en } from "@wailsjs/go/models";
 
 type FilesState = {
-  selectedEncryption: keys.FileInfo | null;
-  selectedValidation: keys.FileInfo | null;
+  selectedEncryption: en.FileInfo | null;
+  selectedValidation: en.FileInfo | null;
 };
 
 type FilesActions = {
-  setSelectedEncryption: (file: keys.FileInfo) => void;
-  setSelectedValidation: (file: keys.FileInfo) => void;
+  setSelectedEncryption: (file: en.FileInfo) => void;
+  setSelectedValidation: (file: en.FileInfo) => void;
 };
 
 const useSelectedValSymEnStore = create<FilesState & FilesActions>((set) => ({

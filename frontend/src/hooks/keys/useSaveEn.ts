@@ -1,7 +1,7 @@
 import React from "react";
 import { getFolderPathClientHook } from "@/hooks/getFolderPathClinet";
 import { useToast } from "@/hooks/use-toast";
-import { SaveSymmetricKey } from "../../../wailsjs/go/keys/KeyStore";
+import { SaveSymEn } from "../../../wailsjs/go/en/KeyStore";
 import { LogDebug } from "../../../wailsjs/runtime/runtime";
 
 export function useSaveKey() {
@@ -48,7 +48,7 @@ export function useSaveKey() {
     }
 
     try {
-      await SaveSymmetricKey(folderPath, keyFileName, encryptedData);
+      await SaveSymEn(folderPath, keyFileName, encryptedData);
       toast({
         variant: "default",
         className: "border-0",

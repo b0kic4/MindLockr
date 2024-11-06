@@ -16,13 +16,13 @@ import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncr
 import { cleanShownKey } from "@/lib/utils/useCleanKey";
 import SelectPgpKeyPair from "@/routes/keys/components/key-gen/SelectPgpKeyPair";
 import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
-import { LoadEncryptedKeyContent } from "@wailsjs/go/keys/KeyRetrieve";
-import { hybenc, keys } from "@wailsjs/go/models";
+import { LoadEncryptedContent } from "@wailsjs/go/en/EnRetrieve";
+import { en, hybenc } from "@wailsjs/go/models";
 import { Eye, EyeOff, Share } from "lucide-react";
 import React from "react";
 
 interface Props {
-  data: keys.KeyInfo;
+  data: en.KeyInfo;
 }
 
 export default function ShareSymEnc({ data }: Props) {
@@ -134,7 +134,7 @@ export default function ShareSymEnc({ data }: Props) {
       return;
     }
 
-    const loadedData = await LoadEncryptedKeyContent(data.name);
+    const loadedData = await LoadEncryptedContent(data.name);
 
     if (!loadedData) {
       return toast({

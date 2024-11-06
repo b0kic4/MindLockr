@@ -12,7 +12,7 @@ import {
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useGenKey } from "@/hooks/keys/useGenKey";
-import { useSaveKey } from "@/hooks/keys/useSaveKey";
+import { useSaveKey } from "@/hooks/keys/useSaveEn";
 import { Input } from "@/components/ui/input";
 import EncryptedDataDisplay from "./EncryptedDataDisplay";
 import AsymmetricKeyEncryptionForm from "./forms/AsymmetricEncryptionForm";

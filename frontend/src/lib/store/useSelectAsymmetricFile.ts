@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import { keys } from "@wailsjs/go/models";
+import { en } from "@wailsjs/go/models";
 
 type FileState = {
-  selectedFile: keys.FileInfo | null;
+  selectedFile: en.FileInfo | null;
 };
 
 type FileActions = {
-  setSelectedFile: (file: keys.FileInfo) => void;
+  setSelectedFile: (file: en.FileInfo) => void;
 };
 
 const useSelectedAsymmetricFileStore = create<FileState & FileActions>(
