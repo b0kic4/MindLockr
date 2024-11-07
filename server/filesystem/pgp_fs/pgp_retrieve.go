@@ -35,13 +35,11 @@ func (kr *PgpRetrieve) RetrievePgpKeys() ([]PgpKeyInfo, error) {
 	rsaKeys := []PgpKeyInfo{}
 	var err error
 
-	// Pass the key type "ECC" when retrieving ECC keys
 	eccKeys, err = kr.getPgpKeysFromDirectory(eccBaseFolderPath, "ECC")
 	if err != nil {
 		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving ECC PGP keys: %v", err)
 	}
 
-	// Pass the key type "RSA" when retrieving RSA keys
 	rsaKeys, err = kr.getPgpKeysFromDirectory(rsaBaseFolderPath, "RSA")
 	if err != nil {
 		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving RSA PGP keys: %v", err)

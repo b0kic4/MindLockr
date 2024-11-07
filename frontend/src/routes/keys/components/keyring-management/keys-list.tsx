@@ -1,4 +1,3 @@
-import { CustomDecryptButton } from "@/components/shared/decryption/CustomButtonDecryptDialog";
 import { Button } from "@/components/ui/button";
 import {
   ContextMenu,
@@ -7,23 +6,23 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import { pgpfs } from "@wailsjs/go/models";
 import { RetrievePgpPubKey } from "@wailsjs/go/pgpfs/PgpRetrieve";
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import React from "react";
-import { FiCheck, FiCopy } from "react-icons/fi";
 
 export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
   const [selectedKey, setSelectedKey] = React.useState<pgpfs.PgpKeyInfo | null>(
     null,
   );
-  const [copied, setCopied] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
 
   const [keyPath, setKeyPath] = React.useState<string>("");
+  const [isClicked, setIsClicked] = React.useState<boolean>(false);
+  const [passphrase, setPassphrase] = React.useState<string>("");
 
-  const { handleDecryptPrivKey, decryptedPrivKey, handleHidePrivKey } =
+  const { handleDecryptPrivKey, decryptedPrivKey, isDec, handleHidePrivKey } =
     usePrivateKeyDecryption({ keyPath });
 
   React.useEffect(() => {
@@ -33,15 +32,14 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
     }
   }, [selectedKey]);
 
-  // Handle copying the private key to clipboard
   const handleCopy = () => {
     if (decryptedPrivKey) {
       navigator.clipboard
         .writeText(decryptedPrivKey)
         .then(() => {
           LogInfo("Private key copied to clipboard");
-          setCopied(true); // Update the copied state
           handleHidePrivKey();
+          setIsClicked(false);
         })
         .catch((err) => {
           LogError(`Failed to copy to clipboard: ${err}`);
@@ -76,6 +74,12 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
     }
   };
 
+  // Modify form submission to properly handle the event
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevent default form submission
+    handleDecryptPrivKey(passphrase); // Pass the passphrase to the handler
+  };
+
   return (
     <div className="flex flex-col line">
       <div className="flex px-4 py-2 justify-around text-black dark:text-white font-bold">
@@ -101,23 +105,40 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
               Copy Public Key
             </ContextMenuItem>
 
-            <div className="flex flex-col space-y-2">
-              {!decryptedPrivKey && (
-                <CustomDecryptButton
-                  keyName={key.name}
-                  onSubmit={(passphrase) => {
-                    setLoading(true);
-                    handleDecryptPrivKey(passphrase);
-                  }}
-                />
+            <div className="flex flex-col">
+              {!decryptedPrivKey && !isClicked && (
+                <Button
+                  variant={"ghost"}
+                  className="flex text-center items-center justify-center text-sm text-green-500 px-2 py-1 rounded transition"
+                  onClick={() => setIsClicked(true)}
+                >
+                  Copy Private Key
+                </Button>
               )}
-              {decryptedPrivKey && (
+
+              {!decryptedPrivKey && isClicked && (
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-4">
+                    <Input
+                      type="password"
+                      placeholder="Enter Passphrase"
+                      value={passphrase}
+                      onChange={(e) => setPassphrase(e.target.value)}
+                      required
+                      className="w-full"
+                    />
+                  </div>
+                  <button>Submit</button>
+                </form>
+              )}
+
+              {decryptedPrivKey && isDec && (
                 <Button
                   onClick={handleCopy}
                   variant={"ghost"}
-                  className="flex text-center items-center justify-center gap-2 text-sm text-green-500 px-2 py-1  rounded transition"
+                  className="flex text-center items-center justify-center text-sm text-green-500 px-2 py-1 rounded transition"
                 >
-                  Copy Private Key
+                  Copy
                 </Button>
               )}
             </div>
