@@ -9,8 +9,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import { pgpfs } from "@wailsjs/go/models";
-import { RetrievePgpPubKey } from "@wailsjs/go/pgpfs/PgpRetrieve";
+import {
+  RetrievePgpPubKey,
+  RetrievePgpFingerprint,
+} from "@wailsjs/go/pgpfs/PgpRetrieve";
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
+import { useToast } from "@/hooks/use-toast";
 import React from "react";
 
 export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
@@ -32,17 +36,37 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
     }
   }, [selectedKey]);
 
+  const { toast } = useToast();
+
   const handleCopy = () => {
     if (decryptedPrivKey) {
       navigator.clipboard
         .writeText(decryptedPrivKey)
         .then(() => {
-          LogInfo("Private key copied to clipboard");
           handleHidePrivKey();
           setIsClicked(false);
+          toast({
+            variant: "default",
+            className: "bg-green-500 border-0",
+            title: "Private key copied successfully",
+            description: "Private key is in you clipboard",
+          });
         })
         .catch((err) => {
           LogError(`Failed to copy to clipboard: ${err}`);
+          const errorMessage =
+            err instanceof Error
+              ? err.message
+              : typeof err === "string"
+                ? err
+                : JSON.stringify(err);
+
+          toast({
+            variant: "destructive",
+            className: "bg-red-500 border-0",
+            title: "Failed to copy private key into your clipboard",
+            description: errorMessage,
+          });
         });
     }
   };
@@ -54,8 +78,32 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
         const publicKey = await RetrievePgpPubKey(key.folderPath);
         navigator.clipboard
           .writeText(publicKey)
-          .then(() => LogInfo("Public key copied to clipboard"))
-          .catch((err) => LogError(`Failed to copy to clipboard: ${err}`));
+          .then(() => {
+            LogInfo("Public key copied to clipboard");
+            toast({
+              variant: "default",
+              className: "bg-green-500 border-0",
+              title: "Private key copied successfully",
+              description: "Private key is in you clipboard",
+            });
+          })
+          .catch((err) => {
+            LogError(`Failed to copy to clipboard: ${err}`);
+
+            const errorMessage =
+              err instanceof Error
+                ? err.message
+                : typeof err === "string"
+                  ? err
+                  : JSON.stringify(err);
+
+            toast({
+              variant: "destructive",
+              className: "bg-red-500 border-0",
+              title: "Failed to copy private key into your clipboard",
+              description: errorMessage,
+            });
+          });
         break;
       case "delete":
         console.log("Delete key pair:", key);
@@ -67,7 +115,35 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
         console.log("Export key:", key);
         break;
       case "copyFingerprint":
-        console.log("Copy fingerprint:", key);
+        const fingerprint = await RetrievePgpFingerprint(key.folderPath);
+        navigator.clipboard
+          .writeText(fingerprint)
+          .then(() => {
+            LogInfo("Fingerprint copied to clipboard");
+            toast({
+              variant: "default",
+              className: "bg-green-500 border-0",
+              title: "Fingerprint copied successfully",
+              description: "Fingerprint is in you clipboard",
+            });
+          })
+          .catch((err) => {
+            LogError(`Failed to copy to clipboard: ${err}`);
+
+            const errorMessage =
+              err instanceof Error
+                ? err.message
+                : typeof err === "string"
+                  ? err
+                  : JSON.stringify(err);
+
+            toast({
+              variant: "destructive",
+              className: "bg-red-500 border-0",
+              title: "Failed to copy fingerprint into your clipboard",
+              description: errorMessage,
+            });
+          });
         break;
       default:
         break;
@@ -100,7 +176,7 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
             </div>
           </ContextMenuTrigger>
 
-          <ContextMenuContent>
+          <ContextMenuContent className="w-full ">
             <ContextMenuItem onSelect={() => handleAction("copyPublic", key)}>
               Copy Public Key
             </ContextMenuItem>
@@ -118,17 +194,17 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
 
               {!decryptedPrivKey && isClicked && (
                 <form onSubmit={handleSubmit}>
-                  <div className="mb-4">
+                  <div className="mb-4 border-2">
                     <Input
                       type="password"
-                      placeholder="Enter Passphrase"
+                      placeholder="Decryption passphrase"
                       value={passphrase}
                       onChange={(e) => setPassphrase(e.target.value)}
                       required
-                      className="w-full"
+                      className="w-full border-0 placeholder:text-sm"
                     />
+                    <button className="text-sm">Submit</button>
                   </div>
-                  <button>Submit</button>
                 </form>
               )}
 

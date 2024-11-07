@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
 )
 
 type PgpRetrieve struct {
@@ -96,4 +98,22 @@ func (kr *PgpRetrieve) RetrievePgpPrivKey(keyFolderPath string) (string, error) 
 	}
 
 	return string(encryptedPrivKeyHex), nil
+}
+
+func (kr *PgpRetrieve) RetrievePgpFingerprint(keyFolderPath string) (string, error) {
+	pubKeyPath := filepath.Join(keyFolderPath, "private.asc")
+
+	pubKeyArmor, err := os.ReadFile(pubKeyPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read private key file: %v", err)
+	}
+
+	loadedPubKey, err := crypto.NewKeyFromArmored(string(pubKeyArmor))
+	if err != nil {
+		return "", fmt.Errorf("failed to load public key %v", err)
+	}
+
+	fingerprint := loadedPubKey.GetFingerprint()
+
+	return string(fingerprint), nil
 }
