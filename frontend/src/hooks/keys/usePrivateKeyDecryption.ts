@@ -1,5 +1,5 @@
 import { DecryptPgpPrivKey } from "@wailsjs/go/pgpdec/PgpDec";
-import { LogError } from "@wailsjs/runtime/runtime.js";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime.js";
 import React from "react";
 import { useToast } from "../use-toast";
 

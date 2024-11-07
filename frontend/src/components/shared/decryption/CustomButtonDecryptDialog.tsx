@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { LogInfo } from "@wailsjs/runtime/runtime";
 import React from "react";
 
 interface PassphraseDialogProps {
@@ -31,8 +32,11 @@ export const CustomDecryptButton: React.FC<PassphraseDialogProps> = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="text-sm p-1 text-red-500 underline">
-          Decrypt private key
+        <Button
+          className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+          variant={"ghost"}
+        >
+          Get Private Key
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark dark:border-0">
