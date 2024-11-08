@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func SavePgpPrivKey(privKeyArmor string, keyName string, enType string) error {
+func SavePgpPrivKey(privKeyArmor string, keyName string) error {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
 
@@ -15,7 +15,7 @@ func SavePgpPrivKey(privKeyArmor string, keyName string, enType string) error {
 		return fmt.Errorf("Please initialize the folder where you want to store private key")
 	}
 
-	keysDir := filepath.Join(folderPath, "pgp", enType, keyName)
+	keysDir := filepath.Join(folderPath, "pgp", keyName)
 
 	err := os.MkdirAll(keysDir, 0755)
 	if err != nil {
@@ -33,7 +33,7 @@ func SavePgpPrivKey(privKeyArmor string, keyName string, enType string) error {
 	return nil
 }
 
-func SavePgpPublicKey(pubKeyArmor string, keyName string, enType string) error {
+func SavePgpPublicKey(pubKeyArmor string, keyName string) error {
 	folderInstance := filesystem.GetFolderInstance()
 	folderPath := folderInstance.GetFolderPath()
 
@@ -41,7 +41,7 @@ func SavePgpPublicKey(pubKeyArmor string, keyName string, enType string) error {
 		return fmt.Errorf("Please initialize the folder where you want to store public key")
 	}
 
-	keysDir := filepath.Join(folderPath, "pgp", enType, keyName)
+	keysDir := filepath.Join(folderPath, "pgp", keyName)
 
 	err := os.MkdirAll(keysDir, 0755)
 	if err != nil {

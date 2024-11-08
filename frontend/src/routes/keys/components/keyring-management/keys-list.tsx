@@ -161,9 +161,7 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
       <div className="flex px-4 py-2 justify-around text-black dark:text-white font-bold">
         <span className="w-1/3">Key Name</span>
         <span className="w-1/3">Type</span>
-        <span className="w-1/3">Created</span>
-        <span className="w-1/3">Expires</span>
-        <span className="w-1/3">User</span>
+        <span className="w-1/3">Path</span>
       </div>
 
       {keys.map((key) => (
@@ -171,8 +169,8 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
           <ContextMenuTrigger onContextMenu={() => setSelectedKey(key)}>
             <div className="flex px-4 py-2 justify-around items-center cursor-pointer border-b">
               <span className="w-1/3">{key.name}</span>
-              <span className="w-1/3"></span>
-              <span className="w-1/3"></span>
+              <span className="w-1/3">{key.type}</span>
+              <span className="w-1/3 text-xs">{key.folderPath}</span>
             </div>
           </ContextMenuTrigger>
 

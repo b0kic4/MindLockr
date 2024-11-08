@@ -1,6 +1,7 @@
 package pgpfs
 
 import (
+	"MindLockr/server/cryptography/cryptohelper"
 	"MindLockr/server/filesystem"
 	"fmt"
 	"os"
@@ -28,29 +29,11 @@ type PgpKeyInfo struct {
 }
 
 func (kr *PgpRetrieve) RetrievePgpKeys() ([]PgpKeyInfo, error) {
-	folderPath := kr.folderInstance.GetFolderPath()
-
-	eccBaseFolderPath := filepath.Join(folderPath, "pgp", "ECC")
-	rsaBaseFolderPath := filepath.Join(folderPath, "pgp", "RSA")
-
-	eccKeys := []PgpKeyInfo{}
-	rsaKeys := []PgpKeyInfo{}
-	var err error
-
-	eccKeys, err = kr.getPgpKeysFromDirectory(eccBaseFolderPath, "ECC")
-	if err != nil {
-		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving ECC PGP keys: %v", err)
-	}
-
-	rsaKeys, err = kr.getPgpKeysFromDirectory(rsaBaseFolderPath, "RSA")
-	if err != nil {
-		return []PgpKeyInfo{}, fmt.Errorf("Error retrieving RSA PGP keys: %v", err)
-	}
-
-	return append(eccKeys, rsaKeys...), nil
+	folderPath := filepath.Join(kr.folderInstance.GetFolderPath(), "pgp")
+	return kr.getPgpKeysFromDirectory(folderPath)
 }
 
-func (kr *PgpRetrieve) getPgpKeysFromDirectory(basePath string, keyType string) ([]PgpKeyInfo, error) {
+func (kr *PgpRetrieve) getPgpKeysFromDirectory(basePath string) ([]PgpKeyInfo, error) {
 	pgpKeys := []PgpKeyInfo{}
 
 	if _, err := os.Stat(basePath); os.IsNotExist(err) {
@@ -67,10 +50,27 @@ func (kr *PgpRetrieve) getPgpKeysFromDirectory(basePath string, keyType string) 
 			keyName := keyFolder.Name()
 			keyFolderPath := filepath.Join(basePath, keyName)
 
+			pubKeyArmor, err := kr.RetrievePgpPubKey(keyFolderPath)
+			if err != nil {
+				return nil, fmt.Errorf("Failed to get public key in getPgpKeysFromDirectory: %s", err)
+			}
+
+			loadedPubKey, err := crypto.NewKeyFromArmored(pubKeyArmor)
+			if err != nil {
+				return nil, fmt.Errorf("Failed to load public key %v", err)
+			}
+
+			alg := loadedPubKey.GetEntity().PrimaryKey.PubKeyAlgo
+			stringAlg, err := cryptohelper.DetectPGPType(alg)
+			if err != nil {
+				return nil, fmt.Errorf("Failed to detect PGP type %v", err)
+			}
+
 			pgpKeys = append(pgpKeys, PgpKeyInfo{
 				Name:       keyName,
+				PublicKey:  pubKeyArmor,
 				FolderPath: keyFolderPath,
-				Type:       keyType,
+				Type:       stringAlg,
 			})
 		}
 	}
