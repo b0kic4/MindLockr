@@ -16,15 +16,16 @@ import {
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
+import { PacmanLoader } from "react-spinners";
 
 export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
   const [selectedKey, setSelectedKey] = React.useState<pgpfs.PgpKeyInfo | null>(
     null,
   );
-
   const [keyPath, setKeyPath] = React.useState<string>("");
   const [isClicked, setIsClicked] = React.useState<boolean>(false);
   const [passphrase, setPassphrase] = React.useState<string>("");
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const { handleDecryptPrivKey, decryptedPrivKey, isDec, handleHidePrivKey } =
     usePrivateKeyDecryption({ keyPath });
@@ -49,7 +50,7 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
             variant: "default",
             className: "bg-green-500 border-0",
             title: "Private key copied successfully",
-            description: "Private key is in you clipboard",
+            description: "Private key is in your clipboard",
           });
         })
         .catch((err) => {
@@ -83,13 +84,12 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
             toast({
               variant: "default",
               className: "bg-green-500 border-0",
-              title: "Private key copied successfully",
-              description: "Private key is in you clipboard",
+              title: "Public key copied successfully",
+              description: "Public key is in your clipboard",
             });
           })
           .catch((err) => {
             LogError(`Failed to copy to clipboard: ${err}`);
-
             const errorMessage =
               err instanceof Error
                 ? err.message
@@ -100,7 +100,7 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
             toast({
               variant: "destructive",
               className: "bg-red-500 border-0",
-              title: "Failed to copy private key into your clipboard",
+              title: "Failed to copy public key into your clipboard",
               description: errorMessage,
             });
           });
@@ -124,12 +124,11 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
               variant: "default",
               className: "bg-green-500 border-0",
               title: "Fingerprint copied successfully",
-              description: "Fingerprint is in you clipboard",
+              description: "Fingerprint is in your clipboard",
             });
           })
           .catch((err) => {
             LogError(`Failed to copy to clipboard: ${err}`);
-
             const errorMessage =
               err instanceof Error
                 ? err.message
@@ -150,10 +149,11 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
     }
   };
 
-  // Modify form submission to properly handle the event
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission
-    handleDecryptPrivKey(passphrase); // Pass the passphrase to the handler
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true); // Set loading state
+    await handleDecryptPrivKey(passphrase); // Decrypt private key
+    setIsLoading(false); // Reset loading state after completion
   };
 
   return (
@@ -174,7 +174,7 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
             </div>
           </ContextMenuTrigger>
 
-          <ContextMenuContent className="w-full ">
+          <ContextMenuContent className="w-full">
             <ContextMenuItem onSelect={() => handleAction("copyPublic", key)}>
               Copy Public Key
             </ContextMenuItem>
@@ -201,7 +201,18 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
                       required
                       className="w-full border-0 placeholder:text-sm"
                     />
-                    <button className="text-sm">Submit</button>
+                    <Button
+                      type="submit"
+                      className="text-sm"
+                      variant={"ghost"}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <PacmanLoader size={8} color="#fff" />
+                      ) : (
+                        "Submit"
+                      )}
+                    </Button>
                   </div>
                 </form>
               )}
