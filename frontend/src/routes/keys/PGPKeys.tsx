@@ -11,7 +11,7 @@ import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
 import { TextSearchIcon } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import React from "react";
-import { PgpKeysGenForm } from "./components/PGP/PgpKeysGenForm";
+import { PgpKeysGenForm } from "./components/key-gen/PgpKeysGenForm";
 import ListKeys from "./components/keyring-management/keys-list";
 
 export default function PGPKeys() {
@@ -28,10 +28,12 @@ export default function PGPKeys() {
     .filter((keyName) =>
       keyName.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
     )
-    .filter((key) =>
-      selectedType === "all" ? true : key.type === selectedType,
-    );
-
+    .filter((key) => {
+      if (selectedType === "all") return true;
+      if (selectedType === "RSA") return key.type === "RSA";
+      if (selectedType === "ECC") return key.type !== "RSA";
+      return false;
+    });
   // I should have a component that will be displayed under the list of the keys
   // with showing more informaiton about the key pair from entity or smth like that
   // just like on the gpa

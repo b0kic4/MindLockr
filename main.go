@@ -7,9 +7,9 @@ import (
 	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
 	pgpdec "MindLockr/server/cryptography/pgp/pgp_dec"
 	pgpgen "MindLockr/server/cryptography/pgp/pgp_gen"
-	pgpget "MindLockr/server/cryptography/pgp/pgp_get"
 	"MindLockr/server/filesystem"
 	"MindLockr/server/filesystem/en"
+	pgpfs "MindLockr/server/filesystem/pgp_fs"
 	"context"
 	"embed"
 
@@ -33,7 +33,7 @@ func main() {
 	enRetrieve := en.NewEnRetrieve(folder)
 	keyStore := &en.KeyStore{}
 	pgp_gen := &pgpgen.PgpKeysGen{}
-	pgp_get := pgpget.NewPgpRetrieve(folder)
+	pgp_get := pgpfs.NewPgpRetrieve(folder)
 	pgp_dec := &pgpdec.PgpDec{}
 
 	app := NewApp()

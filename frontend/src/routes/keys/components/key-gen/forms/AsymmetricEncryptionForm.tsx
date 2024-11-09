@@ -94,10 +94,11 @@ export default function AsymmetricKeyEncryptionForm({
             Public Key
           </label>
         </div>
+
         <Textarea
           id="publicKey"
           placeholder="Public Key"
-          className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+          className="mb-2 h-40 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
           value={providedPubKey || ""}
           onChange={handlePublicKeyChange}
         />
@@ -149,9 +150,10 @@ export default function AsymmetricKeyEncryptionForm({
           id="privateKey"
           placeholder="Private Key"
           value={providedPrivKey}
-          className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+          className="mb-2 h-40 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
           onChange={handlePrivateKeyChange}
         />
+
         <em className="text-sm text-purple-500 ml-2">
           Fill out the required information first. Once private key is
           decrypted, you have 5 seconds to submit the form.

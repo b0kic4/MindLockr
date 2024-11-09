@@ -16,10 +16,10 @@ import useSelectNumOfBits from "@/lib/store/useSelectNumberOfBits";
 import { GeneratePGPKeys } from "@wailsjs/go/pgpgen/PgpKeysGen";
 import { LogError } from "@wailsjs/runtime/runtime";
 import React from "react";
-import SelectAlg from "./SelectAlgorithm";
-import NumberOfBitsRSA from "./SelectNumberOfBitsForRSA";
+import SelectAlg from "../PGP/SelectAlgorithm";
+import NumberOfBitsRSA from "../PGP/SelectNumberOfBitsForRSA";
 import { PacmanLoader } from "react-spinners";
-import SelectCurve from "./SelectCurve";
+import SelectCurve from "../PGP/SelectCurve";
 import useSelectCurve from "@/lib/store/useSelectCurve";
 
 type Props = {

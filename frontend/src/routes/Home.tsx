@@ -49,15 +49,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      <div className="w-full p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-        <p className="text-md text-gray-700 dark:text-gray-300 text-center">
-          <strong>Important:</strong> Do not share the encryption algorithm or
-          passphrase. The algorithm is undetectable and stored within folders of
-          files. Decryption can be slow if the algorithm is forgotten. Never
-          share encryption details or passphrases with others.
-        </p>
-      </div>
     </div>
   );
 }

@@ -26,7 +26,7 @@ export default function EncryptedDataDisplay({ encryptedData }: Props) {
         <Button
           onClick={handleCopy}
           variant={"ghost"}
-          className="flex text-center items-center justify-center gap-2 absolute top-2 right-2 text-sm text-green-500 px-2 py-1  rounded transition"
+          className="flex text-center items-center justify-center gap-2 absolute top-2 text-sm text-green-500 py-1  rounded transition"
         >
           {copied ? <FiCheck /> : <FiCopy />} {copied ? "Copied" : "Copy"}
         </Button>

@@ -103,12 +103,12 @@ func (pgpKeysGen *PgpKeysGen) GenStoreRSA(req RequestData) (ReturnType, error) {
 
 	var err error
 
-	err = pgpfs.SavePgpPrivKey(privKey, req.Usage, req.EnType)
+	err = pgpfs.SavePgpPrivKey(privKey, req.Usage)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
 	}
 
-	err = pgpfs.SavePgpPublicKey(pubKey, req.Usage, req.EnType)
+	err = pgpfs.SavePgpPublicKey(pubKey, req.Usage)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
 	}
@@ -173,12 +173,12 @@ func (pgpKeysGen *PgpKeysGen) GenStoreECC(req RequestData) (ReturnType, error) {
 		return ReturnType{}, fmt.Errorf("failed while extracting armored private key: %s", err)
 	}
 
-	err = pgpfs.SavePgpPrivKey(privKey, req.Usage, req.EnType)
+	err = pgpfs.SavePgpPrivKey(privKey, req.Usage)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save private key: %v", err)
 	}
 
-	err = pgpfs.SavePgpPublicKey(pubKey, req.Usage, req.EnType)
+	err = pgpfs.SavePgpPublicKey(pubKey, req.Usage)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to save public key: %v", err)
 	}
