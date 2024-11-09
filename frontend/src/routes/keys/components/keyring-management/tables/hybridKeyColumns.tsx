@@ -9,18 +9,12 @@ import { ColumnDef } from "@tanstack/react-table";
 import { en } from "@wailsjs/go/models";
 import { KeyRound, Search, Trash } from "lucide-react";
 
-// TODO:
-// So we are generating the hybrid files (3 of them)
-// into one single folder
-// we need to transform that into one .gpg or .pgp
-// file
-
 export const getHybridKeyColumns = (
   handleDelete: (file: any) => void,
 ): ColumnDef<en.FileInfo, any>[] => {
-  const handleVerify = (file: en.FolderInfo) => {};
+  const handleVerify = (file: en.FileInfo) => {};
 
-  const handleDecrypt = (file: en.FolderInfo) => {};
+  const handleDecrypt = (file: en.FileInfo) => {};
 
   return [
     {
