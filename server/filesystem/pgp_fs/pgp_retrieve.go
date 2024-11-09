@@ -81,12 +81,12 @@ func (kr *PgpRetrieve) getPgpKeysFromDirectory(basePath string) ([]PgpKeyInfo, e
 func (kr *PgpRetrieve) RetrievePgpPubKey(keyFolderPath string) (string, error) {
 	pubKeyPath := filepath.Join(keyFolderPath, "public.asc")
 
-	pubKeyPEM, err := os.ReadFile(pubKeyPath)
+	pubKeyArmor, err := os.ReadFile(pubKeyPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read public key file: %v", err)
 	}
 
-	return string(pubKeyPEM), nil
+	return string(pubKeyArmor), nil
 }
 
 func (kr *PgpRetrieve) RetrievePgpPrivKey(keyFolderPath string) (string, error) {
@@ -116,4 +116,41 @@ func (kr *PgpRetrieve) RetrievePgpFingerprint(keyFolderPath string) (string, err
 	fingerprint := loadedPubKey.GetFingerprint()
 
 	return string(fingerprint), nil
+}
+
+func (kr *PgpRetrieve) RetrieveKeyMoreInfo(keyFolderPath string) (map[string]string, error) {
+	pubKeyPath := filepath.Join(keyFolderPath, "public.asc")
+	pubKeyArmor, err := os.ReadFile(pubKeyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read public key file: %v", err)
+	}
+
+	loadedKey, err := crypto.NewKeyFromArmored(string(pubKeyArmor))
+	if err != nil {
+		return nil, fmt.Errorf("failed to load public key %v", err)
+	}
+
+	moreInfo := make(map[string]string)
+	identities := loadedKey.GetEntity().Identities
+	for _, identity := range identities {
+		moreInfo["User Name"] = identity.Name
+		moreInfo["Email"] = identity.UserId.Email
+		break
+	}
+
+	moreInfo["Fingerprint"] = loadedKey.GetFingerprint()
+
+	// Example for Key Type and Validity
+	alg := loadedKey.GetEntity().PrimaryKey.PubKeyAlgo
+	stringAlg, err := cryptohelper.DetectPGPType(alg)
+	if err == nil {
+		moreInfo["Key Type"] = stringAlg
+	} else {
+		moreInfo["Key Type"] = "Unknown"
+	}
+
+	moreInfo["Owner Trust"] = "N/A"
+	moreInfo["Key Validity"] = "Fully Valid"
+
+	return moreInfo, nil
 }

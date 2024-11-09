@@ -38,7 +38,7 @@ export default function SelectPgpKeyPair() {
 
   const [isPublicChecked, setIsPublicChecked] = React.useState(false);
   const [isPrivateChecked, setIsPrivateChecked] = React.useState(false);
-  const [encType, setEncType] = React.useState<string>("ECC");
+  const [encType, setEncType] = React.useState<string>("all");
 
   React.useEffect(() => {
     fetchPgpKeys();
@@ -118,7 +118,12 @@ export default function SelectPgpKeyPair() {
     handleHidePrivKey();
   };
 
-  const filteredPgpKeys = pgpKeys.filter((key) => key.type === encType);
+  const filteredPgpKeys = pgpKeys.filter((key) => {
+    if (encType === "all") return true;
+    if (encType === "RSA") return key.type === "RSA";
+    if (encType === "ECC") return key.type !== "RSA";
+    return false;
+  });
 
   return (
     <div className="p-6 max-w-md bg-background dark:bg-background-dark text-white rounded-lg shadow-md">
@@ -136,6 +141,7 @@ export default function SelectPgpKeyPair() {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="ECC">ECC</SelectItem>
               <SelectItem value="RSA">RSA</SelectItem>
             </SelectGroup>

@@ -8,15 +8,21 @@ import {
 } from "@/components/ui/context-menu";
 import { Input } from "@/components/ui/input";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
+import { useToast } from "@/hooks/use-toast";
 import { pgpfs } from "@wailsjs/go/models";
 import {
-  RetrievePgpPubKey,
   RetrievePgpFingerprint,
+  RetrievePgpPubKey,
+  RetrieveKeyMoreInfo,
 } from "@wailsjs/go/pgpfs/PgpRetrieve";
 import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
-import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { PacmanLoader } from "react-spinners";
+import KeyMoreInfo from "./KeyMoreInfo";
+
+export type PGPInfo = {
+  [key: string]: string;
+};
 
 export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
   const [selectedKey, setSelectedKey] = React.useState<pgpfs.PgpKeyInfo | null>(
@@ -26,6 +32,8 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
   const [isClicked, setIsClicked] = React.useState<boolean>(false);
   const [passphrase, setPassphrase] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+  const [keyMoreInfo, setKeyMoreInfo] = React.useState<PGPInfo | null>(null);
 
   const { handleDecryptPrivKey, decryptedPrivKey, isDec, handleHidePrivKey } =
     usePrivateKeyDecryption({ keyPath });
@@ -72,7 +80,6 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
     }
   };
 
-  // Action handler for context menu items
   const handleAction = async (action: string, key: pgpfs.PgpKeyInfo) => {
     switch (action) {
       case "copyPublic":
@@ -149,104 +156,122 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
     }
   };
 
+  const handleRetrieveKeyInfo = async (folderPath: string) => {
+    try {
+      setKeyMoreInfo(null);
+      const keyInfo = await RetrieveKeyMoreInfo(folderPath);
+
+      setKeyMoreInfo(keyInfo);
+    } catch (error) {
+      LogError(`Failed to retrieve key information: ${error}`);
+      setKeyMoreInfo(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true); // Set loading state
-    await handleDecryptPrivKey(passphrase); // Decrypt private key
-    setIsLoading(false); // Reset loading state after completion
+    setIsLoading(true);
+    await handleDecryptPrivKey(passphrase);
+    setIsLoading(false);
   };
 
   return (
-    <div className="flex flex-col line">
-      <div className="flex px-4 py-2 justify-around text-black dark:text-white font-bold">
-        <span className="w-1/3">Key Name</span>
-        <span className="w-1/3">Type</span>
-        <span className="w-1/3">Path</span>
-      </div>
+    <div className="flex flex-col">
+      <div className="flex flex-col line">
+        <div className="flex px-4 py-2 justify-around text-black dark:text-white font-bold">
+          <span className="w-1/3">Key Name</span>
+          <span className="w-1/3">Type</span>
+          <span className="w-1/3">Path</span>
+        </div>
 
-      {keys.map((key) => (
-        <ContextMenu key={key.name}>
-          <ContextMenuTrigger onContextMenu={() => setSelectedKey(key)}>
-            <div className="flex px-4 py-2 justify-around items-center cursor-pointer border-b">
-              <span className="w-1/3">{key.name}</span>
-              <span className="w-1/3">{key.type}</span>
-              <span className="w-1/3 text-xs">{key.folderPath}</span>
-            </div>
-          </ContextMenuTrigger>
-
-          <ContextMenuContent className="w-full">
-            <ContextMenuItem onSelect={() => handleAction("copyPublic", key)}>
-              Copy Public Key
-            </ContextMenuItem>
-
-            <div className="flex flex-col">
-              {!decryptedPrivKey && !isClicked && (
-                <Button
-                  variant={"ghost"}
-                  className="flex text-center items-center justify-center text-sm text-green-500 px-2 py-1 rounded transition"
-                  onClick={() => setIsClicked(true)}
-                >
-                  Copy Private Key
-                </Button>
-              )}
-
-              {!decryptedPrivKey && isClicked && (
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-4 border-2">
-                    <Input
-                      type="password"
-                      placeholder="Decryption passphrase"
-                      value={passphrase}
-                      onChange={(e) => setPassphrase(e.target.value)}
-                      required
-                      className="w-full border-0 placeholder:text-sm"
-                    />
-                    <Button
-                      type="submit"
-                      className="text-sm"
-                      variant={"ghost"}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <PacmanLoader size={8} color="#fff" />
-                      ) : (
-                        "Submit"
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              )}
-
-              {decryptedPrivKey && isDec && (
-                <Button
-                  onClick={handleCopy}
-                  variant={"ghost"}
-                  className="flex text-center items-center justify-center text-sm text-green-500 px-2 py-1 rounded transition"
-                >
-                  Copy
-                </Button>
-              )}
-            </div>
-
-            <ContextMenuSeparator />
-            <ContextMenuItem onSelect={() => handleAction("delete", key)}>
-              Delete Key Pair
-            </ContextMenuItem>
-            <ContextMenuItem onSelect={() => handleAction("edit", key)}>
-              Edit
-            </ContextMenuItem>
-            <ContextMenuItem onSelect={() => handleAction("export", key)}>
-              Export
-            </ContextMenuItem>
-            <ContextMenuSeparator />
-            <ContextMenuItem
-              onSelect={() => handleAction("copyFingerprint", key)}
+        {keys.map((key) => (
+          <ContextMenu key={key.name}>
+            <ContextMenuTrigger
+              onClick={() => handleRetrieveKeyInfo(key.folderPath)}
+              onContextMenu={() => setSelectedKey(key)}
             >
-              Copy Fingerprint
-            </ContextMenuItem>
-          </ContextMenuContent>
-        </ContextMenu>
-      ))}
+              <div className="flex px-4 py-2 justify-around items-center cursor-pointer border-b">
+                <span className="w-1/3">{key.name}</span>
+                <span className="w-1/3">{key.type}</span>
+                <span className="w-1/3 text-xs">{key.folderPath}</span>
+              </div>
+            </ContextMenuTrigger>
+
+            <ContextMenuContent className="w-full">
+              <ContextMenuItem onSelect={() => handleAction("copyPublic", key)}>
+                Copy Public Key
+              </ContextMenuItem>
+
+              <div className="flex flex-col">
+                {!decryptedPrivKey && !isClicked && (
+                  <Button
+                    variant={"ghost"}
+                    className="flex text-center items-center justify-center text-sm text-green-500 px-2 py-1 rounded transition"
+                    onClick={() => setIsClicked(true)}
+                  >
+                    Copy Private Key
+                  </Button>
+                )}
+
+                {!decryptedPrivKey && isClicked && (
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-4 border-2">
+                      <Input
+                        type="password"
+                        placeholder="Decryption passphrase"
+                        value={passphrase}
+                        onChange={(e) => setPassphrase(e.target.value)}
+                        required
+                        className="w-full border-0 placeholder:text-sm"
+                      />
+                      <Button
+                        type="submit"
+                        className="text-sm"
+                        variant={"ghost"}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <PacmanLoader size={8} color="#fff" />
+                        ) : (
+                          "Submit"
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+
+                {decryptedPrivKey && isDec && (
+                  <Button
+                    onClick={handleCopy}
+                    variant={"ghost"}
+                    className="flex text-center items-center justify-center text-sm text-green-500 px-2 py-1 rounded transition"
+                  >
+                    Copy
+                  </Button>
+                )}
+              </div>
+
+              <ContextMenuSeparator />
+              <ContextMenuItem onSelect={() => handleAction("delete", key)}>
+                Delete Key Pair
+              </ContextMenuItem>
+              <ContextMenuItem onSelect={() => handleAction("edit", key)}>
+                Edit
+              </ContextMenuItem>
+              <ContextMenuItem onSelect={() => handleAction("export", key)}>
+                Export
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+              <ContextMenuItem
+                onSelect={() => handleAction("copyFingerprint", key)}
+              >
+                Copy Fingerprint
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
+        ))}
+      </div>
+      {keyMoreInfo ? <KeyMoreInfo keyInfo={keyMoreInfo} /> : null}
     </div>
   );
 }
