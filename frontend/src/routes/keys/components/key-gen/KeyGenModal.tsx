@@ -16,9 +16,10 @@ import { useToast } from "@/hooks/use-toast";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
 import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
 import { hybenc } from "@wailsjs/go/models";
-import { LogError } from "@wailsjs/runtime/runtime";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import React from "react";
-import { FiCheck, FiCopy } from "react-icons/fi";
+import { SaveHybEn } from "@wailsjs/go/en/KeyStore";
+import { en } from "@wailsjs/go/models";
 import EncryptedDataDisplay from "./EncryptedDataDisplay";
 import AsymmetricKeyEncryptionForm from "./forms/AsymmetricEncryptionForm";
 import EncryptionForm from "./forms/EncryptionForm";
@@ -42,7 +43,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
   const [encryptedData, setEncryptedData] = React.useState("");
   const [keyType, setKeyType] = React.useState("symmetric");
   const [keyFileName, setKeyFileName] = React.useState("");
-  const [copied, setCopied] = React.useState<boolean>(false);
 
   const { generateKey, result, error } = useGenKey();
   const { saveKey, errorWhenSaving } = useSaveKey();
@@ -95,7 +95,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     if (!passphrase) missingFields.push("Passphrase");
     if (!privKeyPassphrase) missingFields.push("Private Key Passphrase");
     if (!algorithm) missingFields.push("Algorithm");
-    if (!folderName) missingFields.push("Folder Name");
     if (!providedPubKey) missingFields.push("Public Key");
     if (!providedPrivKey) missingFields.push("Private Key");
 
@@ -115,7 +114,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       data,
       passphrase,
       privPassphrase: privKeyPassphrase,
-      folderName,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };
@@ -169,6 +167,44 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     await fetchKeys();
   };
 
+  const handleSaveHybEn = async () => {
+    if (!encryptedData) {
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Save Failed",
+        description: "No encrypted data available to save.",
+      });
+      return;
+    }
+
+    const req: en.HybridRequestData = {
+      FileName: keyFileName,
+      MsgArmor: encryptedData,
+    };
+
+    try {
+      await SaveHybEn(req);
+
+      toast({
+        variant: "default",
+        title: "Message Saved Successfully",
+        description: `Your encrypted message has been saved to the folder: ${req.FileName}`,
+      });
+    } catch (error) {
+      LogError("Saving encrypted message failed: " + JSON.stringify(error));
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      toast({
+        variant: "destructive",
+        className: "bg-red-500 border-0",
+        title: "Save Failed",
+        description: errorMessage,
+      });
+    }
+  };
+
   const clearEn = () => {
     setData("");
     setPassphrase("");
@@ -177,12 +213,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     setEncryptedData("");
     handleHidePrivKey();
     clearPub(), clearPriv(), clearPair(), clearEnKey();
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(encryptedData);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const encryptedDataRef = React.useRef<HTMLTextAreaElement | null>(null);
@@ -217,23 +247,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
           <Questions />
           <KeyTypeTabs keyType={keyType} setKeyType={setKeyType}>
             <div className="flex flex-col space-y-2">
-              {keyType === "asymmetric" && (
-                <div className="flex flex-col items-start justify-start space-y-1 mt-4">
-                  <label
-                    htmlFor="publicKey"
-                    className="block text-sm font-medium text-foreground dark:text-foreground-dark"
-                  >
-                    Specify the Foler where the Message will be saved (optional)
-                  </label>
-                  <Input
-                    id="folderName"
-                    value={folderName}
-                    onChange={(e) => setFolderName(e.target.value)}
-                    className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
-                    placeholder="Specify the folder name to store data"
-                  />
-                </div>
-              )}
               <EncryptionForm
                 data={data}
                 setData={setData}
@@ -257,25 +270,17 @@ export default function KeysGenModal({ fetchKeys }: Props) {
               Clear
             </Button>
             <EncryptedDataDisplay encryptedData={encryptedData} />
+
+            {encryptedData && (
+              <KeySaveForm
+                keyFileName={keyFileName}
+                setKeyFileName={setKeyFileName}
+                handleSaveKey={
+                  keyType == "symmetric" ? handleSaveKey : handleSaveHybEn
+                }
+              />
+            )}
           </div>
-
-          {keyType === "symmetric" && (
-            <Button
-              onClick={clearEn}
-              variant="link"
-              className="flex underline text-blue-500"
-            >
-              Clear
-            </Button>
-          )}
-
-          {encryptedData && keyType == "symmetric" && (
-            <KeySaveForm
-              keyFileName={keyFileName}
-              setKeyFileName={setKeyFileName}
-              handleSaveKey={handleSaveKey}
-            />
-          )}
         </div>
 
         <SheetFooter>
