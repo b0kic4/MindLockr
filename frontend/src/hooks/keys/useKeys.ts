@@ -15,12 +15,6 @@ interface FileInfo {
   path: string;
 }
 
-interface FolderInfo {
-  name: string;
-  files: FileInfo[];
-  path: string;
-}
-
 interface SymmetricKey {
   name: string;
   algorithm: string;
@@ -29,7 +23,7 @@ interface SymmetricKey {
 
 export interface KeyData {
   symmetric: SymmetricKey[];
-  asymmetric: FolderInfo[];
+  asymmetric: FileInfo[];
 }
 
 export function useKeys() {

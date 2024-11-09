@@ -6,6 +6,6 @@ export function LoadAsymEnData(arg1:string):Promise<string>;
 
 export function LoadEncryptedContent(arg1:string):Promise<string>;
 
-export function RetrieveAsymEn():Promise<Array<en.FolderInfo>>;
+export function RetrieveAsymEn():Promise<Array<en.FileInfo>>;
 
 export function RetrieveSymEn():Promise<Array<en.KeyInfo>>;
