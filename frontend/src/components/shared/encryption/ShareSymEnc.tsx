@@ -149,7 +149,6 @@ export default function ShareSymEnc({ data }: Props) {
       data: loadedData,
       passphrase,
       privPassphrase: "",
-      folderName,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };
