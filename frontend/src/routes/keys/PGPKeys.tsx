@@ -8,12 +8,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePgpKeys } from "@/hooks/keys/usePgpKeys";
-import { Accordion } from "@radix-ui/react-accordion";
 import { TextSearchIcon } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import React from "react";
-import PgpKeyAccordionItem from "./components/PGP/PgpKeyAccordionItem";
-import { PgpKeysGenForm } from "./components/PGP/PgpKeysGenForm";
+import { PgpKeysGenForm } from "./components/key-gen/PgpKeysGenForm";
+import ListKeys from "./components/keyring-management/keys-list";
 
 export default function PGPKeys() {
   const { pgpKeys, fetchPgpKeys } = usePgpKeys();
@@ -21,13 +20,23 @@ export default function PGPKeys() {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const [selectedType, setSelectedType] = React.useState<string>("all");
 
+  React.useEffect(() => {
+    fetchPgpKeys();
+  }, []);
+
   const filteredKeys = pgpKeys
     .filter((keyName) =>
       keyName.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
     )
-    .filter((key) =>
-      selectedType === "all" ? true : key.type === selectedType,
-    );
+    .filter((key) => {
+      if (selectedType === "all") return true;
+      if (selectedType === "RSA") return key.type === "RSA";
+      if (selectedType === "ECC") return key.type !== "RSA";
+      return false;
+    });
+  // I should have a component that will be displayed under the list of the keys
+  // with showing more informaiton about the key pair from entity or smth like that
+  // just like on the gpa
 
   return (
     <div className="p-6 rounded shadow-md">
@@ -67,11 +76,7 @@ export default function PGPKeys() {
 
       {pgpKeys.length > 0 ? (
         filteredKeys.length > 0 ? (
-          <Accordion type="multiple" className="mt-4">
-            {filteredKeys.map((keyName) => (
-              <PgpKeyAccordionItem keyName={keyName} />
-            ))}
-          </Accordion>
+          <ListKeys keys={filteredKeys} />
         ) : (
           <p className="text-gray-600 text-center mt-8">
             No PGP keys match your search.

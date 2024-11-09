@@ -1,57 +1,53 @@
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useGenKey } from "@/hooks/keys/useGenKey";
-import { useSaveKey } from "@/hooks/keys/useSaveKey";
+import { useSaveKey } from "@/hooks/keys/useSaveEn";
 import { Input } from "@/components/ui/input";
 import EncryptedDataDisplay from "./EncryptedDataDisplay";
 import AsymmetricKeyEncryptionForm from "./forms/AsymmetricEncryptionForm";
 import EncryptionForm from "./forms/EncryptionForm";
 import KeySaveForm from "./forms/KeySaveForm";
-import AlgorithmSelector from "./utils/AlgorithmSelector";
 import KeyTypeTabs from "./utils/KeyTypeTabs";
 import Questions from "./utils/Questions";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { EncryptSharedData } from "@wailsjs/go/hybridencryption/HybridEncryption";
-import { hybridencryption } from "@wailsjs/go/models";
+import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
+import { hybenc } from "@wailsjs/go/models";
 import { LogError } from "@wailsjs/runtime/runtime";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   fetchKeys: () => Promise<void>;
 }
 
+// Maybe to tansform the component to be the
+// Sheet
+
 export default function KeysGenModal({ fetchKeys }: Props) {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
+  const [privKeyPassphrase, setPrivKeyPassphrase] = React.useState<string>("");
   const [algorithm, setAlgorithm] = React.useState("AES");
-  const [algorithmType, setAlgorithmType] = React.useState<string>("");
-
-  // utils for encryption (asymmetric)
   const [folderName, setFolderName] = React.useState<string>("");
-
-  // encrypted string
   const [encryptedData, setEncryptedData] = React.useState("");
-
-  // keyinfo
   const [keyType, setKeyType] = React.useState("symmetric");
   const [keyFileName, setKeyFileName] = React.useState("");
 
-  // hooks
   const { generateKey, result, error } = useGenKey();
   const { saveKey, errorWhenSaving } = useSaveKey();
   const { toast } = useToast();
 
-  // zustand
   const {
     selectedPgpKeyPair,
     providedPubKey,
@@ -66,20 +62,12 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     keyPath: selectedPgpKeyPair,
   });
 
-  // effect to update encrypted data asap
   React.useEffect(() => {
     if (result) setEncryptedData(result);
   }, [result]);
 
-  // symmetric encryption
   const handleGenerateKey = async () => {
-    const requestData = {
-      data,
-      passphrase,
-      algorithm,
-      algorithmType,
-    };
-
+    const requestData = { data, passphrase, algorithm };
     await generateKey(requestData);
 
     if (error) {
@@ -100,14 +88,13 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     }
   };
 
-  // hybrid encryption
   const handleGenerateSharableData = async () => {
     const missingFields = [];
 
     if (!data) missingFields.push("Data");
     if (!passphrase) missingFields.push("Passphrase");
+    if (!privKeyPassphrase) missingFields.push("Private Key Passphrase");
     if (!algorithm) missingFields.push("Algorithm");
-    if (!algorithmType) missingFields.push("Algorithm Type");
     if (!folderName) missingFields.push("Folder Name");
     if (!providedPubKey) missingFields.push("Public Key");
     if (!providedPrivKey) missingFields.push("Private Key");
@@ -124,20 +111,18 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       return;
     }
 
-    const reqData: hybridencryption.RequestData = {
+    const reqData: hybenc.RequestData = {
       data,
       passphrase,
-      algorithm,
-      algorithmType,
+      privPassphrase: privKeyPassphrase,
       folderName,
       pubKey: providedPubKey,
       privKey: providedPrivKey,
     };
 
     try {
-      const response: hybridencryption.ResponseData =
-        await EncryptSharedData(reqData);
-      setEncryptedData(response.SymmetricData);
+      const response: string = await EncryptAndSign(reqData);
+      setEncryptedData(response);
 
       toast({
         variant: "default",
@@ -146,8 +131,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       });
     } catch (error) {
       LogError("Hybrid Encryption failed: " + JSON.stringify(error));
-
-      // Handle known error structures
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -167,12 +150,13 @@ export default function KeysGenModal({ fetchKeys }: Props) {
       setData("");
       setPassphrase("");
       handleHidePrivKey();
+      setPrivKeyPassphrase("");
       clearPub(), clearPriv(), clearPair(), clearEnKey();
     }
   };
 
   const handleSaveKey = async () => {
-    await saveKey(keyFileName, encryptedData, algorithmType);
+    await saveKey(keyFileName, encryptedData);
 
     if (!errorWhenSaving) {
       setData("");
@@ -184,39 +168,56 @@ export default function KeysGenModal({ fetchKeys }: Props) {
 
     await fetchKeys();
   };
+
+  const clearEn = () => {
+    setData("");
+    setPassphrase("");
+    setAlgorithm("AES");
+    setKeyFileName("");
+    setEncryptedData("");
+    handleHidePrivKey();
+    clearPub(), clearPriv(), clearPair(), clearEnKey();
+  };
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Sheet>
+      <SheetTrigger asChild>
         <Button
           className="bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow-lg transition-all"
           variant="default"
         >
-          + Add New Key / Encrypt New Message
+          Encrypt New Message
         </Button>
-      </DialogTrigger>
+      </SheetTrigger>
 
-      <DialogContent className="w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 text-black dark:text-gray-200">
-        <DialogHeader>
-          <DialogTitle>Key Generation & Encryption</DialogTitle>
-          <DialogDescription>
+      <SheetContent className="w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl overflow-y-auto bg-secondary dark:bg-secondary-dark text-black dark:text-gray-200">
+        <SheetHeader>
+          <SheetTitle className="dark:text-white text-black">
+            Message Encryption
+          </SheetTitle>
+          <SheetDescription>
             Please provide the necessary information for encryption.
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
-        {/* Scrollable Content */}
-        <div className="space-y-6 overflow-auto max-h-[70vh] p-4">
+        <div className="space-y-6 overflow-auto p-4">
           <Questions />
 
           <KeyTypeTabs keyType={keyType} setKeyType={setKeyType}>
             <div className="flex flex-col space-y-2">
               {keyType === "asymmetric" && (
-                <Input
-                  id="folderName"
-                  value={folderName}
-                  onChange={(e) => setFolderName(e.target.value)}
-                  placeholder="Specify the folder name to store data"
-                  className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
-                />
+                <>
+                  <Label className="flex" htmlFor="folderName">
+                    Folder Name
+                  </Label>
+                  <Input
+                    id="folderName"
+                    value={folderName}
+                    onChange={(e) => setFolderName(e.target.value)}
+                    placeholder="Specify the folder name to store data"
+                    className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+                  />
+                </>
               )}
               <EncryptionForm
                 data={data}
@@ -224,18 +225,25 @@ export default function KeysGenModal({ fetchKeys }: Props) {
                 passphrase={passphrase}
                 setPassphrase={setPassphrase}
               />
-              <AlgorithmSelector
-                algorithm={algorithm}
-                setAlgorithm={setAlgorithm}
-                algorithmType={algorithmType}
-                setAlgorithmType={setAlgorithmType}
-              />
-              {keyType === "asymmetric" && <AsymmetricKeyEncryptionForm />}
+              {keyType === "asymmetric" && (
+                <AsymmetricKeyEncryptionForm
+                  setPrivKeyPassphrase={setPrivKeyPassphrase}
+                />
+              )}
             </div>
           </KeyTypeTabs>
 
           {keyType === "symmetric" && (
-            <EncryptedDataDisplay encryptedData={encryptedData} />
+            <div>
+              <Button
+                onClick={clearEn}
+                variant="link"
+                className="flex underline text-blue-500"
+              >
+                Clear
+              </Button>
+              <EncryptedDataDisplay encryptedData={encryptedData} />
+            </div>
           )}
 
           {encryptedData && keyType === "symmetric" && (
@@ -247,10 +255,11 @@ export default function KeysGenModal({ fetchKeys }: Props) {
           )}
         </div>
 
-        <DialogFooter>
+        <SheetFooter>
           {keyType === "symmetric" && (
             <Button
               onClick={handleGenerateKey}
+              disabled={!data || !passphrase}
               className="bg-blue-600 text-white p-3 rounded w-full"
             >
               Encrypt Data with Symmetric Key
@@ -260,13 +269,21 @@ export default function KeysGenModal({ fetchKeys }: Props) {
           {keyType === "asymmetric" && (
             <Button
               onClick={handleGenerateSharableData}
+              disabled={
+                !data ||
+                !passphrase ||
+                !privKeyPassphrase ||
+                !folderName ||
+                !providedPubKey ||
+                !providedPrivKey
+              }
               className="bg-blue-500 text-white p-3 rounded w-full"
             >
               Generate Sharable Encryption
             </Button>
           )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

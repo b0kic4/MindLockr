@@ -25,11 +25,8 @@ export default function NumberOfBitsRSA() {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Bits</SelectLabel>
-          <SelectItem value="1024">1024</SelectItem>
-          <SelectItem value="2048">2048</SelectItem>
           <SelectItem value="3072">3072</SelectItem>
           <SelectItem value="4096">4096</SelectItem>
-          <SelectItem value="7680">7680</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

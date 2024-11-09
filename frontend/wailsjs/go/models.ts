@@ -1,49 +1,4 @@
-export namespace hybridencryption {
-	
-	export class RequestData {
-	    data: string;
-	    passphrase: string;
-	    algorithm?: string;
-	    algorithmType?: string;
-	    folderName: string;
-	    pubKey: string;
-	    privKey: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new RequestData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.data = source["data"];
-	        this.passphrase = source["passphrase"];
-	        this.algorithm = source["algorithm"];
-	        this.algorithmType = source["algorithmType"];
-	        this.folderName = source["folderName"];
-	        this.pubKey = source["pubKey"];
-	        this.privKey = source["privKey"];
-	    }
-	}
-	export class ResponseData {
-	    SymmetricData: string;
-	    EncryptedPassphrase: string;
-	    Signature: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new ResponseData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.SymmetricData = source["SymmetricData"];
-	        this.EncryptedPassphrase = source["EncryptedPassphrase"];
-	        this.Signature = source["Signature"];
-	    }
-	}
-
-}
-
-export namespace keys {
+export namespace en {
 	
 	export class FileInfo {
 	    name: string;
@@ -133,6 +88,75 @@ export namespace keys {
 	        this.algorithm = source["algorithm"];
 	    }
 	}
+
+}
+
+export namespace hybdec {
+	
+	export class RequestData {
+	    data: string;
+	    privPassphrase: string;
+	    folderName?: string;
+	    pubKey: string;
+	    privKey: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RequestData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.data = source["data"];
+	        this.privPassphrase = source["privPassphrase"];
+	        this.folderName = source["folderName"];
+	        this.pubKey = source["pubKey"];
+	        this.privKey = source["privKey"];
+	    }
+	}
+	export class ReturnType {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new ReturnType(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
+	    }
+	}
+
+}
+
+export namespace hybenc {
+	
+	export class RequestData {
+	    data: string;
+	    passphrase: string;
+	    privPassphrase: string;
+	    folderName: string;
+	    pubKey: string;
+	    privKey: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RequestData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.data = source["data"];
+	        this.passphrase = source["passphrase"];
+	        this.privPassphrase = source["privPassphrase"];
+	        this.folderName = source["folderName"];
+	        this.pubKey = source["pubKey"];
+	        this.privKey = source["privKey"];
+	    }
+	}
+
+}
+
+export namespace pgpfs {
+	
 	export class PgpKeyInfo {
 	    name: string;
 	    publicKey: string;
@@ -153,10 +177,18 @@ export namespace keys {
 	        this.type = source["type"];
 	    }
 	}
+
+}
+
+export namespace pgpgen {
+	
 	export class RequestData {
+	    Email: string;
+	    Name: string;
 	    EnType: string;
 	    Usage: string;
 	    Passphrase: string;
+	    Curve: string;
 	    Bits: number;
 	
 	    static createFrom(source: any = {}) {
@@ -165,9 +197,12 @@ export namespace keys {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Email = source["Email"];
+	        this.Name = source["Name"];
 	        this.EnType = source["EnType"];
 	        this.Usage = source["Usage"];
 	        this.Passphrase = source["Passphrase"];
+	        this.Curve = source["Curve"];
 	        this.Bits = source["Bits"];
 	    }
 	}
@@ -213,7 +248,6 @@ export namespace symmetricencryption {
 	    data: string;
 	    passphrase: string;
 	    algorithm: string;
-	    algorithmType: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RequestData(source);
@@ -224,7 +258,6 @@ export namespace symmetricencryption {
 	        this.data = source["data"];
 	        this.passphrase = source["passphrase"];
 	        this.algorithm = source["algorithm"];
-	        this.algorithmType = source["algorithmType"];
 	    }
 	}
 

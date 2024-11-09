@@ -64,7 +64,7 @@ body {
   }
 
   .dark {
-    --background: 210, 28%, 12%; /* Dark background */
+    --background: 0, 0%, 7%; /* Updated for #0E1113 */
     --foreground: 0, 0%, 98%; /* Light text on dark */
     --card: 210, 16%, 20%; /* Slightly lighter card background */
     --card-foreground: 0, 0%, 90%; /* Lighter text on cards */

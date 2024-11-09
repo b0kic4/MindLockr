@@ -1,11 +1,11 @@
 import { useToast } from "@/hooks/use-toast";
-import { RetrievePgpKeys } from "@wailsjs/go/keys/KeyRetrieve";
-import { keys } from "@wailsjs/go/models";
+import { pgpfs } from "@wailsjs/go/models";
+import { RetrievePgpKeys } from "@wailsjs/go/pgpfs/PgpRetrieve";
 import { LogError } from "@wailsjs/runtime/runtime";
 import React from "react";
 
 export function usePgpKeys() {
-  const [pgpKeys, setPgpKeys] = React.useState<keys.PgpKeyInfo[]>([]);
+  const [pgpKeys, setPgpKeys] = React.useState<pgpfs.PgpKeyInfo[]>([]);
   const { toast } = useToast();
 
   const fetchPgpKeys = React.useCallback(async () => {

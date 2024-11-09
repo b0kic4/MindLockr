@@ -1,13 +1,15 @@
 package main
 
 import (
-	hybriddecryption "MindLockr/server/cryptography/decryption/hybrid_decryption"
+	hybdec "MindLockr/server/cryptography/decryption/hyb_dec"
 	symmetricdecryption "MindLockr/server/cryptography/decryption/symmetric_decryption"
-	"MindLockr/server/cryptography/decryption/validation"
-	hybridencryption "MindLockr/server/cryptography/encryption/hybrid_encryption"
+	hybenc "MindLockr/server/cryptography/encryption/hyb_enc"
 	symmetricencryption "MindLockr/server/cryptography/encryption/symmetric_encryption"
+	pgpdec "MindLockr/server/cryptography/pgp/pgp_dec"
+	pgpgen "MindLockr/server/cryptography/pgp/pgp_gen"
 	"MindLockr/server/filesystem"
-	"MindLockr/server/filesystem/keys"
+	"MindLockr/server/filesystem/en"
+	pgpfs "MindLockr/server/filesystem/pgp_fs"
 	"context"
 	"embed"
 
@@ -25,13 +27,14 @@ var assets embed.FS
 func main() {
 	symmetric_encryption := &symmetricencryption.Cryptography{}
 	symmetric_decryption := &symmetricdecryption.Cryptography{}
-	hybrid_encryption := &hybridencryption.HybridEncryption{}
-	hybrid_decryption := &hybriddecryption.HybridPassphraseDecryption{}
-	validator := &validation.Validator{}
+	hyb_enc := &hybenc.HybEnc{}
+	hyb_dec := &hybdec.HybDec{}
 	folder := filesystem.GetFolderInstance()
-	keyRetrieve := keys.NewKeyRetrieve(folder)
-	keyStore := &keys.KeyStore{}
-	pgpKeys := &keys.PgpKeysGen{}
+	enRetrieve := en.NewEnRetrieve(folder)
+	keyStore := &en.KeyStore{}
+	pgp_gen := &pgpgen.PgpKeysGen{}
+	pgp_get := pgpfs.NewPgpRetrieve(folder)
+	pgp_dec := &pgpdec.PgpDec{}
 
 	app := NewApp()
 
@@ -99,12 +102,13 @@ func main() {
 			symmetric_encryption,
 			symmetric_decryption,
 			folder,
-			keyRetrieve,
+			enRetrieve,
 			keyStore,
-			pgpKeys,
-			hybrid_encryption,
-			hybrid_decryption,
-			validator,
+			pgp_gen,
+			pgp_get,
+			pgp_dec,
+			hyb_enc,
+			hyb_dec,
 		},
 	})
 	if err != nil {

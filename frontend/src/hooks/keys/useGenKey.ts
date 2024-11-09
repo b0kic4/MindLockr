@@ -7,7 +7,6 @@ type GenerateKeyDataRequest = {
   data: string;
   passphrase: string;
   algorithm: string;
-  algorithmType: string;
 };
 
 export function useGenKey() {

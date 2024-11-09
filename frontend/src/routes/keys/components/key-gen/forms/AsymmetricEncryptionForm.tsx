@@ -1,14 +1,23 @@
 import { DecryptButton } from "@/components/shared/decryption/DecryptButton";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { cleanShownKey } from "@/lib/utils/useCleanKey";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import SelectPgpKeyPair from "../SelectPgpKeyPair";
 
-export default function AsymmetricKeyEncryptionForm() {
+// i need to rewrite the decryption of the private key
+// so the passphrase of the decrypted private key
+// to be sent to the server
+
+interface Props {
+  setPrivKeyPassphrase: (value: string) => void;
+}
+
+export default function AsymmetricKeyEncryptionForm({
+  setPrivKeyPassphrase,
+}: Props) {
   // hooks
   const {
     selectedPgpKeyPair,
@@ -19,24 +28,23 @@ export default function AsymmetricKeyEncryptionForm() {
     setProvidedPubKey,
   } = usePgpAsymmetricEncryptionInputsStore();
 
-  const { decryptedPrivKey, isDec, handleDecryptPrivKey, handleHidePrivKey } =
-    usePrivateKeyDecryption({
-      keyPath: selectedPgpKeyPair,
-    });
+  const {
+    decryptedPrivKey,
+    isDec,
+    handleHidePrivKey,
+    handleDecryptReturnPassphrase,
+  } = usePrivateKeyDecryption({
+    keyPath: selectedPgpKeyPair,
+  });
 
   const [isPrivateKeyVisible, setIsPrivateKeyVisible] = React.useState(false);
 
-  const [shownPubKey, setShownPubKey] = React.useState<string>("");
-  const [shownPrivKey, setShownPrivKey] = React.useState<string>("");
-
-  // When keys are selected with SelectPgpKeyPair component
-  React.useEffect(() => {
-    const cleanedPrivKey = cleanShownKey(providedPrivKey);
-    setShownPrivKey(cleanedPrivKey);
-
-    const cleanedPubKey = cleanShownKey(providedPubKey);
-    setShownPubKey(cleanedPubKey);
-  }, [providedPubKey, providedPrivKey]);
+  // get the passphrase of the function from hook
+  // pass this function to the decrypt buton
+  const getPassphrasePrivKey = async (passphrase: string) => {
+    const providedPassphrase = await handleDecryptReturnPassphrase(passphrase);
+    if (providedPassphrase.length > 0) setPrivKeyPassphrase(providedPassphrase);
+  };
 
   React.useEffect(() => {
     if (!providedPrivKey && decryptedPrivKey) {
@@ -50,45 +58,26 @@ export default function AsymmetricKeyEncryptionForm() {
     }
 
     if (decryptedPrivKey && decryptedPrivKey.length > 0) {
-      const cleanedPrivKey = cleanShownKey(decryptedPrivKey);
-      setShownPrivKey(cleanedPrivKey);
-
-      const formattedDecPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
-      setProvidedPrivKey(formattedDecPrivKey);
+      setProvidedPrivKey(decryptedPrivKey);
     }
   }, [decryptedPrivKey]);
 
   // for manual input
-  const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePublicKeyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const rawPubKey = e.target.value;
-
-    const cleanedPubKey = cleanShownKey(rawPubKey);
-    setShownPubKey(cleanedPubKey);
-
-    const formattedPubKey = `-----BEGIN PGP PUBLIC KEY-----\n${cleanedPubKey}\n-----END PGP PUBLIC KEY-----`;
-    setProvidedPubKey(formattedPubKey);
+    setProvidedPubKey(rawPubKey);
   };
 
   // for manual input
-  const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePrivateKeyChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
     const rawPrivKey = e.target.value;
-
-    const cleanedPrivKey = cleanShownKey(rawPrivKey);
-
-    setShownPrivKey(cleanedPrivKey);
-
-    const formattedPrivKey = `-----BEGIN PGP PRIVATE KEY-----\n${cleanedPrivKey}\n-----END PGP PRIVATE KEY-----`;
-    setProvidedPrivKey(formattedPrivKey);
+    setProvidedPrivKey(rawPrivKey);
   };
 
   return (
-    <div className="space-y-4 p-4 bg-muted dark:bg-muted-dark mt-4 rounded-lg">
-      <h3 className="text-lg font-semibold">Asymmetric Key Encryption</h3>
-      <p className="text-sm text-foreground dark:text-foreground-dark">
-        Please select a PGP key pair or provide custom keys for asymmetric
-        encryption.
-      </p>
-
+    <div className="space-y-4 p-4 mt-4 rounded-lg">
       <div className="space-y-2">
         <div className="flex items-center justify-center">
           <SelectPgpKeyPair />
@@ -105,10 +94,12 @@ export default function AsymmetricKeyEncryptionForm() {
             Public Key
           </label>
         </div>
-        <Input
+
+        <Textarea
           id="publicKey"
           placeholder="Public Key"
-          value={shownPubKey || ""}
+          className="mb-2 h-40 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+          value={providedPubKey || ""}
           onChange={handlePublicKeyChange}
         />
       </div>
@@ -147,7 +138,7 @@ export default function AsymmetricKeyEncryptionForm() {
                   Please decrypt your private key.
                 </em>
                 <DecryptButton
-                  onSubmit={handleDecryptPrivKey}
+                  onSubmit={getPassphrasePrivKey}
                   keyName={providedPrivKey}
                 />
               </>
@@ -155,16 +146,17 @@ export default function AsymmetricKeyEncryptionForm() {
           )}
         </div>
 
-        <Input
+        <Textarea
           id="privateKey"
           placeholder="Private Key"
-          type={isPrivateKeyVisible ? "text" : "password"}
-          value={shownPrivKey || ""}
+          value={providedPrivKey}
+          className="mb-2 h-40 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
           onChange={handlePrivateKeyChange}
         />
-        <em className="text-sm text-yellow-500 ml-2">
-          Submit the form when you decrypt your private key with the passphrase.
-          You get 3.5 seconds before the key is encrypted again
+
+        <em className="text-sm text-purple-500 ml-2">
+          Fill out the required information first. Once private key is
+          decrypted, you have 5 seconds to submit the form.
         </em>
       </div>
     </div>
