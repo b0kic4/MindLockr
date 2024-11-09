@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -9,23 +10,23 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import React from "react";
-import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 import { useGenKey } from "@/hooks/keys/useGenKey";
+import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import { useSaveKey } from "@/hooks/keys/useSaveEn";
-import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
+import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
+import { hybenc } from "@wailsjs/go/models";
+import { LogError } from "@wailsjs/runtime/runtime";
+import React from "react";
+import { FiCheck, FiCopy } from "react-icons/fi";
 import EncryptedDataDisplay from "./EncryptedDataDisplay";
 import AsymmetricKeyEncryptionForm from "./forms/AsymmetricEncryptionForm";
 import EncryptionForm from "./forms/EncryptionForm";
 import KeySaveForm from "./forms/KeySaveForm";
 import KeyTypeTabs from "./utils/KeyTypeTabs";
 import Questions from "./utils/Questions";
-import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
-import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
-import { hybenc } from "@wailsjs/go/models";
-import { LogError } from "@wailsjs/runtime/runtime";
-import { Label } from "@/components/ui/label";
 
 interface Props {
   fetchKeys: () => Promise<void>;
@@ -43,6 +44,7 @@ export default function KeysGenModal({ fetchKeys }: Props) {
   const [encryptedData, setEncryptedData] = React.useState("");
   const [keyType, setKeyType] = React.useState("symmetric");
   const [keyFileName, setKeyFileName] = React.useState("");
+  const [copied, setCopied] = React.useState<boolean>(false);
 
   const { generateKey, result, error } = useGenKey();
   const { saveKey, errorWhenSaving } = useSaveKey();
@@ -179,6 +181,12 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     clearPub(), clearPriv(), clearPair(), clearEnKey();
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(encryptedData);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -266,22 +274,41 @@ export default function KeysGenModal({ fetchKeys }: Props) {
             </Button>
           )}
 
-          {keyType === "asymmetric" && (
-            <Button
-              onClick={handleGenerateSharableData}
-              disabled={
-                !data ||
-                !passphrase ||
-                !privKeyPassphrase ||
-                !folderName ||
-                !providedPubKey ||
-                !providedPrivKey
-              }
-              className="bg-blue-500 text-white p-3 rounded w-full"
-            >
-              Generate Sharable Encryption
-            </Button>
-          )}
+          <div className="flex">
+            {encryptedData && (
+              <div>
+                <Textarea
+                  id="encryptedData"
+                  value={encryptedData}
+                  placeholder="PGP Message"
+                  readOnly
+                  className="mb-2 h-40 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+                />
+                <Button
+                  onClick={handleCopy}
+                  variant="ghost"
+                  className="flex text-center items-center justify-center gap-2 text-sm text-green-500 py-1 rounded transition"
+                >
+                  {copied ? <FiCheck /> : <FiCopy />}{" "}
+                  {copied ? "Copied" : "Copy"}
+                </Button>
+              </div>
+            )}
+
+            <div className="flex flex-col mt-4 space-y-4">
+              {keyType === "asymmetric" && (
+                <Button
+                  onClick={handleGenerateSharableData}
+                  disabled={
+                    !data || !passphrase || !privKeyPassphrase || !folderName
+                  }
+                  className="bg-blue-500 text-white p-3 rounded w-full"
+                >
+                  Generate Sharable Encryption
+                </Button>
+              )}
+            </div>
+          </div>
         </SheetFooter>
       </SheetContent>
     </Sheet>

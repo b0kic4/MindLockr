@@ -140,7 +140,6 @@ func (kr *PgpRetrieve) RetrieveKeyMoreInfo(keyFolderPath string) (map[string]str
 
 	moreInfo["Fingerprint"] = loadedKey.GetFingerprint()
 
-	// Example for Key Type and Validity
 	alg := loadedKey.GetEntity().PrimaryKey.PubKeyAlgo
 	stringAlg, err := cryptohelper.DetectPGPType(alg)
 	if err == nil {
