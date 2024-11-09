@@ -19,14 +19,14 @@ export default function EncryptedDataDisplay({ encryptedData }: Props) {
 
   return (
     <div className="flex flex-col space-y-4 p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold text-foreground dark:text-foreground-dark">
+      <h3 className="text-sm font-semibold text-foreground dark:text-foreground-dark">
         Encrypted Data
       </h3>
       <div className="relative p-4 bg-card dark:bg-card-dark rounded-lg overflow-x-auto">
         <Button
           onClick={handleCopy}
           variant={"ghost"}
-          className="flex text-center items-center justify-center gap-2 absolute top-2 text-sm text-green-500 py-1  rounded transition"
+          className="flex text-center items-center justify-center gap-2 absolute top-2 text-xs text-green-500 py-1  rounded transition"
         >
           {copied ? <FiCheck /> : <FiCopy />} {copied ? "Copied" : "Copy"}
         </Button>
