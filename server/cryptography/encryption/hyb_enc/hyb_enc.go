@@ -13,7 +13,6 @@ type (
 		Data              string `json:"data"`
 		Passphrase        string `json:"passphrase"`
 		PrivKeyPassphrase string `json:"privPassphrase"`
-		FolderName        string `json:"folderName"`
 		PubKey            string `json:"pubKey"`
 		PrivKey           string `json:"privKey"`
 	}
@@ -23,7 +22,6 @@ type (
 		AlgSymEnc           string
 		EncryptedPassphrase string
 		Signature           string
-		FolderName          string
 	}
 )
 
@@ -67,8 +65,6 @@ func (he *HybEnc) EncryptAndSign(req RequestData) (string, error) {
 	}
 
 	encHandle.ClearPrivateParams()
-
-	fmt.Println(string(pgpArmor))
 
 	return string(pgpArmor), nil
 }

@@ -29,12 +29,8 @@ func (ks *KeyStore) SaveSymEn(folderPath, fileName, keyContent string) error {
 }
 
 type HybridRequestData struct {
-	SymmetricData       string
-	AlgSymEnc           string
-	EncyrptedPassphrase string
-	Signature           string
-	FolderName          string
-	AsymAlgType         string
+	FileName string
+	MsgArmor string
 }
 
 func (ks *KeyStore) SaveHybEn(req HybridRequestData) error {
@@ -45,48 +41,17 @@ func (ks *KeyStore) SaveHybEn(req HybridRequestData) error {
 		return fmt.Errorf("Please initialize the folder where you want to store data")
 	}
 
-	keysDir := filepath.Join(folderPath, "keys/asymmetric", req.AsymAlgType, req.FolderName)
-
-	// Check if the specified FolderName already exists
-	if _, err := os.Stat(keysDir); !os.IsNotExist(err) {
-		return fmt.Errorf("The folder with the name '%s' already exists. Please specify a new name for the data.", req.FolderName)
+	messageDir := filepath.Join(folderPath, "keys/asymmetric")
+	if err := os.MkdirAll(messageDir, os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create message directory: %v", err)
 	}
 
-	// Create the keys directory
-	err := os.MkdirAll(keysDir, os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("failed to create keys directory: %v", err)
+	messageFilePath := filepath.Join(messageDir, req.FileName+".asc")
+
+	if err := os.WriteFile(messageFilePath, []byte(req.MsgArmor), 0644); err != nil {
+		return fmt.Errorf("failed to write PGP message to file: %v", err)
 	}
 
-	// Create the directory for the algorithm type within the folder
-	algorithmDir := filepath.Join(keysDir, req.AlgSymEnc)
-	if err := os.MkdirAll(algorithmDir, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create algorithm directory: %v", err)
-	}
-
-	// Define the full paths for the files
-	symmetricDataFilePath := filepath.Join(algorithmDir, "symmetric_data.enc")
-	encryptedPassphraseFilePath := filepath.Join(keysDir, "encrypted_passphrase.key")
-	signatureFilePath := filepath.Join(keysDir, "signature.sig")
-
-	// Write the symmetric data to the file
-	err = os.WriteFile(symmetricDataFilePath, []byte(req.SymmetricData), 0644)
-	if err != nil {
-		return fmt.Errorf("failed to write symmetric data: %v", err)
-	}
-
-	// Write the encrypted passphrase to the file
-	err = os.WriteFile(encryptedPassphraseFilePath, []byte(req.EncyrptedPassphrase), 0644)
-	if err != nil {
-		return fmt.Errorf("failed to write encrypted passphrase: %v", err)
-	}
-
-	// Write the signature to the file
-	err = os.WriteFile(signatureFilePath, []byte(req.Signature), 0644)
-	if err != nil {
-		return fmt.Errorf("failed to write signature: %v", err)
-	}
-
-	fmt.Printf("Data saved successfully in %s\n", keysDir)
+	fmt.Printf("PGP message saved successfully in %s\n", messageFilePath)
 	return nil
 }

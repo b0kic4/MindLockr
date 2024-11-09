@@ -53,12 +53,8 @@ export namespace en {
 		}
 	}
 	export class HybridRequestData {
-	    SymmetricData: string;
-	    AlgSymEnc: string;
-	    EncyrptedPassphrase: string;
-	    Signature: string;
-	    FolderName: string;
-	    AsymAlgType: string;
+	    FileName: string;
+	    MsgArmor: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new HybridRequestData(source);
@@ -66,12 +62,8 @@ export namespace en {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.SymmetricData = source["SymmetricData"];
-	        this.AlgSymEnc = source["AlgSymEnc"];
-	        this.EncyrptedPassphrase = source["EncyrptedPassphrase"];
-	        this.Signature = source["Signature"];
-	        this.FolderName = source["FolderName"];
-	        this.AsymAlgType = source["AsymAlgType"];
+	        this.FileName = source["FileName"];
+	        this.MsgArmor = source["MsgArmor"];
 	    }
 	}
 	export class KeyInfo {
@@ -134,7 +126,6 @@ export namespace hybenc {
 	    data: string;
 	    passphrase: string;
 	    privPassphrase: string;
-	    folderName: string;
 	    pubKey: string;
 	    privKey: string;
 	
@@ -147,7 +138,6 @@ export namespace hybenc {
 	        this.data = source["data"];
 	        this.passphrase = source["passphrase"];
 	        this.privPassphrase = source["privPassphrase"];
-	        this.folderName = source["folderName"];
 	        this.pubKey = source["pubKey"];
 	        this.privKey = source["privKey"];
 	    }
