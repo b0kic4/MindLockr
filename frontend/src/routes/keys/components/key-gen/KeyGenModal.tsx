@@ -184,6 +184,8 @@ export default function KeysGenModal({ fetchKeys }: Props) {
         title: "Message Saved Successfully",
         description: `Your encrypted message has been saved to the folder: ${req.FileName}`,
       });
+
+      fetchKeys();
     } catch (error) {
       LogError("Saving encrypted message failed: " + JSON.stringify(error));
       const errorMessage =
