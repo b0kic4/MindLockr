@@ -117,7 +117,7 @@ export function PgpKeysGenForm({ fetchPgpKeys }: Props) {
                 onChange={(e) => setKeyName(e.target.value)}
                 type="text"
                 className="col-span-3"
-                placeholder="Please provide a key name that reflects its intended usage."
+                placeholder="Provide a key name that reflects its intended usage."
               />
               <Label htmlFor="passphrase" className="text-right">
                 Passphrase

@@ -1,16 +1,9 @@
-// opening collapsable window example:
-// pressing on keys can navigate to the keys route (dashboard)
-// but when clicked on the arrow down icon to show all the possible
-// routes for that keys
-
 import {
   DatabaseBackup,
-  Files,
-  Fingerprint,
   GlobeLock,
   Home,
   IdCard,
-  KeyRound,
+  FileLock2,
   Network,
   NotebookPen,
   UserPen,
@@ -21,8 +14,7 @@ import { NavItem } from "./NavItem";
 export function Sidebar() {
   const navigationRoutes = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/keys", label: "Keys", icon: KeyRound },
-    { href: "/files", label: "Files", icon: Files },
+    { href: "/keys", label: "PGP", icon: FileLock2 },
     { href: "/cipher", label: "Cipher", icon: GlobeLock },
     { href: "/credentials", label: "Credentials", icon: UserPen },
     { href: "/wallet", label: "Wallet", icon: WalletMinimal },

@@ -24,7 +24,7 @@ export default function EncryptionForm({
         placeholder="Type your message in here"
         value={data}
         onChange={(e) => setData(e.target.value)}
-        className="mb-2 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
+        className="mb-2 h-40 bg-card dark:bg-muted-dark text-foreground dark:text-foreground-dark"
       />
       <Label className="flex" htmlFor="passphrase">
         Passphrase
