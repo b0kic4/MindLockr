@@ -13,6 +13,7 @@ import { useDebounce } from "use-debounce";
 import React from "react";
 import { PgpKeysGenForm } from "./components/key-gen/PgpKeysGenForm";
 import ListKeys from "./components/keyring-management/keys-list";
+import { Button } from "@/components/ui/button";
 
 export default function PGPKeys() {
   const { pgpKeys, fetchPgpKeys } = usePgpKeys();
@@ -69,7 +70,10 @@ export default function PGPKeys() {
           </Select>
         </div>
 
-        <div className="ml-auto">
+        <div className="flex ml-auto gap-2">
+          <Button className="px-6 py-3 bg-purple-600 text-white font-semibold rounded hover:bg-purple-700 shadow-lg transition-all">
+            Import PGP Keys
+          </Button>
           <PgpKeysGenForm fetchPgpKeys={fetchPgpKeys} />
         </div>
       </div>

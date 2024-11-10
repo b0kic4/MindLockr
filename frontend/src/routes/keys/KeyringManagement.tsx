@@ -36,13 +36,6 @@ export default function KeyringManagement() {
     key.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  // in the hybrid encryption table
-  // we should have the
-  // verify button
-  // decrypt button
-  //
-  // we should have a in Select => ALL, SYMMETRIC and HYBRID (ASYMMETRIC)
-
   const renderContent = () => {
     if (filterKeyType === "Symmetric") {
       return (

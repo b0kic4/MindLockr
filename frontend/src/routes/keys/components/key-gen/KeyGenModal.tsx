@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -14,12 +13,11 @@ import { usePrivateKeyDecryption } from "@/hooks/keys/usePrivateKeyDecryption";
 import { useSaveKey } from "@/hooks/keys/useSaveEn";
 import { useToast } from "@/hooks/use-toast";
 import usePgpAsymmetricEncryptionInputsStore from "@/lib/store/useAsymmetricEncryptionPrivPubKeysProvided";
-import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
-import { hybenc } from "@wailsjs/go/models";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
-import React from "react";
 import { SaveHybEn } from "@wailsjs/go/en/KeyStore";
-import { en } from "@wailsjs/go/models";
+import { EncryptAndSign } from "@wailsjs/go/hybenc/HybEnc";
+import { en, hybenc } from "@wailsjs/go/models";
+import { LogError } from "@wailsjs/runtime/runtime";
+import React from "react";
 import EncryptedDataDisplay from "./EncryptedDataDisplay";
 import AsymmetricKeyEncryptionForm from "./forms/AsymmetricEncryptionForm";
 import EncryptionForm from "./forms/EncryptionForm";
@@ -31,15 +29,11 @@ interface Props {
   fetchKeys: () => Promise<void>;
 }
 
-// Maybe to tansform the component to be the
-// Sheet
-
 export default function KeysGenModal({ fetchKeys }: Props) {
   const [data, setData] = React.useState("");
   const [passphrase, setPassphrase] = React.useState("");
   const [privKeyPassphrase, setPrivKeyPassphrase] = React.useState<string>("");
   const [algorithm, setAlgorithm] = React.useState("AES");
-  const [folderName, setFolderName] = React.useState<string>("");
   const [encryptedData, setEncryptedData] = React.useState("");
   const [keyType, setKeyType] = React.useState("symmetric");
   const [keyFileName, setKeyFileName] = React.useState("");
@@ -144,7 +138,6 @@ export default function KeysGenModal({ fetchKeys }: Props) {
           errorMessage || "An unknown error occurred during encryption.",
       });
     } finally {
-      setFolderName("");
       setData("");
       setPassphrase("");
       handleHidePrivKey();
@@ -215,10 +208,9 @@ export default function KeysGenModal({ fetchKeys }: Props) {
     clearPub(), clearPriv(), clearPair(), clearEnKey();
   };
 
-  const encryptedDataRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const encryptedDataRef = React.useRef<any | null>(null);
 
   React.useEffect(() => {
-    // Auto-focus encrypted message if available
     if (encryptedData) {
       encryptedDataRef.current?.scrollIntoView({ behavior: "smooth" });
       encryptedDataRef.current?.focus();
@@ -272,13 +264,15 @@ export default function KeysGenModal({ fetchKeys }: Props) {
             <EncryptedDataDisplay encryptedData={encryptedData} />
 
             {encryptedData && (
-              <KeySaveForm
-                keyFileName={keyFileName}
-                setKeyFileName={setKeyFileName}
-                handleSaveKey={
-                  keyType == "symmetric" ? handleSaveKey : handleSaveHybEn
-                }
-              />
+              <div ref={encryptedDataRef}>
+                <KeySaveForm
+                  keyFileName={keyFileName}
+                  setKeyFileName={setKeyFileName}
+                  handleSaveKey={
+                    keyType == "symmetric" ? handleSaveKey : handleSaveHybEn
+                  }
+                />
+              </div>
             )}
           </div>
         </div>
