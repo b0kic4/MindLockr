@@ -23,11 +23,11 @@ MindLockr is a secure, intelligent digital vault that helps you store and manage
 - **User-Friendly Interface**: Intuitive design for easy navigation and management.
 
 ## Built With
-
+- Go
+- Wails
 - React
 - Vite
-- Wails
-- Go
+
 - Chatting functionality may be developed in Rust or continue with Go.
 
 ## Installation
