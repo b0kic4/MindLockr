@@ -19,19 +19,20 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
     setIsPrivKeyVisible(false);
   }, [keyPath]);
 
-  const handleDecryptPrivKey = async (passphrase: string) => {
+  const handleDecryptPrivKey = async (passphrase: string): Promise<boolean> => {
     try {
       const decrypted = await DecryptPgpPrivKey(passphrase, keyPath);
       setDecryptedPrivKey(decrypted);
       setIsPrivKeyVisible(true);
       setIsDec(true);
 
-      // Hide the decrypted private key after 3 seconds
       setTimeout(() => {
         setDecryptedPrivKey("");
         setIsPrivKeyVisible(false);
         setIsDec(false);
       }, 5000);
+
+      return true;
     } catch (error) {
       LogError(error as any);
       toast({
@@ -41,6 +42,7 @@ export function usePrivateKeyDecryption({ keyPath }: Props) {
         description:
           "Error decrypting the private key. Please check the passphrase provided",
       });
+      return false;
     }
   };
 

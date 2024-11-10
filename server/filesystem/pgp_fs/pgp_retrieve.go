@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
 )
@@ -133,12 +134,18 @@ func (kr *PgpRetrieve) RetrieveKeyMoreInfo(keyFolderPath string) (map[string]str
 	moreInfo := make(map[string]string)
 	identities := loadedKey.GetEntity().Identities
 	for _, identity := range identities {
-		moreInfo["User Name"] = identity.Name
+		moreInfo["Name"] = identity.Name
 		moreInfo["Email"] = identity.UserId.Email
 		break
 	}
 
 	moreInfo["Fingerprint"] = loadedKey.GetFingerprint()
+
+	currentUnixTime := time.Now().Unix()
+	canEncrypt := loadedKey.CanEncrypt(currentUnixTime)
+	moreInfo["Can Encrypt"] = fmt.Sprintf("%v", canEncrypt)
+
+	moreInfo["Version"] = fmt.Sprintf("%v", loadedKey.GetVersion())
 
 	alg := loadedKey.GetEntity().PrimaryKey.PubKeyAlgo
 	stringAlg, err := cryptohelper.DetectPGPType(alg)
@@ -148,7 +155,6 @@ func (kr *PgpRetrieve) RetrieveKeyMoreInfo(keyFolderPath string) (map[string]str
 		moreInfo["Key Type"] = "Unknown"
 	}
 
-	moreInfo["Owner Trust"] = "N/A"
 	moreInfo["Key Validity"] = "Fully Valid"
 	moreInfo["Path"] = keyFolderPath
 

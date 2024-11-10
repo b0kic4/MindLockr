@@ -41,7 +41,6 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
   React.useEffect(() => {
     if (selectedKey) {
       setKeyPath(selectedKey.folderPath);
-      LogInfo(`Key path selected: ${selectedKey.folderPath}`);
     }
   }, [selectedKey]);
 

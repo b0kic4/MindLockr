@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 export default function KeysNav() {
   return (
     <div className="flex flex-col font-semibold items-center pt-4 text-center">
-      <div className="grid grid-cols-1 md:grid-cols-1 w-full lg:flex gap-4">
+      <div className="flex justify-start">
         <NavLink
           to="/keys"
           end
