@@ -150,6 +150,7 @@ func (kr *PgpRetrieve) RetrieveKeyMoreInfo(keyFolderPath string) (map[string]str
 
 	moreInfo["Owner Trust"] = "N/A"
 	moreInfo["Key Validity"] = "Fully Valid"
+	moreInfo["Path"] = keyFolderPath
 
 	return moreInfo, nil
 }

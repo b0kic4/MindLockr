@@ -4,7 +4,6 @@ import { Sidebar } from "./components/shared/sidebar/Sidebar";
 import Home from "./routes/Home";
 import KeysNav from "./routes/keys/components/KeysNav";
 import KeyringManagement from "./routes/keys/KeyringManagement";
-import KeysSigningSignature from "./routes/keys/KeysSigningSignature";
 import PGPKeys from "./routes/keys/PGPKeys";
 
 // Layout for the /keys route
@@ -32,8 +31,8 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/keys" element={<KeysLayout />}>
               <Route index element={<PGPKeys />} />
-              <Route path="keyring" element={<KeyringManagement />} />
-              <Route path="signing" element={<KeysSigningSignature />} />
+              <Route path="messages" element={<KeyringManagement />} />
+              <Route path="files" element={<KeyringManagement />} />
             </Route>
           </Routes>
         </div>
