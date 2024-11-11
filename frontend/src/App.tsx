@@ -1,3 +1,4 @@
+import Cipher from "./routes/Cipher";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { TopNav } from "./components/shared/navbar/TopNav";
 import { Sidebar } from "./components/shared/sidebar/Sidebar";
@@ -34,6 +35,7 @@ const App = () => {
               <Route path="messages" element={<KeyringManagement />} />
               <Route path="files" element={<KeyringManagement />} />
             </Route>
+            <Route path="/cipher" element={<Cipher />} />
           </Routes>
         </div>
       </div>

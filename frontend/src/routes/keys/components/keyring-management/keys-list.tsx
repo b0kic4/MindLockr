@@ -32,7 +32,6 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
   const [isClicked, setIsClicked] = React.useState<boolean>(false);
   const [passphrase, setPassphrase] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
   const [keyMoreInfo, setKeyMoreInfo] = React.useState<PGPInfo | null>(null);
 
   const { handleDecryptPrivKey, decryptedPrivKey, isDec, handleHidePrivKey } =
@@ -159,7 +158,6 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
     try {
       setKeyMoreInfo(null);
       const keyInfo = await RetrieveKeyMoreInfo(folderPath);
-
       setKeyMoreInfo(keyInfo);
     } catch (error) {
       LogError(`Failed to retrieve key information: ${error}`);
@@ -175,7 +173,7 @@ export default function ListKeys({ keys }: { keys: pgpfs.PgpKeyInfo[] }) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="p-6 bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
       <div className="flex flex-col line">
         <div className="flex px-4 py-2 justify-around text-black dark:text-white font-bold">
           <span className="w-1/3">Key Name</span>
