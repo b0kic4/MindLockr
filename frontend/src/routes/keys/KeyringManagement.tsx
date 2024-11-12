@@ -1,32 +1,17 @@
 import { Input } from "@/components/ui/input";
-import { useHybDeleteEn, useSymDeleteEn } from "@/hooks/keys/useDeleteKey";
 import { useKeys } from "@/hooks/keys/useKeys";
 import { TextSearchIcon } from "lucide-react";
 import React from "react";
 import KeysGenModal from "./components/key-gen/KeyGenModal";
 import { KeyTypeFilter } from "./components/keyring-management/KeyTypeFilter";
-import { HybridDataTable } from "./components/keyring-management/tables/hybrid-table";
-import { getHybridKeyColumns } from "./components/keyring-management/tables/hybridKeyColumns";
-import { SymmetricDataTable } from "./components/keyring-management/tables/symmetric-table";
-import { getSymmetricKeyColumns } from "./components/keyring-management/tables/symmetricKeyColumns";
+import { HybridCardList } from "./components/keyring-management/cards/pgp-card-list";
+import { SymmetricCardList } from "./components/keyring-management/cards/symmetric-card-list";
 
 export default function KeyringManagement() {
   const { keys, fetchKeys } = useKeys();
-  const [filterKeyType, setFilterKeyType] = React.useState<string>("Symmetric");
+  const [filterKeyType, setFilterKeyType] =
+    React.useState<string>("Asymmetric");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
-
-  const { handleSymDelete } = useSymDeleteEn({ fetchKeys });
-  const { handleHybDelete } = useHybDeleteEn({ fetchKeys });
-
-  const symcolumns = React.useMemo(
-    () => getSymmetricKeyColumns(handleSymDelete),
-    [handleSymDelete],
-  );
-
-  const hybcolumns = React.useMemo(
-    () => getHybridKeyColumns(handleHybDelete),
-    [handleHybDelete],
-  );
 
   const symmetricFilteredKeys = keys.symmetric.filter((key) =>
     key.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -38,16 +23,9 @@ export default function KeyringManagement() {
 
   const renderContent = () => {
     if (filterKeyType === "Symmetric") {
-      return (
-        <SymmetricDataTable data={symmetricFilteredKeys} columns={symcolumns} />
-      );
+      return <SymmetricCardList data={symmetricFilteredKeys} />;
     } else if (filterKeyType === "Asymmetric") {
-      return (
-        <HybridDataTable
-          data={hybridFilteredKeys}
-          columns={hybcolumns as any}
-        />
-      );
+      return <HybridCardList data={hybridFilteredKeys} />;
     } else {
       return (
         <p className="text-muted">

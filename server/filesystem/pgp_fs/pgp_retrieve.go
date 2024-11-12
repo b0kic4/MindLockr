@@ -102,16 +102,16 @@ func (kr *PgpRetrieve) RetrievePgpPrivKey(keyFolderPath string) (string, error) 
 }
 
 func (kr *PgpRetrieve) RetrievePgpFingerprint(keyFolderPath string) (string, error) {
-	pubKeyPath := filepath.Join(keyFolderPath, "private.asc")
+	pubKeyPath := filepath.Join(keyFolderPath, "public.asc")
 
 	pubKeyArmor, err := os.ReadFile(pubKeyPath)
 	if err != nil {
-		return "", fmt.Errorf("failed to read private key file: %v", err)
+		return "", fmt.Errorf("failed to read public key file: %v", err)
 	}
 
 	loadedPubKey, err := crypto.NewKeyFromArmored(string(pubKeyArmor))
 	if err != nil {
-		return "", fmt.Errorf("failed to load public key %v", err)
+		return "", fmt.Errorf("failed to load public key: %v", err)
 	}
 
 	fingerprint := loadedPubKey.GetFingerprint()
