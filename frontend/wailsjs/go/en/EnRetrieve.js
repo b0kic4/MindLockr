@@ -14,6 +14,10 @@ export function RetrieveAsymEn() {
   return window['go']['en']['EnRetrieve']['RetrieveAsymEn']();
 }
 
+export function RetrievePGPMsgInfo(arg1) {
+  return window['go']['en']['EnRetrieve']['RetrievePGPMsgInfo'](arg1);
+}
+
 export function RetrieveSymEn() {
   return window['go']['en']['EnRetrieve']['RetrieveSymEn']();
 }

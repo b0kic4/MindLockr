@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
 )
 
 type EnRetrieve struct {
@@ -125,4 +127,48 @@ func (kr *EnRetrieve) RetrieveAsymEn() ([]FileInfo, error) {
 	}
 
 	return files, nil
+}
+
+func (kr *EnRetrieve) RetrievePGPMsgInfo(path string) (map[string]string, error) {
+	msgPath := filepath.Join(path)
+
+	msgArmor, err := os.ReadFile(msgPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read message file: %v", err)
+	}
+
+	pgpMsg, err := crypto.NewPGPMessageFromArmored(string(msgArmor))
+	if err != nil {
+		return nil, fmt.Errorf("failed to load the pgp msg from armor: %s", err)
+	}
+	fmt.Println("Successfully loaded the PGP message from armor.")
+
+	msgInfo := make(map[string]string)
+
+	msgInfo["armor"] = string(msgArmor)
+
+	if pgpMsg.DetachedSignature != nil {
+		msgInfo["signature"] = string(pgpMsg.DetachedSignature)
+	}
+	numOfPackets, err := pgpMsg.GetNumberOfKeyPackets()
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve number of packets: %s", err)
+	}
+	msgInfo["packets"] = fmt.Sprintf("%d", numOfPackets)
+
+	encryptionKeys, ok := pgpMsg.HexEncryptionKeyIDs()
+	if ok {
+		if len(encryptionKeys) > 0 {
+			msgInfo["encryptionKeyIDs"] = fmt.Sprintf("%v", encryptionKeys)
+		}
+	}
+
+	signatureKeys, ok := pgpMsg.HexSignatureKeyIDs()
+	if ok {
+		if len(signatureKeys) > 0 {
+			msgInfo["signatureKeyIDs"] = fmt.Sprintf("%v", signatureKeys)
+		}
+	}
+
+	return msgInfo, nil
 }

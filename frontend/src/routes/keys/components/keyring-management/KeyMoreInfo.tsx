@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FiCheck, FiCopy } from "react-icons/fi";
 import React from "react";
-import { PGPInfo } from "./keys-list";
+import { PGPInfo } from "@/lib/types/keys";
 import {
   RetrievePgpPubKey,
   RetrievePgpPrivKey,

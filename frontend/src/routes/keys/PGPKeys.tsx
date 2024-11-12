@@ -35,9 +35,6 @@ export default function PGPKeys() {
       if (selectedType === "ECC") return key.type !== "RSA";
       return false;
     });
-  // I should have a component that will be displayed under the list of the keys
-  // with showing more informaiton about the key pair from entity or smth like that
-  // just like on the gpa
 
   return (
     <div className="p-6 rounded shadow-md">
