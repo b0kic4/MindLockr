@@ -14,7 +14,7 @@ export default function Home() {
         </p>
       </div>
 
-      <div className="w-full p-4 bg-muted dark:bg-muted-dark rounded-lg shadow-md">
+      <div className="w-full p-4 bg-background dark:bg-background-dark rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold mb-2">Folder Path Selection</h2>
         {folderPath ? (
           <div className="flex flex-col items-center">
