@@ -45,7 +45,7 @@ const PGPMessageInfo: React.FC<PGPMessageInfoProps> = ({ msgData }) => {
           ))}
       </ul>
       {msgData.armor && (
-        <div className="mt-4 bg-gray-100 dark:bg-gray-800 p-2 rounded-lg overflow-auto max-h-40 relative">
+        <div className="mt-4 bg-gray-100 dark:bg-background-dark p-2 rounded-lg overflow-auto max-h-40 relative">
           <pre className="text-sm whitespace-pre-wrap">{msgData.armor}</pre>
           <button
             className="absolute top-2 right-2 p-1 text-gray-500 hover:text-blue-500 transition-colors"
