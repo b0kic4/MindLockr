@@ -27,8 +27,8 @@ type (
 // 1. decrypt and validate
 // 2. decrypt
 // 3. validate
-// 4. decrypt from folder
-// 5. decrypt from text input
+// 4. decrypt from file pick
+// 5. decrypt from textarea
 func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 	pgp := crypto.PGP()
 

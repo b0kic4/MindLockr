@@ -12,12 +12,12 @@ import {
   RetrievePgpFingerprint,
   RetrievePgpPubKey,
 } from "@wailsjs/go/pgpfs/PgpRetrieve";
-import { RetrievePGPMsgInfo } from "@wailsjs/go/en/EnRetrieve";
-import { LogError } from "@wailsjs/runtime/runtime";
+import { LoadAsymEnData, RetrievePGPMsgInfo } from "@wailsjs/go/en/EnRetrieve";
+import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
 import React from "react";
 import PGPMessageInfo from "./pgp-more-info";
 
-interface HybridCardListProps {
+interface PGPCardListProps {
   data: FileInfo[];
 }
 
@@ -47,6 +47,10 @@ const handleCopy = (text: string) => {
 
 const handleAction = async (action: string, key: FileInfo) => {
   switch (action) {
+    case "copy":
+      const armor = await LoadAsymEnData(key.path);
+      handleCopy(armor);
+      break;
     case "copyPublic":
       const publicKey = await RetrievePgpPubKey(key.path);
       handleCopy(publicKey);
@@ -69,7 +73,7 @@ const handleAction = async (action: string, key: FileInfo) => {
   }
 };
 
-export function HybridCardList({ data }: HybridCardListProps) {
+export function HybridCardList({ data }: PGPCardListProps) {
   const [msgData, setMsgData] = React.useState<PGPInfo | null>(null);
 
   const moreInfo = async (item: FileInfo) => {
@@ -100,6 +104,10 @@ export function HybridCardList({ data }: HybridCardListProps) {
             </ContextMenuTrigger>
 
             <ContextMenuContent>
+              <ContextMenuItem onSelect={() => handleAction("copy", item)}>
+                Copy
+              </ContextMenuItem>
+
               <ContextMenuItem
                 onSelect={() => handleAction("copyPublic", item)}
               >

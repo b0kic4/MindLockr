@@ -141,7 +141,6 @@ func (kr *EnRetrieve) RetrievePGPMsgInfo(path string) (map[string]string, error)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load the pgp msg from armor: %s", err)
 	}
-	fmt.Println("Successfully loaded the PGP message from armor.")
 
 	msgInfo := make(map[string]string)
 
