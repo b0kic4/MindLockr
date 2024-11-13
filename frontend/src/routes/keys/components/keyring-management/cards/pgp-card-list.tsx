@@ -13,7 +13,7 @@ import {
   RetrievePgpPubKey,
 } from "@wailsjs/go/pgpfs/PgpRetrieve";
 import { LoadAsymEnData, RetrievePGPMsgInfo } from "@wailsjs/go/en/EnRetrieve";
-import { LogError, LogInfo } from "@wailsjs/runtime/runtime";
+import { LogError } from "@wailsjs/runtime/runtime";
 import React from "react";
 import PGPMessageInfo from "./pgp-more-info";
 

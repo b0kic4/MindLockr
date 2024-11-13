@@ -2,70 +2,140 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertCircle, CheckCircle, Lock, Unlock } from "lucide-react";
+import useCipherPgpData from "@/lib/store/cipher/CipherDecrytStore";
+import {
+  Decrypt,
+  DecryptAndValidate,
+  ValidateSignature,
+} from "@wailsjs/go/hybdec/HybDec";
+import { hybdec } from "@wailsjs/go/models";
+import { LogInfo } from "@wailsjs/runtime/runtime";
+import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
+import { Label } from "@components/ui/label";
 
 export default function Cipher() {
   const [pgpMessage, setPgpMessage] = React.useState("");
   const [pgpKey, setPgpKey] = React.useState("");
-  const [file, setFile] = React.useState<File | null>(null);
-  const [inputType, setInputType] = React.useState("manual");
+  const [messageFile, setMessageFile] = React.useState<File | null>(null);
+  const [keyFile, setKeyFile] = React.useState<File | null>(null);
+  const [messageInputType, setMessageInputType] = React.useState("manual");
+  const [keyInputType, setKeyInputType] = React.useState("manual");
   const [keyType, setKeyType] = React.useState("public");
   const [passphrase, setPassphrase] = React.useState("");
   const [result, setResult] = React.useState<{
     success: boolean;
     message: string;
   } | null>(null);
+  const [decryptedData, setDecryptedData] = React.useState<string | null>(null);
+  const { setSelectedKey, setSelectedMsg } = useCipherPgpData();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMessageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFile(e.target.files[0]);
+      setMessageFile(e.target.files[0]);
     }
   };
 
-  const decryptMessage = () => {
-    // Placeholder for PGP decryption logic
-    setResult({ success: true, message: "Message decrypted successfully!" });
+  const handleKeyFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setKeyFile(e.target.files[0]);
+    }
   };
 
-  const decryptAndValidate = () => {
-    // Placeholder for decryption and validation logic
-    setResult({
-      success: true,
-      message: "Message decrypted and validated successfully!",
-    });
+  // Handles decryption
+  const decryptMessage = async () => {
+    try {
+      const reqData: hybdec.RequestData = {
+        data: pgpMessage,
+        privKey: keyType === "private" ? pgpKey : "",
+        privPassphrase: passphrase,
+        pubKey: keyType === "public" ? pgpKey : "",
+      };
+      const response = await Decrypt(reqData);
+      LogInfo(JSON.stringify(response));
+      setResult({ success: true, message: "Message decrypted successfully!" });
+      // setDecryptedData(response.data || ""); // Use empty string if no data
+    } catch (error) {
+      setResult({
+        success: false,
+        message: `Decryption failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      });
+    }
   };
 
-  const validateSignature = () => {
-    // Placeholder for signature validation logic
-    setResult({ success: true, message: "Signature validated successfully!" });
+  // Handles decryption with validation
+  const decryptAndValidate = async () => {
+    try {
+      const response: hybdec.ReturnType = await DecryptAndValidate({
+        data: pgpMessage,
+        privKey: keyType === "private" ? pgpKey : "",
+        privPassphrase: passphrase,
+        pubKey: keyType === "public" ? pgpKey : "",
+      });
+      LogInfo(JSON.stringify(response));
+      // setResult({
+      //   success: response.valid,
+      //   message: response.valid
+      //     ? "Message decrypted and validated successfully!"
+      //     : "Validation failed",
+      // });
+      // setDecryptedData(response.data || "");
+    } catch (error) {
+      setResult({
+        success: false,
+        message: `Decryption and validation failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      });
+    }
+  };
+
+  // Handles signature validation
+  const validateSignature = async () => {
+    try {
+      const isValid = await ValidateSignature({
+        data: pgpMessage,
+        privKey: keyType === "private" ? pgpKey : "",
+        privPassphrase: passphrase,
+        pubKey: keyType === "public" ? pgpKey : "",
+      });
+      LogInfo(JSON.stringify(isValid));
+      setResult({
+        success: isValid,
+        message: isValid
+          ? "Signature validated successfully!"
+          : "Signature validation failed",
+      });
+    } catch (error) {
+      setResult({
+        success: false,
+        message: `Signature validation failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      });
+    }
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-background dark:bg-background-dark">
+    <Card className="w-full max-w-4xl mx-auto bg-background dark:bg-background-dark shadow-lg">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">
-          Enhanced PGP Cipher UI
+        <CardTitle className="text-2xl font-bold text-center">
+          PGP Cipher
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <Tabs
-          defaultValue="message"
-          className="w-full bg-background dark:bg-background-dark"
-        >
-          <TabsList className="grid w-full grid-cols-2 bg-background dark:bg-background-dark">
-            <TabsTrigger value="message">PGP Message</TabsTrigger>
-            <TabsTrigger value="key">PGP Key</TabsTrigger>
-          </TabsList>
-          <TabsContent value="message" className="space-y-4">
+      <CardContent className="space-y-6 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* PGP Message Section */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">PGP Message</h2>
             <div className="space-y-2">
               <Label>Input Method</Label>
               <RadioGroup
                 defaultValue="manual"
-                onValueChange={setInputType}
+                onValueChange={setMessageInputType}
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -78,7 +148,8 @@ export default function Cipher() {
                 </div>
               </RadioGroup>
             </div>
-            {inputType === "manual" ? (
+
+            {messageInputType === "manual" ? (
               <div className="space-y-2">
                 <Label htmlFor="pgp-message">PGP Armored Message</Label>
                 <Textarea
@@ -96,12 +167,15 @@ export default function Cipher() {
                   id="pgp-file"
                   type="file"
                   accept=".pgp,.asc"
-                  onChange={handleFileChange}
+                  onChange={handleMessageFileChange}
                 />
               </div>
             )}
-          </TabsContent>
-          <TabsContent value="key" className="space-y-4">
+          </div>
+
+          {/* PGP Key Section */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">PGP Key</h2>
             <div className="space-y-2">
               <Label>Key Type</Label>
               <RadioGroup
@@ -119,11 +193,12 @@ export default function Cipher() {
                 </div>
               </RadioGroup>
             </div>
+
             <div className="space-y-2">
               <Label>Input Method</Label>
               <RadioGroup
                 defaultValue="manual"
-                onValueChange={setInputType}
+                onValueChange={setKeyInputType}
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -136,7 +211,8 @@ export default function Cipher() {
                 </div>
               </RadioGroup>
             </div>
-            {inputType === "manual" ? (
+
+            {keyInputType === "manual" ? (
               <div className="space-y-2">
                 <Label htmlFor="pgp-key">
                   {keyType === "public" ? "Public" : "Private"} Key
@@ -156,62 +232,65 @@ export default function Cipher() {
                   id="key-file"
                   type="file"
                   accept=".asc"
-                  onChange={handleFileChange}
+                  onChange={handleKeyFileChange}
                 />
               </div>
             )}
+
             {keyType === "private" && (
               <div className="space-y-2">
                 <Label htmlFor="passphrase">Passphrase</Label>
                 <Input
                   id="passphrase"
                   type="password"
-                  placeholder="Enter passphrase for private key"
+                  placeholder="Enter passphrase"
                   value={passphrase}
                   onChange={(e) => setPassphrase(e.target.value)}
                 />
               </div>
             )}
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
 
-        <div className="flex flex-wrap gap-4">
-          <Button onClick={decryptMessage} className="flex items-center gap-2">
-            <Unlock className="w-4 h-4" />
-            Decrypt Message
+        {/* Action Buttons */}
+        <div className="flex space-x-4 justify-center mt-6">
+          <Button onClick={decryptMessage} variant="outline">
+            <Unlock className="mr-2" /> Decrypt
           </Button>
-          <Button
-            onClick={decryptAndValidate}
-            className="flex items-center gap-2"
-          >
-            <Lock className="w-4 h-4" />
-            Decrypt and Validate
+          <Button onClick={decryptAndValidate} variant="outline">
+            <Unlock className="mr-2" /> Decrypt & Validate
           </Button>
-          <Button
-            onClick={validateSignature}
-            className="flex items-center gap-2"
-          >
-            <CheckCircle className="w-4 h-4" />
-            Validate Signature
+          <Button onClick={validateSignature} variant="outline">
+            <CheckCircle className="mr-2" /> Validate Signature
           </Button>
         </div>
 
+        {/* Result Message */}
         {result && (
           <div
-            className={`p-4 rounded-md ${
-              result.success
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
+            className={`mt-6 p-4 rounded-lg ${
+              result.success ? "bg-green-100" : "bg-red-100"
+            } flex items-center space-x-4`}
           >
-            <div className="flex items-center gap-2">
-              {result.success ? (
-                <CheckCircle className="w-5 h-5" />
-              ) : (
-                <AlertCircle className="w-5 h-5" />
-              )}
-              <p>{result.message}</p>
-            </div>
+            {result.success ? (
+              <CheckCircle className="text-green-500" />
+            ) : (
+              <AlertCircle className="text-red-500" />
+            )}
+            <span className="text-lg font-medium">{result.message}</span>
+          </div>
+        )}
+
+        {/* Decrypted Data */}
+        {decryptedData && (
+          <div className="mt-6 space-y-2">
+            <h2 className="text-lg font-semibold">Decrypted Data</h2>
+            <Textarea
+              readOnly
+              value={decryptedData}
+              rows={5}
+              className="bg-gray-100"
+            />
           </div>
         )}
       </CardContent>
