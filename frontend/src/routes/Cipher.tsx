@@ -120,7 +120,7 @@ export default function Cipher() {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-background dark:bg-background-dark shadow-lg">
+    <Card className="w-full max-w-7xl mx-auto bg-background dark:bg-background-dark shadow-lg">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center">
           PGP Cipher
@@ -140,11 +140,11 @@ export default function Cipher() {
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="manual" id="manual-message" />
-                  <Label htmlFor="manual-message">Manual Input</Label>
+                  <Label htmlFor="manual-message">Text</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="file" id="file-message" />
-                  <Label htmlFor="file-message">File Upload</Label>
+                  <Label htmlFor="file-message">File</Label>
                 </div>
               </RadioGroup>
             </div>
@@ -174,44 +174,47 @@ export default function Cipher() {
           </div>
 
           {/* PGP Key Section */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <h2 className="text-xl font-semibold">PGP Key</h2>
-            <div className="space-y-2">
-              <Label>Key Type</Label>
-              <RadioGroup
-                defaultValue="public"
-                onValueChange={setKeyType}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="public" id="public-key" />
-                  <Label htmlFor="public-key">Public Key</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="private" id="private-key" />
-                  <Label htmlFor="private-key">Private Key</Label>
-                </div>
-              </RadioGroup>
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
+              <div className="space-y-3">
+                <Label>Key Type</Label>
+                <RadioGroup
+                  defaultValue="public"
+                  onValueChange={setKeyType}
+                  className="flex space-x-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="public" id="public-key" />
+                    <Label htmlFor="public-key">Public Key</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="private" id="private-key" />
+                    <Label htmlFor="private-key">Private Key</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-3">
+                <Label>Input Method</Label>
+                <RadioGroup
+                  defaultValue="manual"
+                  onValueChange={setKeyInputType}
+                  className="flex space-x-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="manual" id="manual-key" />
+                    <Label htmlFor="manual-key">Text</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="file" id="file-key" />
+                    <Label htmlFor="file-key">File</Label>
+                  </div>
+                </RadioGroup>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Input Method</Label>
-              <RadioGroup
-                defaultValue="manual"
-                onValueChange={setKeyInputType}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="manual" id="manual-key" />
-                  <Label htmlFor="manual-key">Manual Input</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="file" id="file-key" />
-                  <Label htmlFor="file-key">File Upload</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
+            {/* Conditional sections for key input and passphrase */}
             {keyInputType === "manual" ? (
               <div className="space-y-2">
                 <Label htmlFor="pgp-key">
@@ -253,15 +256,24 @@ export default function Cipher() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex space-x-4 justify-center mt-6">
-          <Button onClick={decryptMessage} variant="outline">
-            <Unlock className="mr-2" /> Decrypt
+        <div className="flex flex-wrap justify-center gap-4 mt-6">
+          <Button onClick={decryptMessage} className="flex items-center gap-2">
+            <Unlock className="w-4 h-4" />
+            Decrypt Message
           </Button>
-          <Button onClick={decryptAndValidate} variant="outline">
-            <Unlock className="mr-2" /> Decrypt & Validate
+          <Button
+            onClick={decryptAndValidate}
+            className="flex items-center gap-2"
+          >
+            <Lock className="w-4 h-4" />
+            Decrypt and Validate
           </Button>
-          <Button onClick={validateSignature} variant="outline">
-            <CheckCircle className="mr-2" /> Validate Signature
+          <Button
+            onClick={validateSignature}
+            className="flex items-center gap-2"
+          >
+            <CheckCircle className="w-4 h-4" />
+            Validate Signature
           </Button>
         </div>
 
