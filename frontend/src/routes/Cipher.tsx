@@ -120,11 +120,9 @@ export default function Cipher() {
   };
 
   return (
-    <Card className="w-full max-w-7xl mx-auto bg-background dark:bg-background-dark shadow-lg">
+    <Card className="w-full max-w-6xl mx-auto bg-background dark:bg-background-dark shadow-lg">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">
-          PGP Cipher
-        </CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">Cipher</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -136,7 +134,7 @@ export default function Cipher() {
               <RadioGroup
                 defaultValue="manual"
                 onValueChange={setMessageInputType}
-                className="flex space-x-4"
+                className="flex items-center justify-center space-x-4"
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="manual" id="manual-message" />
@@ -155,6 +153,7 @@ export default function Cipher() {
                 <Textarea
                   id="pgp-message"
                   placeholder="Enter PGP armored message here..."
+                  className="text-xs"
                   value={pgpMessage}
                   onChange={(e) => setPgpMessage(e.target.value)}
                   rows={5}
@@ -174,9 +173,9 @@ export default function Cipher() {
           </div>
 
           {/* PGP Key Section */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h2 className="text-xl font-semibold">PGP Key</h2>
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
+            <div className="flex flex-col md:flex-row justify-around items-center space-y-4 md:space-y-0 md:space-x-4">
               <div className="space-y-3">
                 <Label>Key Type</Label>
                 <RadioGroup
@@ -216,13 +215,14 @@ export default function Cipher() {
 
             {/* Conditional sections for key input and passphrase */}
             {keyInputType === "manual" ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="pgp-key">
                   {keyType === "public" ? "Public" : "Private"} Key
                 </Label>
                 <Textarea
                   id="pgp-key"
                   placeholder={`Enter ${keyType} key here...`}
+                  className="text-xs"
                   value={pgpKey}
                   onChange={(e) => setPgpKey(e.target.value)}
                   rows={5}
@@ -301,7 +301,7 @@ export default function Cipher() {
               readOnly
               value={decryptedData}
               rows={5}
-              className="bg-gray-100"
+              className="bg-gray-100 text-xs"
             />
           </div>
         )}
