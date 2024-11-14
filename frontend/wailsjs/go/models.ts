@@ -51,10 +51,10 @@ export namespace hybdec {
 	
 	export class RequestData {
 	    data: string;
-	    privPassphrase: string;
+	    privPassphrase?: string;
 	    folderName?: string;
-	    pubKey: string;
-	    privKey: string;
+	    pubKey?: string;
+	    privKey?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RequestData(source);
