@@ -75,28 +75,23 @@ func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 func (hd *HybDec) Decrypt(req RequestData) (ReturnType, error) {
 	pgp := crypto.PGP()
 
-	sendersPubKey, err := crypto.NewKeyFromArmored(req.PubKey)
-	if err != nil {
-		return ReturnType{}, fmt.Errorf("failed to get the pub key from armored in hyb en: %s", err)
-	}
-
 	recievers, err := crypto.NewPrivateKeyFromArmored(req.PrivKey, []byte(req.PrivKeyPassphrase))
 	if err != nil {
+		fmt.Println("Error loading receiver's private key:", err)
 		return ReturnType{}, fmt.Errorf("failed to get the priv key from armored in hyb en: %s", err)
 	}
 
 	decHandle, err := pgp.Decryption().
 		DecryptionKey(recievers).
-		VerificationKey(sendersPubKey).
 		New()
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to create decryption handle: %s", err)
 	}
 	defer decHandle.ClearPrivateParams()
 
-	// Decrypt armored message
 	decrypted, err := decHandle.Decrypt([]byte(req.PgpMessage), crypto.Armor)
 	if err != nil {
+		fmt.Println("Error decrypting message:", err)
 		return ReturnType{}, fmt.Errorf("failed to decrypt message: %s", err)
 	}
 
@@ -110,32 +105,24 @@ func (hd *HybDec) ValidateSignature(req RequestData) (bool, error) {
 
 	sendersPubKey, err := crypto.NewKeyFromArmored(req.PubKey)
 	if err != nil {
-		return false, fmt.Errorf("failed to get the pub key from armored in hyb en: %s", err)
+		return false, fmt.Errorf("failed to get the pub key from armored: %s", err)
 	}
+	fmt.Println("Sender's Public Key Loaded.")
 
-	recievers, err := crypto.NewPrivateKeyFromArmored(req.PrivKey, []byte(req.PrivKeyPassphrase))
+	verifyHandle, err := pgp.Verify().VerificationKey(sendersPubKey).New()
 	if err != nil {
-		return false, fmt.Errorf("failed to get the priv key from armored in hyb en: %s", err)
+		return false, fmt.Errorf("failed to create verification handle: %s", err)
 	}
 
-	decHandle, err := pgp.Decryption().
-		DecryptionKey(recievers).
-		VerificationKey(sendersPubKey).
-		New()
+	verifiedResult, err := verifyHandle.VerifyInline([]byte(req.PgpMessage), crypto.Armor)
 	if err != nil {
-		return false, fmt.Errorf("failed to create decryption handle: %s", err)
-	}
-	defer decHandle.ClearPrivateParams()
-
-	decrypted, err := decHandle.Decrypt([]byte(req.PgpMessage), crypto.Armor)
-	if err != nil {
-		return false, fmt.Errorf("failed to decrypt message: %s", err)
+		return false, fmt.Errorf("signature verification failed: %s", err)
 	}
 
-	if sigErr := decrypted.SignatureError(); sigErr != nil {
-		return false, fmt.Errorf("signature verification failed: %s", sigErr)
+	if sigErr := verifiedResult.SignatureError(); sigErr != nil {
+		return false, fmt.Errorf("verification failed: %s", sigErr)
 	}
-	fmt.Println("Signature is valid.")
 
+	fmt.Println("Signature verified successfully.")
 	return true, nil
 }
