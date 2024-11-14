@@ -16,12 +16,16 @@ import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
 import { Label } from "@components/ui/label";
 
 export default function Cipher() {
-  const [pgpMessage, setPgpMessage] = React.useState("");
-  const [pgpKey, setPgpKey] = React.useState("");
-  const [messageFile, setMessageFile] = React.useState<File | null>(null);
-  const [keyFile, setKeyFile] = React.useState<File | null>(null);
-  const [messageInputType, setMessageInputType] = React.useState("manual");
-  const [keyInputType, setKeyInputType] = React.useState("manual");
+  // pgp
+  const [pgpMessage, setPgpMessage] = React.useState<string>("");
+  const [pgpKey, setPgpKey] = React.useState<string>("");
+
+  const [operation, setOperation] = React.useState<
+    "decrypt" | "decryptAndValidate" | "validateSignature"
+  >("decrypt");
+
+  const [messageInputType, setMessageInputType] = React.useState("text");
+  const [keyInputType, setKeyInputType] = React.useState("text");
   const [keyType, setKeyType] = React.useState("public");
   const [passphrase, setPassphrase] = React.useState("");
   const [result, setResult] = React.useState<{
@@ -31,18 +35,39 @@ export default function Cipher() {
   const [decryptedData, setDecryptedData] = React.useState<string | null>(null);
   const { setSelectedKey, setSelectedMsg } = useCipherPgpData();
 
+  const handleOperationChange = (
+    value: "decrypt" | "decryptAndValidate" | "validateSignature",
+  ) => {
+    setOperation(value);
+  };
+
   const handleMessageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setMessageFile(e.target.files[0]);
+      const file = e.target.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result as string;
+        setPgpMessage(content);
+      };
+      reader.readAsText(file);
     }
   };
 
   const handleKeyFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setKeyFile(e.target.files[0]);
+      const file = e.target.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result as string;
+        setPgpKey(content);
+      };
+      reader.readAsText(file);
     }
   };
 
+  const handleAction = () => {};
   // Handles decryption
   const decryptMessage = async () => {
     try {
@@ -125,6 +150,26 @@ export default function Cipher() {
         <CardTitle className="text-2xl font-bold text-center">Cipher</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 p-6">
+        <h3 className="font-semibold">Choose an Operation</h3>
+        <RadioGroup
+          value={operation}
+          onValueChange={handleOperationChange}
+          className="flex flex-row justify-center items-center text-center"
+        >
+          <RadioGroupItem value="decrypt" id="decrypt" />
+          <Label htmlFor="decrypt">Decrypt</Label>
+          <RadioGroupItem value="decryptAndValidate" id="decryptAndValidate" />
+          <Label htmlFor="decryptAndValidate">
+            Decrypt and Validate Signature
+          </Label>
+          <RadioGroupItem value="validateSignature" id="validateSignature" />
+          <Label htmlFor="validateSignature">Validate Signature</Label>
+        </RadioGroup>
+
+        <div className="flex justify-center my-6">
+          <div className="w-1/2 border-t border-gray-300" />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* PGP Message Section */}
           <div className="space-y-4">
@@ -132,13 +177,13 @@ export default function Cipher() {
             <div className="space-y-2">
               <Label>Input Method</Label>
               <RadioGroup
-                defaultValue="manual"
+                defaultValue="text"
                 onValueChange={setMessageInputType}
                 className="flex items-center justify-center space-x-4"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="manual" id="manual-message" />
-                  <Label htmlFor="manual-message">Text</Label>
+                  <RadioGroupItem value="text" id="text-message" />
+                  <Label htmlFor="text-message">Text</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="file" id="file-message" />
@@ -147,13 +192,13 @@ export default function Cipher() {
               </RadioGroup>
             </div>
 
-            {messageInputType === "manual" ? (
+            {messageInputType === "text" ? (
               <div className="space-y-2">
                 <Label htmlFor="pgp-message">PGP Armored Message</Label>
                 <Textarea
                   id="pgp-message"
                   placeholder="Enter PGP armored message here..."
-                  className="text-xs"
+                  className="h-44 text-xs"
                   value={pgpMessage}
                   onChange={(e) => setPgpMessage(e.target.value)}
                   rows={5}
@@ -177,33 +222,15 @@ export default function Cipher() {
             <h2 className="text-xl font-semibold">PGP Key</h2>
             <div className="flex flex-col md:flex-row justify-around items-center space-y-4 md:space-y-0 md:space-x-4">
               <div className="space-y-3">
-                <Label>Key Type</Label>
-                <RadioGroup
-                  defaultValue="public"
-                  onValueChange={setKeyType}
-                  className="flex space-x-4"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="public" id="public-key" />
-                    <Label htmlFor="public-key">Public Key</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="private" id="private-key" />
-                    <Label htmlFor="private-key">Private Key</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-3">
                 <Label>Input Method</Label>
                 <RadioGroup
-                  defaultValue="manual"
+                  defaultValue="text"
                   onValueChange={setKeyInputType}
                   className="flex space-x-4"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="manual" id="manual-key" />
-                    <Label htmlFor="manual-key">Text</Label>
+                    <RadioGroupItem value="text" id="text-key" />
+                    <Label htmlFor="text-key">Text</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="file" id="file-key" />
@@ -214,68 +241,128 @@ export default function Cipher() {
             </div>
 
             {/* Conditional sections for key input and passphrase */}
-            {keyInputType === "manual" ? (
+            {operation === "decrypt" && (
               <div className="space-y-3">
-                <Label htmlFor="pgp-key">
-                  {keyType === "public" ? "Public" : "Private"} Key
-                </Label>
-                <Textarea
-                  id="pgp-key"
-                  placeholder={`Enter ${keyType} key here...`}
-                  className="text-xs"
-                  value={pgpKey}
-                  onChange={(e) => setPgpKey(e.target.value)}
-                  rows={5}
-                />
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Label htmlFor="key-file">Key File (.asc)</Label>
-                <Input
-                  id="key-file"
-                  type="file"
-                  accept=".asc"
-                  onChange={handleKeyFileChange}
-                />
+                <Label htmlFor="private-key">Private Key</Label>
+                {keyInputType == "text" ? (
+                  <Textarea
+                    id="private-key"
+                    placeholder="Enter private key here..."
+                    className="h-44 text-xs"
+                    value={pgpKey}
+                    onChange={(e) => setPgpKey(e.target.value)}
+                    rows={5}
+                  />
+                ) : (
+                  <Input
+                    id="pgp-file"
+                    type="file"
+                    accept=".pgp,.asc"
+                    onChange={handleKeyFileChange}
+                  />
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="passphrase">Passphrase</Label>
+                  <Input
+                    id="passphrase"
+                    type="password"
+                    placeholder="Enter passphrase"
+                    value={passphrase}
+                    onChange={(e) => setPassphrase(e.target.value)}
+                  />
+                </div>
               </div>
             )}
 
-            {keyType === "private" && (
-              <div className="space-y-2">
-                <Label htmlFor="passphrase">Passphrase</Label>
-                <Input
-                  id="passphrase"
-                  type="password"
-                  placeholder="Enter passphrase"
-                  value={passphrase}
-                  onChange={(e) => setPassphrase(e.target.value)}
-                />
+            {operation === "decryptAndValidate" && (
+              <div className="space-y-3">
+                <Label htmlFor="public-key">Public Key</Label>
+                {keyInputType == "text" ? (
+                  <Textarea
+                    id="public-key"
+                    placeholder="Enter public key here..."
+                    className="h-44 text-xs"
+                    value={pgpKey}
+                    onChange={(e) => setPgpKey(e.target.value)}
+                    rows={5}
+                  />
+                ) : (
+                  <Input
+                    id="key-file"
+                    type="file"
+                    accept=".asc"
+                    onChange={handleKeyFileChange}
+                  />
+                )}
+                <Label htmlFor="private-key">Private Key</Label>
+                {keyInputType == "text" ? (
+                  <Textarea
+                    id="private-key"
+                    placeholder="Enter private key here..."
+                    className="h-44 text-xs"
+                    value={pgpKey}
+                    onChange={(e) => setPgpKey(e.target.value)}
+                    rows={5}
+                  />
+                ) : (
+                  <Input
+                    id="key-file"
+                    type="file"
+                    accept=".asc"
+                    onChange={handleKeyFileChange}
+                  />
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="passphrase">Passphrase</Label>
+                  <Input
+                    id="passphrase"
+                    type="password"
+                    placeholder="Enter passphrase"
+                    value={passphrase}
+                    onChange={(e) => setPassphrase(e.target.value)}
+                  />
+                </div>
+                <Button>Test Private key Decryption</Button>
+              </div>
+            )}
+
+            {operation === "validateSignature" && (
+              <div className="space-y-3">
+                <Label htmlFor="public-key">Public Key</Label>
+                {keyInputType == "text" ? (
+                  <Textarea
+                    id="public-key"
+                    placeholder="Enter public key here..."
+                    className="h-44 text-xs"
+                    value={pgpKey}
+                    onChange={(e) => setPgpKey(e.target.value)}
+                    rows={5}
+                  />
+                ) : (
+                  <Input
+                    id="key-file"
+                    type="file"
+                    accept=".asc"
+                    onChange={handleKeyFileChange}
+                  />
+                )}
               </div>
             )}
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mt-6">
-          <Button onClick={decryptMessage} className="flex items-center gap-2">
-            <Unlock className="w-4 h-4" />
-            Decrypt Message
-          </Button>
-          <Button
-            onClick={decryptAndValidate}
-            className="flex items-center gap-2"
-          >
-            <Lock className="w-4 h-4" />
-            Decrypt and Validate
-          </Button>
-          <Button
-            onClick={validateSignature}
-            className="flex items-center gap-2"
-          >
+        <Button onClick={handleAction} className="flex items-center gap-2">
+          {operation === "decrypt" && <Unlock className="w-4 h-4" />}
+          {operation === "decryptAndValidate" && <Lock className="w-4 h-4" />}
+          {operation === "validateSignature" && (
             <CheckCircle className="w-4 h-4" />
-            Validate Signature
-          </Button>
-        </div>
+          )}
+          {operation === "decrypt"
+            ? "Decrypt"
+            : operation === "decryptAndValidate"
+              ? "Decrypt and Validate Signature"
+              : "Validate Signature"}
+        </Button>
 
         {/* Result Message */}
         {result && (
