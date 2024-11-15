@@ -9,22 +9,17 @@ import (
 
 type KeyStore struct{}
 
-// SaveSymmetricKey saves a symmetric encryption key to the specified folder
 func (ks *KeyStore) SaveSymEn(folderPath, fileName, keyContent string) error {
-	// Ensure the 'keys/symmetric/algorithmUsed' subdirectory exists
-	keysDir := filepath.Join(folderPath, "keys/symmetric")
+	keysDir := filepath.Join(folderPath, "sym_lockr")
 	if err := os.MkdirAll(keysDir, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create keys/symmetric/%s directory: ", err)
+		return fmt.Errorf("failed to create sym_lockr/%s directory: ", err)
 	}
 
-	// Create the full path for the key file (with .key extension)
 	keyFilePath := filepath.Join(keysDir, fileName+".key")
 
-	// Write the key content to the file
 	if err := os.WriteFile(keyFilePath, []byte(keyContent), 0644); err != nil {
 		return fmt.Errorf("failed to write key to file: %v", err)
 	}
-
 	return nil
 }
 
@@ -41,7 +36,7 @@ func (ks *KeyStore) SaveHybEn(req HybridRequestData) error {
 		return fmt.Errorf("Please initialize the folder where you want to store data")
 	}
 
-	messageDir := filepath.Join(folderPath, "keys/asymmetric")
+	messageDir := filepath.Join(folderPath, "hyb_lockr")
 	if err := os.MkdirAll(messageDir, os.ModePerm); err != nil {
 		return fmt.Errorf("failed to create message directory: %v", err)
 	}

@@ -90,48 +90,52 @@ export function HybridCardList({ data }: PGPCardListProps) {
   return (
     <div className="flex-col">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {data.map((item) => (
-          <ContextMenu key={item.name}>
-            <ContextMenuTrigger asChild>
-              <Card
-                onClick={() => moreInfo(item)}
-                className="shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer"
-              >
-                <CardContent className="flex bg-background dark:bg-background-dark justify-between items-center p-4">
-                  {item.name}
-                </CardContent>
-              </Card>
-            </ContextMenuTrigger>
+        {data.length > 0 ? (
+          data.map((item) => (
+            <ContextMenu key={item.name}>
+              <ContextMenuTrigger asChild>
+                <Card
+                  onClick={() => moreInfo(item)}
+                  className="shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer"
+                >
+                  <CardContent className="flex bg-background dark:bg-background-dark justify-between items-center p-4">
+                    {item.name}
+                  </CardContent>
+                </Card>
+              </ContextMenuTrigger>
 
-            <ContextMenuContent>
-              <ContextMenuItem onSelect={() => handleAction("copy", item)}>
-                Copy
-              </ContextMenuItem>
+              <ContextMenuContent>
+                <ContextMenuItem onSelect={() => handleAction("copy", item)}>
+                  Copy
+                </ContextMenuItem>
 
-              <ContextMenuItem
-                onSelect={() => handleAction("copyPublic", item)}
-              >
-                Copy Public Key
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem onSelect={() => handleAction("delete", item)}>
-                Delete Key Pair
-              </ContextMenuItem>
-              <ContextMenuItem onSelect={() => handleAction("edit", item)}>
-                Edit
-              </ContextMenuItem>
-              <ContextMenuItem onSelect={() => handleAction("export", item)}>
-                Export
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem
-                onSelect={() => handleAction("copyFingerprint", item)}
-              >
-                Copy Fingerprint
-              </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
-        ))}
+                <ContextMenuItem
+                  onSelect={() => handleAction("copyPublic", item)}
+                >
+                  Copy Public Key
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem onSelect={() => handleAction("delete", item)}>
+                  Delete Key Pair
+                </ContextMenuItem>
+                <ContextMenuItem onSelect={() => handleAction("edit", item)}>
+                  Edit
+                </ContextMenuItem>
+                <ContextMenuItem onSelect={() => handleAction("export", item)}>
+                  Export
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  onSelect={() => handleAction("copyFingerprint", item)}
+                >
+                  Copy Fingerprint
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+          ))
+        ) : (
+          <p className="text-muted">No hybrid encryption found. </p>
+        )}
       </div>
       <div className="flex-row">
         {msgData && <PGPMessageInfo msgData={msgData} />}

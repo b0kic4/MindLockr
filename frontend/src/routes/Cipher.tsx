@@ -309,7 +309,7 @@ export default function Cipher() {
                     id="public-key"
                     placeholder="Enter public key here..."
                     className="h-44 text-xs"
-                    value={pgpKey}
+                    value={pubPgpKey}
                     onChange={(e) => setPubPgpKey(e.target.value)}
                     rows={5}
                   />
@@ -361,8 +361,8 @@ export default function Cipher() {
                     id="public-key"
                     placeholder="Enter public key here..."
                     className="h-44 text-xs"
-                    value={pgpKey}
-                    onChange={(e) => setPgpKey(e.target.value)}
+                    value={pubPgpKey}
+                    onChange={(e) => setPubPgpKey(e.target.value)}
                     rows={5}
                   />
                 ) : (
@@ -370,7 +370,7 @@ export default function Cipher() {
                     id="key-file"
                     type="file"
                     accept=".asc"
-                    onChange={handlePrivKeyFileChange}
+                    onChange={handlePubKeyFileChange}
                   />
                 )}
               </div>

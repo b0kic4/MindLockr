@@ -30,7 +30,7 @@ type PgpKeyInfo struct {
 }
 
 func (kr *PgpRetrieve) RetrievePgpKeys() ([]PgpKeyInfo, error) {
-	folderPath := filepath.Join(kr.folderInstance.GetFolderPath(), "pgp")
+	folderPath := filepath.Join(kr.folderInstance.GetFolderPath(), "pgp-keys")
 	return kr.getPgpKeysFromDirectory(folderPath)
 }
 

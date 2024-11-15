@@ -29,6 +29,7 @@ type (
 // 3. validate
 // 4. decrypt from file pick
 // 5. decrypt from textarea
+
 func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 	pgp := crypto.PGP()
 
@@ -51,13 +52,11 @@ func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 	}
 	defer decHandle.ClearPrivateParams()
 
-	// Decrypt armored message
 	decrypted, err := decHandle.Decrypt([]byte(req.PgpMessage), crypto.Armor)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to decrypt message: %s", err)
 	}
 
-	// Verify signature
 	if sigErr := decrypted.SignatureError(); sigErr != nil {
 		return ReturnType{
 			data:  string(decrypted.Bytes()),
@@ -65,6 +64,7 @@ func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 		}, fmt.Errorf("signature verification failed: %s", sigErr)
 	}
 	fmt.Println("Signature is valid.")
+	fmt.Println("data: ", decrypted.Bytes())
 
 	return ReturnType{
 		data:  string(decrypted.Bytes()),
@@ -111,15 +111,18 @@ func (hd *HybDec) ValidateSignature(req RequestData) (bool, error) {
 
 	verifyHandle, err := pgp.Verify().VerificationKey(sendersPubKey).New()
 	if err != nil {
+		fmt.Println("failed to create verification handle: ", err)
 		return false, fmt.Errorf("failed to create verification handle: %s", err)
 	}
 
 	verifiedResult, err := verifyHandle.VerifyInline([]byte(req.PgpMessage), crypto.Armor)
 	if err != nil {
+		fmt.Println("signature verification failed: ", err)
 		return false, fmt.Errorf("signature verification failed: %s", err)
 	}
 
 	if sigErr := verifiedResult.SignatureError(); sigErr != nil {
+		fmt.Println("verification failed: ", err)
 		return false, fmt.Errorf("verification failed: %s", sigErr)
 	}
 
