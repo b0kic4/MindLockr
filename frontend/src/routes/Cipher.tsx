@@ -1,10 +1,10 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, CheckCircle, Lock, Unlock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import useCipherPgpData from "@/lib/store/cipher/CipherDecrytStore";
+import { Label } from "@components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
 import {
   Decrypt,
   DecryptAndValidate,
@@ -12,13 +12,14 @@ import {
 } from "@wailsjs/go/hybdec/HybDec";
 import { hybdec } from "@wailsjs/go/models";
 import { LogInfo } from "@wailsjs/runtime/runtime";
-import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group";
-import { Label } from "@components/ui/label";
+import { AlertCircle, CheckCircle, Lock, Unlock } from "lucide-react";
+import React from "react";
 
 export default function Cipher() {
   // pgp
   const [pgpMessage, setPgpMessage] = React.useState<string>("");
   const [pgpKey, setPgpKey] = React.useState<string>("");
+  const [pubPgpKey, setPubPgpKey] = React.useState<string>("");
 
   const [operation, setOperation] = React.useState<
     "decrypt" | "decryptAndValidate" | "validateSignature"
@@ -33,6 +34,8 @@ export default function Cipher() {
     message: string;
   } | null>(null);
   const [decryptedData, setDecryptedData] = React.useState<string | null>(null);
+
+  // state for saving the form inputs
   const { setSelectedKey, setSelectedMsg } = useCipherPgpData();
 
   const handleOperationChange = (
@@ -54,7 +57,20 @@ export default function Cipher() {
     }
   };
 
-  const handleKeyFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePubKeyFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result as string;
+        setPubPgpKey(content);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handlePrivKeyFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const file = e.target.files[0];
 
@@ -67,15 +83,28 @@ export default function Cipher() {
     }
   };
 
-  const handleAction = () => {};
-  // Handles decryption
+  const handleAction = async () => {
+    LogInfo("action");
+    LogInfo(operation);
+    try {
+      if (operation === "decrypt") {
+        await decryptMessage();
+      } else if (operation === "decryptAndValidate") {
+        await decryptAndValidate();
+      } else if (operation === "validateSignature") {
+        await validateSignature();
+      }
+    } catch (error) {
+      LogInfo("Operation not supported");
+    }
+  };
   const decryptMessage = async () => {
     try {
+      LogInfo("in decrypt message");
       const reqData: hybdec.RequestData = {
         data: pgpMessage,
-        privKey: keyType === "private" ? pgpKey : "",
+        privKey: pgpKey,
         privPassphrase: passphrase,
-        pubKey: keyType === "public" ? pgpKey : "",
       };
       const response = await Decrypt(reqData);
       LogInfo(JSON.stringify(response));
@@ -96,9 +125,9 @@ export default function Cipher() {
     try {
       const response: hybdec.ReturnType = await DecryptAndValidate({
         data: pgpMessage,
-        privKey: keyType === "private" ? pgpKey : "",
+        pubKey: pubPgpKey,
+        privKey: pgpKey,
         privPassphrase: passphrase,
-        pubKey: keyType === "public" ? pgpKey : "",
       });
       LogInfo(JSON.stringify(response));
       // setResult({
@@ -123,9 +152,9 @@ export default function Cipher() {
     try {
       const isValid = await ValidateSignature({
         data: pgpMessage,
-        privKey: keyType === "private" ? pgpKey : "",
+        pubKey: pubPgpKey,
+        privKey: pgpKey,
         privPassphrase: passphrase,
-        pubKey: keyType === "public" ? pgpKey : "",
       });
       LogInfo(JSON.stringify(isValid));
       setResult({
@@ -246,19 +275,19 @@ export default function Cipher() {
                 <Label htmlFor="private-key">Private Key</Label>
                 {keyInputType == "text" ? (
                   <Textarea
-                    id="private-key"
-                    placeholder="Enter private key here..."
+                    id="public-key"
+                    placeholder="Enter public key here..."
                     className="h-44 text-xs"
                     value={pgpKey}
-                    onChange={(e) => setPgpKey(e.target.value)}
+                    onChange={(e) => setPubPgpKey(e.target.value)}
                     rows={5}
                   />
                 ) : (
                   <Input
-                    id="pgp-file"
+                    id="key-file"
                     type="file"
-                    accept=".pgp,.asc"
-                    onChange={handleKeyFileChange}
+                    accept=".asc"
+                    onChange={handlePubKeyFileChange}
                   />
                 )}
                 <div className="space-y-2">
@@ -282,8 +311,8 @@ export default function Cipher() {
                     id="public-key"
                     placeholder="Enter public key here..."
                     className="h-44 text-xs"
-                    value={pgpKey}
-                    onChange={(e) => setPgpKey(e.target.value)}
+                    value={pubPgpKey}
+                    onChange={(e) => setPubPgpKey(e.target.value)}
                     rows={5}
                   />
                 ) : (
@@ -291,7 +320,7 @@ export default function Cipher() {
                     id="key-file"
                     type="file"
                     accept=".asc"
-                    onChange={handleKeyFileChange}
+                    onChange={handlePubKeyFileChange}
                   />
                 )}
                 <Label htmlFor="private-key">Private Key</Label>
@@ -309,7 +338,7 @@ export default function Cipher() {
                     id="key-file"
                     type="file"
                     accept=".asc"
-                    onChange={handleKeyFileChange}
+                    onChange={handlePrivKeyFileChange}
                   />
                 )}
                 <div className="space-y-2">
@@ -334,6 +363,25 @@ export default function Cipher() {
                     id="public-key"
                     placeholder="Enter public key here..."
                     className="h-44 text-xs"
+                    value={pubPgpKey}
+                    onChange={(e) => setPubPgpKey(e.target.value)}
+                    rows={5}
+                  />
+                ) : (
+                  <Input
+                    id="key-file"
+                    type="file"
+                    accept=".asc"
+                    onChange={handlePubKeyFileChange}
+                  />
+                )}
+
+                <Label htmlFor="private-key">Private Key</Label>
+                {keyInputType == "text" ? (
+                  <Textarea
+                    id="private-key"
+                    placeholder="Enter public key here..."
+                    className="h-44 text-xs"
                     value={pgpKey}
                     onChange={(e) => setPgpKey(e.target.value)}
                     rows={5}
@@ -343,9 +391,21 @@ export default function Cipher() {
                     id="key-file"
                     type="file"
                     accept=".asc"
-                    onChange={handleKeyFileChange}
+                    onChange={handlePrivKeyFileChange}
                   />
                 )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="passphrase">Passphrase</Label>
+                  <Input
+                    id="passphrase"
+                    type="password"
+                    placeholder="Enter passphrase"
+                    value={passphrase}
+                    onChange={(e) => setPassphrase(e.target.value)}
+                  />
+                </div>
+                <Button>Test Private key Decryption</Button>
               </div>
             )}
           </div>

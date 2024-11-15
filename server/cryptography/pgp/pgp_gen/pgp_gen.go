@@ -55,13 +55,11 @@ func (pgpKeysGen *PgpKeysGen) GenStoreRSA(req RequestData) (ReturnType, error) {
 
 	switch req.Bits {
 	case 4096:
-		// Generate a High Security RSA Key (4096 bits)
 		rsaKeyHigh, err := keyGenHandle.GenerateKeyWithSecurity(constants.HighSecurity)
 		if err != nil {
 			return ReturnType{}, fmt.Errorf("error occurred when generating HighSecurity RSA key: %s", err)
 		}
 
-		// Extract the public key (armored)
 		pubKey, err = rsaKeyHigh.GetArmoredPublicKey()
 		if err != nil {
 			return ReturnType{}, fmt.Errorf("failed while extracting armored public key: %s", err)
@@ -78,13 +76,11 @@ func (pgpKeysGen *PgpKeysGen) GenStoreRSA(req RequestData) (ReturnType, error) {
 		}
 
 	case 3072:
-		// Generate a Standard RSA Key (3072 bits)
 		rsaKey, err := keyGenHandle.GenerateKey()
 		if err != nil {
 			return ReturnType{}, fmt.Errorf("error occurred when generating RSA key: %s", err)
 		}
 
-		// Extract the public key (armored)
 		pubKey, err = rsaKey.GetArmoredPublicKey()
 		if err != nil {
 			return ReturnType{}, fmt.Errorf("failed while extracting armored public key: %s", err)
@@ -155,19 +151,16 @@ func (pgpKeysGen *PgpKeysGen) GenStoreECC(req RequestData) (ReturnType, error) {
 		return ReturnType{}, fmt.Errorf("unsupported curve type: %v", req.Curve)
 	}
 
-	// Extract the public key (armored)
 	pubKey, err := ecKey.GetArmoredPublicKey()
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed while extracting armored public key: %s", err)
 	}
 
-	// Lock the private key with the passphrase
 	lockedKey, err := pgp.LockKey(ecKey, []byte(req.Passphrase))
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("error when locking the private key: %s", err)
 	}
 
-	// Get the armored private key
 	privKey, err := lockedKey.Armor()
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed while extracting armored private key: %s", err)
@@ -190,7 +183,6 @@ func (pgpKeysGen *PgpKeysGen) GenStoreECC(req RequestData) (ReturnType, error) {
 }
 
 // generate without storing
-
 func (pgpKeysGen *PgpKeysGen) GenRSA(req RequestData) (ReturnType, error) {
 	pgp4880 := crypto.PGPWithProfile(profile.RFC4880())
 	keyGenHandle := pgp4880.KeyGeneration().AddUserId(req.Name, req.Email).New()
@@ -199,13 +191,11 @@ func (pgpKeysGen *PgpKeysGen) GenRSA(req RequestData) (ReturnType, error) {
 
 	switch req.Bits {
 	case 4096:
-		// Generate a High Security RSA Key (4096 bits)
 		rsaKeyHigh, err := keyGenHandle.GenerateKeyWithSecurity(constants.HighSecurity)
 		if err != nil {
 			return ReturnType{}, fmt.Errorf("error occurred when generating HighSecurity RSA key: %s", err)
 		}
 
-		// Extract the public key (armored)
 		pubKey, err = rsaKeyHigh.GetArmoredPublicKey()
 		if err != nil {
 			return ReturnType{}, fmt.Errorf("failed while extracting armored public key: %s", err)
@@ -222,13 +212,11 @@ func (pgpKeysGen *PgpKeysGen) GenRSA(req RequestData) (ReturnType, error) {
 		}
 
 	case 3072:
-		// Generate a Standard RSA Key (3072 bits)
 		rsaKey, err := keyGenHandle.GenerateKey()
 		if err != nil {
 			return ReturnType{}, fmt.Errorf("error occurred when generating RSA key: %s", err)
 		}
 
-		// Extract the public key (armored)
 		pubKey, err = rsaKey.GetArmoredPublicKey()
 		if err != nil {
 			return ReturnType{}, fmt.Errorf("failed while extracting armored public key: %s", err)
@@ -287,19 +275,16 @@ func (pgpKeysGen *PgpKeysGen) GenECC(req RequestData) (ReturnType, error) {
 		return ReturnType{}, fmt.Errorf("unsupported curve type: %v", req.Curve)
 	}
 
-	// Extract the public key (armored)
 	pubKey, err := ecKey.GetArmoredPublicKey()
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed while extracting armored public key: %s", err)
 	}
 
-	// Lock the private key with the passphrase
 	lockedKey, err := pgp.LockKey(ecKey, []byte(req.Passphrase))
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("error when locking the private key: %s", err)
 	}
 
-	// Get the armored private key
 	privKey, err := lockedKey.Armor()
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed while extracting armored private key: %s", err)

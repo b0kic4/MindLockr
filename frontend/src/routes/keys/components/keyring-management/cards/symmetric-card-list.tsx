@@ -15,20 +15,24 @@ interface SymmetricCardListProps {
 export function SymmetricCardList({ data }: SymmetricCardListProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {data.map((item) => (
-        <ContextMenu>
-          <ContextMenuTrigger asChild>
-            <Card
-              key={item.name}
-              className="shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer"
-            >
-              <CardContent className="flex bg-background dark:bg-background-dark justify-between items-center p-4">
-                {item.name}
-              </CardContent>
-            </Card>
-          </ContextMenuTrigger>
-        </ContextMenu>
-      ))}
+      {data.length > 0 ? (
+        data.map((item) => (
+          <ContextMenu>
+            <ContextMenuTrigger asChild>
+              <Card
+                key={item.name}
+                className="shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer"
+              >
+                <CardContent className="flex bg-background dark:bg-background-dark justify-between items-center p-4">
+                  {item.name}
+                </CardContent>
+              </Card>
+            </ContextMenuTrigger>
+          </ContextMenu>
+        ))
+      ) : (
+        <p className="text-muted">No symmetric encryption found.</p>
+      )}
     </div>
   );
 }

@@ -68,8 +68,3 @@ func (he *HybEnc) EncryptAndSign(req RequestData) (string, error) {
 
 	return string(pgpArmor), nil
 }
-
-// for transorming the already encrypted symmetric data into sharable hybrid enc
-func (he *HybEnc) TrasformHybEn(req RequestData) (string, error) {
-	return "", nil
-}

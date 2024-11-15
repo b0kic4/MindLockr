@@ -47,7 +47,7 @@ type PgpKeyInfo struct {
 
 func (kr *EnRetrieve) LoadEncryptedContent(keyName string) (string, error) {
 	folderPath := kr.folderInstance.GetFolderPath()
-	keyFilePath := filepath.Join(folderPath, "keys", "symmetric", keyName)
+	keyFilePath := filepath.Join(folderPath, "sym_lockr/", keyName)
 
 	content, err := os.ReadFile(keyFilePath)
 	if err != nil {
@@ -71,7 +71,7 @@ func (kr *EnRetrieve) LoadAsymEnData(dataFilePath string) (string, error) {
 func (kr *EnRetrieve) RetrieveSymEn() ([]KeyInfo, error) {
 	folderPath := kr.folderInstance.GetFolderPath()
 
-	keysBaseFolderPath := filepath.Join(folderPath, "keys/symmetric")
+	keysBaseFolderPath := filepath.Join(folderPath, "sym_lockr")
 
 	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("Keys folder does not exist at: %s", keysBaseFolderPath)
@@ -98,7 +98,7 @@ func (kr *EnRetrieve) RetrieveSymEn() ([]KeyInfo, error) {
 
 func (kr *EnRetrieve) RetrieveAsymEn() ([]FileInfo, error) {
 	folderPath := kr.folderInstance.GetFolderPath()
-	keysBaseFolderPath := filepath.Join(folderPath, "keys/asymmetric")
+	keysBaseFolderPath := filepath.Join(folderPath, "hyb_lockr")
 
 	if _, err := os.Stat(keysBaseFolderPath); os.IsNotExist(err) {
 		return []FileInfo{}, nil
