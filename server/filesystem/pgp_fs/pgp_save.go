@@ -15,7 +15,7 @@ func SavePgpPrivKey(privKeyArmor string, keyName string) error {
 		return fmt.Errorf("Please initialize the folder where you want to store private key")
 	}
 
-	keysDir := filepath.Join(folderPath, "pgp", keyName)
+	keysDir := filepath.Join(folderPath, "pgp-keys", keyName)
 
 	err := os.MkdirAll(keysDir, 0755)
 	if err != nil {
@@ -41,7 +41,7 @@ func SavePgpPublicKey(pubKeyArmor string, keyName string) error {
 		return fmt.Errorf("Please initialize the folder where you want to store public key")
 	}
 
-	keysDir := filepath.Join(folderPath, "pgp", keyName)
+	keysDir := filepath.Join(folderPath, "pgp-keys", keyName)
 
 	err := os.MkdirAll(keysDir, 0755)
 	if err != nil {

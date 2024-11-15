@@ -3,5 +3,3 @@
 import {hybenc} from '../models';
 
 export function EncryptAndSign(arg1:hybenc.RequestData):Promise<string>;
-
-export function TrasformHybEn(arg1:hybenc.RequestData):Promise<string>;

@@ -29,6 +29,7 @@ type (
 // 3. validate
 // 4. decrypt from file pick
 // 5. decrypt from textarea
+
 func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 	pgp := crypto.PGP()
 
@@ -51,20 +52,17 @@ func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 	}
 	defer decHandle.ClearPrivateParams()
 
-	// Decrypt armored message
 	decrypted, err := decHandle.Decrypt([]byte(req.PgpMessage), crypto.Armor)
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to decrypt message: %s", err)
 	}
 
-	// Verify signature
 	if sigErr := decrypted.SignatureError(); sigErr != nil {
 		return ReturnType{
 			data:  string(decrypted.Bytes()),
 			valid: false,
 		}, fmt.Errorf("signature verification failed: %s", sigErr)
 	}
-	fmt.Println("Signature is valid.")
 
 	return ReturnType{
 		data:  string(decrypted.Bytes()),
@@ -75,28 +73,23 @@ func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 func (hd *HybDec) Decrypt(req RequestData) (ReturnType, error) {
 	pgp := crypto.PGP()
 
-	sendersPubKey, err := crypto.NewKeyFromArmored(req.PubKey)
-	if err != nil {
-		return ReturnType{}, fmt.Errorf("failed to get the pub key from armored in hyb en: %s", err)
-	}
-
 	recievers, err := crypto.NewPrivateKeyFromArmored(req.PrivKey, []byte(req.PrivKeyPassphrase))
 	if err != nil {
+		fmt.Println("Error loading receiver's private key:", err)
 		return ReturnType{}, fmt.Errorf("failed to get the priv key from armored in hyb en: %s", err)
 	}
 
 	decHandle, err := pgp.Decryption().
 		DecryptionKey(recievers).
-		VerificationKey(sendersPubKey).
 		New()
 	if err != nil {
 		return ReturnType{}, fmt.Errorf("failed to create decryption handle: %s", err)
 	}
 	defer decHandle.ClearPrivateParams()
 
-	// Decrypt armored message
 	decrypted, err := decHandle.Decrypt([]byte(req.PgpMessage), crypto.Armor)
 	if err != nil {
+		fmt.Println("Error decrypting message:", err)
 		return ReturnType{}, fmt.Errorf("failed to decrypt message: %s", err)
 	}
 
@@ -110,16 +103,16 @@ func (hd *HybDec) ValidateSignature(req RequestData) (bool, error) {
 
 	sendersPubKey, err := crypto.NewKeyFromArmored(req.PubKey)
 	if err != nil {
-		return false, fmt.Errorf("failed to get the pub key from armored in hyb en: %s", err)
+		return false, fmt.Errorf("failed to load sender's public key: %s", err)
 	}
 
-	recievers, err := crypto.NewPrivateKeyFromArmored(req.PrivKey, []byte(req.PrivKeyPassphrase))
+	recieversPrivKey, err := crypto.NewPrivateKeyFromArmored(req.PrivKey, []byte(req.PrivKeyPassphrase))
 	if err != nil {
-		return false, fmt.Errorf("failed to get the priv key from armored in hyb en: %s", err)
+		return false, fmt.Errorf("failed to load receiver's private key: %s", err)
 	}
 
 	decHandle, err := pgp.Decryption().
-		DecryptionKey(recievers).
+		DecryptionKey(recieversPrivKey).
 		VerificationKey(sendersPubKey).
 		New()
 	if err != nil {
@@ -129,13 +122,14 @@ func (hd *HybDec) ValidateSignature(req RequestData) (bool, error) {
 
 	decrypted, err := decHandle.Decrypt([]byte(req.PgpMessage), crypto.Armor)
 	if err != nil {
-		return false, fmt.Errorf("failed to decrypt message: %s", err)
+		return false, fmt.Errorf("failed to decrypt: %s", err)
 	}
 
 	if sigErr := decrypted.SignatureError(); sigErr != nil {
 		return false, fmt.Errorf("signature verification failed: %s", sigErr)
 	}
-	fmt.Println("Signature is valid.")
+
+	fmt.Println("signature is valid")
 
 	return true, nil
 }

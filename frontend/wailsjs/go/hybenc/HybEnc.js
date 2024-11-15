@@ -5,7 +5,3 @@
 export function EncryptAndSign(arg1) {
   return window['go']['hybenc']['HybEnc']['EncryptAndSign'](arg1);
 }
-
-export function TrasformHybEn(arg1) {
-  return window['go']['hybenc']['HybEnc']['TrasformHybEn'](arg1);
-}
