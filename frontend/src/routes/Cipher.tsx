@@ -153,6 +153,8 @@ export default function Cipher() {
       const isValid = await ValidateSignature({
         data: pgpMessage,
         pubKey: pubPgpKey,
+        privKey: pgpKey,
+        privPassphrase: passphrase,
       });
       LogInfo(JSON.stringify(isValid));
       setResult({
@@ -373,6 +375,37 @@ export default function Cipher() {
                     onChange={handlePubKeyFileChange}
                   />
                 )}
+
+                <Label htmlFor="private-key">Private Key</Label>
+                {keyInputType == "text" ? (
+                  <Textarea
+                    id="private-key"
+                    placeholder="Enter public key here..."
+                    className="h-44 text-xs"
+                    value={pgpKey}
+                    onChange={(e) => setPgpKey(e.target.value)}
+                    rows={5}
+                  />
+                ) : (
+                  <Input
+                    id="key-file"
+                    type="file"
+                    accept=".asc"
+                    onChange={handlePrivKeyFileChange}
+                  />
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="passphrase">Passphrase</Label>
+                  <Input
+                    id="passphrase"
+                    type="password"
+                    placeholder="Enter passphrase"
+                    value={passphrase}
+                    onChange={(e) => setPassphrase(e.target.value)}
+                  />
+                </div>
+                <Button>Test Private key Decryption</Button>
               </div>
             )}
           </div>

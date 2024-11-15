@@ -63,8 +63,6 @@ func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 			valid: false,
 		}, fmt.Errorf("signature verification failed: %s", sigErr)
 	}
-	fmt.Println("Signature is valid.")
-	fmt.Println("data: ", decrypted.Bytes())
 
 	return ReturnType{
 		data:  string(decrypted.Bytes()),
@@ -105,27 +103,33 @@ func (hd *HybDec) ValidateSignature(req RequestData) (bool, error) {
 
 	sendersPubKey, err := crypto.NewKeyFromArmored(req.PubKey)
 	if err != nil {
-		return false, fmt.Errorf("failed to get the pub key from armored: %s", err)
+		return false, fmt.Errorf("failed to load sender's public key: %s", err)
 	}
-	fmt.Println("Sender's Public Key Loaded.")
 
-	verifyHandle, err := pgp.Verify().VerificationKey(sendersPubKey).New()
+	recieversPrivKey, err := crypto.NewPrivateKeyFromArmored(req.PrivKey, []byte(req.PrivKeyPassphrase))
 	if err != nil {
-		fmt.Println("failed to create verification handle: ", err)
-		return false, fmt.Errorf("failed to create verification handle: %s", err)
+		return false, fmt.Errorf("failed to load receiver's private key: %s", err)
 	}
 
-	verifiedResult, err := verifyHandle.VerifyInline([]byte(req.PgpMessage), crypto.Armor)
+	decHandle, err := pgp.Decryption().
+		DecryptionKey(recieversPrivKey).
+		VerificationKey(sendersPubKey).
+		New()
 	if err != nil {
-		fmt.Println("signature verification failed: ", err)
-		return false, fmt.Errorf("signature verification failed: %s", err)
+		return false, fmt.Errorf("failed to create decryption handle: %s", err)
+	}
+	defer decHandle.ClearPrivateParams()
+
+	decrypted, err := decHandle.Decrypt([]byte(req.PgpMessage), crypto.Armor)
+	if err != nil {
+		return false, fmt.Errorf("failed to decrypt: %s", err)
 	}
 
-	if sigErr := verifiedResult.SignatureError(); sigErr != nil {
-		fmt.Println("verification failed: ", err)
-		return false, fmt.Errorf("verification failed: %s", sigErr)
+	if sigErr := decrypted.SignatureError(); sigErr != nil {
+		return false, fmt.Errorf("signature verification failed: %s", sigErr)
 	}
 
-	fmt.Println("Signature verified successfully.")
+	fmt.Println("signature is valid")
+
 	return true, nil
 }
