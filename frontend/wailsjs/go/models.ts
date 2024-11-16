@@ -70,7 +70,8 @@ export namespace hybdec {
 	    }
 	}
 	export class ReturnType {
-	
+	    data: string;
+	    valid: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new ReturnType(source);
@@ -78,7 +79,8 @@ export namespace hybdec {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	
+	        this.data = source["data"];
+	        this.valid = source["valid"];
 	    }
 	}
 
