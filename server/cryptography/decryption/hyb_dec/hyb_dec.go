@@ -18,8 +18,8 @@ type (
 	}
 
 	ReturnType struct {
-		data  string
-		valid bool
+		Data  string `json:"data"`
+		Valid bool   `json:"valid"`
 	}
 )
 
@@ -59,14 +59,14 @@ func (hd *HybDec) DecryptAndValidate(req RequestData) (ReturnType, error) {
 
 	if sigErr := decrypted.SignatureError(); sigErr != nil {
 		return ReturnType{
-			data:  string(decrypted.Bytes()),
-			valid: false,
+			Data:  string(decrypted.Bytes()),
+			Valid: false,
 		}, fmt.Errorf("signature verification failed: %s", sigErr)
 	}
 
 	return ReturnType{
-		data:  string(decrypted.Bytes()),
-		valid: true,
+		Data:  string(decrypted.Bytes()),
+		Valid: true,
 	}, nil
 }
 
@@ -94,7 +94,7 @@ func (hd *HybDec) Decrypt(req RequestData) (ReturnType, error) {
 	}
 
 	return ReturnType{
-		data: string(decrypted.Bytes()),
+		Data: string(decrypted.Bytes()),
 	}, nil
 }
 
