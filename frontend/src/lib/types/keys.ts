@@ -29,3 +29,8 @@ export interface KeyData {
 export type PGPInfo = {
   [key: string]: string;
 };
+
+export type DecryptAndValidateReturnType = {
+  data: string;
+  valid: boolean;
+};
